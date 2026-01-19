@@ -42,6 +42,7 @@ const protect = async (req, res, next) => {
     req.admin = admin;
     next();
   } catch (error) {
+    console.error('Auth error:', error.message);
     return res.status(401).json({
       success: false,
       message: 'Nieprawidłowy token.'
@@ -52,6 +53,13 @@ const protect = async (req, res, next) => {
 // Middleware sprawdzający rolę
 const authorize = (...roles) => {
   return (req, res, next) => {
+    if (!req.admin) {
+      return res.status(401).json({
+        success: false,
+        message: 'Brak autoryzacji. Zaloguj się.'
+      });
+    }
+    
     if (!roles.includes(req.admin.role)) {
       return res.status(403).json({
         success: false,

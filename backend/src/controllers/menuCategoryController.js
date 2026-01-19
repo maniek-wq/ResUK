@@ -29,11 +29,7 @@ exports.getCategories = async (req, res) => {
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await MenuCategory.find()
-      .sort({ order: 1 })
-      .populate({
-        path: 'itemCount',
-        select: '_id'
-      });
+      .sort({ order: 1 });
     
     // Dodaj liczbę pozycji do każdej kategorii
     const categoriesWithCount = await Promise.all(
