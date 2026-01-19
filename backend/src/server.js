@@ -24,6 +24,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/locations', require('./routes/locations'));
 app.use('/api/reservations', require('./routes/reservations'));
 app.use('/api/tables', require('./routes/tables'));
+app.use('/api/menu', require('./routes/menu'));
 
 // Health check
 app.get('/api/health', (req, res) => {
