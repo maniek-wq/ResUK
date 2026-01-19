@@ -61,6 +61,11 @@ export const routes: Routes = [
         path: 'reservations',
         loadComponent: () => import('./admin/pages/reservations/reservations.component').then(m => m.AdminReservationsComponent),
         canActivate: [authGuard]
+      },
+      {
+        path: 'menu',
+        loadComponent: () => import('./admin/pages/menu/menu-management.component').then(m => m.MenuManagementComponent),
+        canActivate: [authGuard]
       }
     ]
   },
