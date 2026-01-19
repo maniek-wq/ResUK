@@ -72,9 +72,11 @@ exports.getAllItems = async (req, res) => {
       data: items
     });
   } catch (error) {
+    console.error('Get all items error:', error);
     res.status(500).json({
       success: false,
-      message: 'Błąd pobierania pozycji menu'
+      message: 'Błąd pobierania pozycji menu',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

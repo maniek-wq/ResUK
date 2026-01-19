@@ -54,9 +54,11 @@ exports.getAllCategories = async (req, res) => {
       data: categoriesWithCount
     });
   } catch (error) {
+    console.error('Get all categories error:', error);
     res.status(500).json({
       success: false,
-      message: 'Błąd pobierania kategorii'
+      message: 'Błąd pobierania kategorii',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
