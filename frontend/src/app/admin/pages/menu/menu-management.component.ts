@@ -328,8 +328,13 @@ export class MenuManagementComponent implements OnInit {
         this.items.set(itemsRes.data);
       }
       this.loading.set(false);
-    }).catch(() => {
+    }).catch((error) => {
+      console.error('Error loading menu data:', error);
       this.loading.set(false);
+      // Jeśli błąd 401, przekieruj do logowania
+      if (error?.status === 401 || error?.status === 403) {
+        window.location.href = '/admin/login';
+      }
     });
   }
 
