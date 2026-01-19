@@ -66,6 +66,26 @@ export const routes: Routes = [
         path: 'menu',
         loadComponent: () => import('./admin/pages/menu/menu-management.component').then(m => m.MenuManagementComponent),
         canActivate: [authGuard]
+      },
+      {
+        path: 'menu/categories/new',
+        loadComponent: () => import('./admin/pages/menu/category-editor.component').then(m => m.CategoryEditorComponent),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'menu/categories/:id/edit',
+        loadComponent: () => import('./admin/pages/menu/category-editor.component').then(m => m.CategoryEditorComponent),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'menu/items/new',
+        loadComponent: () => import('./admin/pages/menu/item-editor.component').then(m => m.ItemEditorComponent),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'menu/items/:id/edit',
+        loadComponent: () => import('./admin/pages/menu/item-editor.component').then(m => m.ItemEditorComponent),
+        canActivate: [authGuard]
       }
     ]
   },

@@ -22,7 +22,7 @@ import { MenuService, MenuCategory, MenuItem } from '../../../core/services/menu
               <p class="text-stone-500 text-sm">Edycja kategorii i pozycji menu</p>
             </div>
             <div class="flex gap-4">
-              <a routerLink="/admin/menu/categories" class="btn-primary text-sm">
+              <a routerLink="/admin/menu/categories/new" class="btn-primary text-sm">
                 + Dodaj kategorię
               </a>
               <a routerLink="/admin/menu/items/new" class="btn-primary text-sm">
@@ -88,7 +88,7 @@ import { MenuService, MenuCategory, MenuItem } from '../../../core/services/menu
 
               <div *ngIf="!loading() && categories().length === 0" class="text-center py-12 text-stone-500">
                 <p class="mb-4">Brak kategorii</p>
-                <a routerLink="/admin/menu/categories" class="btn-primary text-sm inline-block">
+                <a routerLink="/admin/menu/categories/new" class="btn-primary text-sm inline-block">
                   Utwórz pierwszą kategorię
                 </a>
               </div>
