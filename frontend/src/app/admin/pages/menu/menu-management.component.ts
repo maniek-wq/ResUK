@@ -150,16 +150,16 @@ import { filter, Subscription } from 'rxjs';
               <!-- Filters -->
               <div class="mb-6 flex gap-4">
                 <select 
-                  [(ngModel)]="selectedCategoryFilter"
-                  (change)="filterItems()"
+                  [ngModel]="selectedCategoryFilter()"
+                  (ngModelChange)="selectedCategoryFilter.set($event)"
                   class="form-input text-sm w-48"
                 >
                   <option value="">Wszystkie kategorie</option>
                   <option *ngFor="let cat of categories()" [value]="cat._id">{{ cat.name }}</option>
                 </select>
                 <select 
-                  [(ngModel)]="availabilityFilter"
-                  (change)="filterItems()"
+                  [ngModel]="availabilityFilter()"
+                  (ngModelChange)="availabilityFilter.set($event)"
                   class="form-input text-sm w-48"
                 >
                   <option value="">Wszystkie</option>
@@ -258,25 +258,27 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   loading = signal(false);
   categories = signal<MenuCategory[]>([]);
   items = signal<MenuItem[]>([]);
-  selectedCategoryFilter: string = '';
-  availabilityFilter: string = '';
+  selectedCategoryFilter = signal<string>('');
+  availabilityFilter = signal<string>('');
   private routerSubscription?: Subscription;
 
   filteredItems = computed(() => {
     let filtered = this.items();
     
     // Filtruj po kategorii
-    if (this.selectedCategoryFilter) {
+    const categoryFilter = this.selectedCategoryFilter();
+    if (categoryFilter) {
       filtered = filtered.filter(item => {
         const categoryId = typeof item.category === 'string' ? item.category : item.category._id;
-        return categoryId === this.selectedCategoryFilter;
+        return categoryId === categoryFilter;
       });
     }
     
     // Filtruj po dostępności
-    if (this.availabilityFilter === 'available') {
+    const availability = this.availabilityFilter();
+    if (availability === 'available') {
       filtered = filtered.filter(item => item.isAvailable);
-    } else if (this.availabilityFilter === 'unavailable') {
+    } else if (availability === 'unavailable') {
       filtered = filtered.filter(item => !item.isAvailable);
     }
     
@@ -360,7 +362,8 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
   }
 
   filterItems(): void {
-    // Computed signal automatycznie się zaktualizuje
+    // Computed signal automatycznie się zaktualizuje dzięki użyciu signal dla filtrów
+    // Metoda pozostaje dla kompatybilności, ale nie jest już potrzebna
   }
 
   toggleCategory(id: string): void {
