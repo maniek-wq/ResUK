@@ -1,19 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
+import { MenuService, MenuCategory, MenuItem } from '../../core/services/menu.service';
 
-interface MenuItem {
-  name: string;
-  description: string;
-  price: string;
-  tags?: string[];
-}
-
-interface MenuCategory {
-  name: string;
-  description: string;
+interface MenuCategoryWithItems extends MenuCategory {
   items: MenuItem[];
 }
 
@@ -45,8 +37,22 @@ interface MenuCategory {
     <section class="py-20 bg-warm-50">
       <div class="container mx-auto px-6">
         
+        <!-- Loading State -->
+        <div *ngIf="loading()" class="text-center py-20">
+          <div class="inline-block w-12 h-12 border-4 border-brown-200 border-t-brown-700 rounded-full animate-spin mb-4"></div>
+          <p class="text-stone-600">Ładowanie menu...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error() && !loading()" class="text-center py-20">
+          <p class="text-red-600 mb-4">{{ error() }}</p>
+          <button (click)="loadMenu()" class="btn-primary">
+            Spróbuj ponownie
+          </button>
+        </div>
+
         <!-- Category Navigation -->
-        <div class="flex flex-wrap justify-center gap-4 mb-16">
+        <div *ngIf="!loading() && !error()" class="flex flex-wrap justify-center gap-4 mb-16">
           <button 
             *ngFor="let category of menuCategories()"
             (click)="selectCategory(category.name)"
@@ -60,9 +66,9 @@ interface MenuCategory {
         </div>
 
         <!-- Menu Items -->
-        <div class="max-w-4xl mx-auto">
+        <div *ngIf="!loading() && !error()" class="max-w-4xl mx-auto">
           <div *ngFor="let category of menuCategories()">
-            <div *ngIf="selectedCategory() === category.name || selectedCategory() === 'Wszystkie'" 
+            <div *ngIf="selectedCategory() === category.name" 
                  class="mb-16 last:mb-0">
               
               <!-- Category Header -->
@@ -70,12 +76,15 @@ interface MenuCategory {
                 <h2 class="font-display text-3xl md:text-4xl text-stone-800 font-semibold">
                   {{ category.name }}
                 </h2>
-                <p class="text-stone-600 mt-2">{{ category.description }}</p>
+                <p *ngIf="category.description" class="text-stone-600 mt-2">{{ category.description }}</p>
                 <div class="section-divider"></div>
               </div>
 
               <!-- Items Grid -->
               <div class="space-y-8">
+                <div *ngIf="category.items.length === 0" class="text-center py-12 text-stone-500">
+                  Brak pozycji w tej kategorii
+                </div>
                 <div 
                   *ngFor="let item of category.items"
                   class="group p-6 bg-white rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300"
@@ -87,26 +96,28 @@ interface MenuCategory {
                                    group-hover:text-brown-700 transition-colors">
                           {{ item.name }}
                         </h3>
-                        <div *ngIf="item.tags" class="flex gap-2">
+                        <div *ngIf="item.tags && item.tags.length > 0" class="flex gap-2">
                           <span 
                             *ngFor="let tag of item.tags"
                             class="px-2 py-0.5 text-xs font-body tracking-wide rounded-full"
                             [ngClass]="{
-                              'bg-green-100 text-green-700': tag === 'vege',
+                              'bg-green-100 text-green-700': tag === 'vege' || tag === 'wegetariańskie',
                               'bg-orange-100 text-orange-700': tag === 'ostre',
-                              'bg-yellow-100 text-yellow-700': tag === 'szef poleca'
+                              'bg-yellow-100 text-yellow-700': tag === 'szef poleca',
+                              'bg-blue-100 text-blue-700': tag === 'gluten-free' || tag === 'bez laktozy',
+                              'bg-purple-100 text-purple-700': tag === 'wegańskie'
                             }"
                           >
                             {{ tag }}
                           </span>
                         </div>
                       </div>
-                      <p class="text-stone-600 text-sm leading-relaxed">
+                      <p *ngIf="item.description" class="text-stone-600 text-sm leading-relaxed">
                         {{ item.description }}
                       </p>
                     </div>
                     <div class="font-display text-xl text-brown-700 font-semibold whitespace-nowrap">
-                      {{ item.price }}
+                      {{ formatPrice(item.price, item.currency) }}
                     </div>
                   </div>
                 </div>
@@ -141,65 +152,75 @@ interface MenuCategory {
     <app-footer></app-footer>
   `
 })
-export class MenuComponent {
-  selectedCategory = signal('Przystawki');
+export class MenuComponent implements OnInit {
+  selectedCategory = signal<string | null>(null);
+  loading = signal(false);
+  error = signal<string | null>(null);
 
-  menuCategories = signal<MenuCategory[]>([
-    {
-      name: 'Przystawki',
-      description: 'Rozpocznij swoją kulinarną przygodę',
-      items: [
-        { name: 'Tatar wołowy', description: 'Klasyczny tatar z polędwicy wołowej, podawany z żółtkiem, kaparami i korniszonami', price: '48 zł', tags: ['szef poleca'] },
-        { name: 'Carpaccio z buraka', description: 'Marynowany burak z kozim serem, rukolą i orzechami włoskimi', price: '36 zł', tags: ['vege'] },
-        { name: 'Śledź w oleju', description: 'Tradycyjny śledź matias z cebulką i ogórkiem kiszonym', price: '32 zł' },
-        { name: 'Bruschetta z pomidorami', description: 'Chrupiące pieczywo z dojrzałymi pomidorami, bazylią i oliwą', price: '28 zł', tags: ['vege'] }
-      ]
-    },
-    {
-      name: 'Zupy',
-      description: 'Domowe receptury i świeże składniki',
-      items: [
-        { name: 'Żurek staropolski', description: 'Na zakwasie, z białą kiełbasą i jajkiem', price: '26 zł' },
-        { name: 'Krem z dyni', description: 'Z pestkami dyni, śmietanką i odrobiną imbiru', price: '24 zł', tags: ['vege'] },
-        { name: 'Rosół z makaronem', description: 'Klarowny rosół z domowym makaronem i warzywami', price: '22 zł' },
-        { name: 'Zupa pomidorowa', description: 'Ze świeżych pomidorów z ryżem lub makaronem', price: '20 zł', tags: ['vege'] }
-      ]
-    },
-    {
-      name: 'Dania główne',
-      description: 'Serca naszej kuchni',
-      items: [
-        { name: 'Polędwica wołowa', description: 'Grillowana polędwica z sosem z zielonego pieprzu, puree ziemniaczanym i warzywami sezonowymi', price: '98 zł', tags: ['szef poleca'] },
-        { name: 'Kaczka konfitowana', description: 'Udko kacze konfit z modrą kapustą i kluskami śląskimi', price: '78 zł' },
-        { name: 'Łosoś na parze', description: 'Z sosem cytrynowo-kaparowym, szpinakiem i młodymi ziemniakami', price: '72 zł' },
-        { name: 'Kotlet schabowy', description: 'Tradycyjny schabowy z ziemniakami i surówką z kapusty', price: '52 zł' },
-        { name: 'Pierogi ruskie', description: 'Domowe pierogi z twarogiem i ziemniakami, podawane ze skwarkami', price: '38 zł', tags: ['vege'] },
-        { name: 'Risotto z grzybami', description: 'Kremowe risotto z mieszanką leśnych grzybów i parmezanem', price: '56 zł', tags: ['vege'] }
-      ]
-    },
-    {
-      name: 'Desery',
-      description: 'Słodkie zakończenie',
-      items: [
-        { name: 'Sernik nowojorski', description: 'Kremowy sernik na kruchym spodzie z sosem malinowym', price: '28 zł' },
-        { name: 'Makowiec tradycyjny', description: 'Domowy makowiec z bakaliami i lukrem', price: '24 zł' },
-        { name: 'Panna cotta', description: 'Włoski deser z wanilią i sosem z owoców leśnych', price: '26 zł' },
-        { name: 'Szarlotka na ciepło', description: 'Z lodami waniliowymi i sosem karmelowym', price: '30 zł', tags: ['szef poleca'] }
-      ]
-    },
-    {
-      name: 'Napoje',
-      description: 'Do wyboru do koloru',
-      items: [
-        { name: 'Kawa espresso', description: 'Włoska kawa z najlepszych ziaren arabiki', price: '12 zł' },
-        { name: 'Herbata liściasta', description: 'Wybór herbat premium: czarna, zielona, owocowa', price: '14 zł' },
-        { name: 'Lemoniada domowa', description: 'Świeżo wyciskana z cytryną, miętą i miodem', price: '16 zł' },
-        { name: 'Wino - kieliszek', description: 'Selekcja win z naszej karty, zapytaj kelnera', price: 'od 24 zł' }
-      ]
-    }
-  ]);
+  menuCategories = signal<MenuCategoryWithItems[]>([]);
+  
+  categoryNames = computed(() => {
+    const categories = this.menuCategories();
+    if (categories.length === 0) return [];
+    return categories.map(cat => cat.name);
+  });
+
+  constructor(private menuService: MenuService) {}
+
+  ngOnInit(): void {
+    this.loadMenu();
+  }
+
+  loadMenu(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    // Pobierz kategorie i pozycje
+    this.menuService.getCategories().subscribe({
+      next: (categoriesRes) => {
+        if (categoriesRes.success) {
+          // Pobierz pozycje dla każdej kategorii
+          const categoryPromises = categoriesRes.data.map(category =>
+            this.menuService.getItemsByCategory(category._id).toPromise().then(itemsRes => ({
+              ...category,
+              items: itemsRes?.success ? itemsRes.data : []
+            }))
+          );
+
+          Promise.all(categoryPromises).then(categoriesWithItems => {
+            this.menuCategories.set(categoriesWithItems);
+            
+            // Ustaw pierwszą kategorię jako domyślną
+            if (categoriesWithItems.length > 0 && !this.selectedCategory()) {
+              this.selectedCategory.set(categoriesWithItems[0].name);
+            }
+            
+            this.loading.set(false);
+          }).catch(() => {
+            this.error.set('Błąd pobierania menu');
+            this.loading.set(false);
+          });
+        }
+      },
+      error: () => {
+        this.error.set('Błąd pobierania menu');
+        this.loading.set(false);
+      }
+    });
+  }
 
   selectCategory(category: string): void {
     this.selectedCategory.set(category);
+  }
+
+  formatPrice(price: number, currency: string = 'PLN'): string {
+    return `${price.toFixed(2)} ${currency}`;
+  }
+
+  getSelectedCategoryData(): MenuCategoryWithItems | null {
+    const selectedName = this.selectedCategory();
+    if (!selectedName) return null;
+    
+    return this.menuCategories().find(cat => cat.name === selectedName) || null;
   }
 }
