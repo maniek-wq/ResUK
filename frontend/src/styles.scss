@@ -1,0 +1,142 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+// Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+
+// CSS Variables
+:root {
+  --color-warm-50: #faf9f7;
+  --color-warm-100: #f5f3ef;
+  --color-warm-200: #e8e4dc;
+  --color-brown-700: #895541;
+  --color-brown-800: #6f4639;
+  --color-brown-900: #5b3b31;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
+}
+
+// Base styles
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply font-body text-stone-800 bg-warm-50 antialiased;
+  overflow-x: hidden;
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  @apply font-display font-semibold tracking-tight;
+}
+
+// Custom scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-warm-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-brown-600 rounded-full;
+  
+  &:hover {
+    @apply bg-brown-700;
+  }
+}
+
+// Selection
+::selection {
+  @apply bg-brown-600 text-white;
+}
+
+// Smooth transitions for interactive elements
+a, button {
+  @apply transition-all duration-300;
+}
+
+// Animation delays utility classes
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+.delay-800 { animation-delay: 800ms; }
+
+// Initial state for animations
+.animate-on-scroll {
+  opacity: 0;
+}
+
+// Gradient text
+.gradient-text {
+  @apply bg-gradient-to-r from-brown-700 via-brown-600 to-brown-800 bg-clip-text text-transparent;
+}
+
+// Glass effect
+.glass {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-lg;
+}
+
+// Elegant underline
+.elegant-underline {
+  position: relative;
+  
+  &::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-brown-600 transition-all duration-300;
+  }
+  
+  &:hover::after {
+    @apply w-full;
+  }
+}
+
+// Button styles
+.btn-primary {
+  @apply px-8 py-3 bg-brown-700 text-white font-body font-semibold tracking-wide rounded-sm
+         hover:bg-brown-800 active:bg-brown-900
+         transform hover:scale-[1.02] active:scale-[0.98]
+         shadow-md hover:shadow-lg
+         transition-all duration-300;
+}
+
+.btn-outline {
+  @apply px-8 py-3 bg-transparent border-2 border-brown-700 text-brown-700 
+         font-body font-semibold tracking-wide rounded-sm
+         hover:bg-brown-700 hover:text-white
+         transform hover:scale-[1.02] active:scale-[0.98]
+         transition-all duration-300;
+}
+
+// Section divider
+.section-divider {
+  @apply w-24 h-0.5 bg-gradient-to-r from-transparent via-brown-600 to-transparent mx-auto my-8;
+}
+
+// Form inputs
+.form-input {
+  @apply w-full px-4 py-3 bg-warm-100 border border-warm-300 rounded-sm
+         text-stone-800 placeholder-stone-500
+         focus:outline-none focus:border-brown-600 focus:ring-2 focus:ring-brown-600/20
+         transition-all duration-300;
+}
+
+// Card style
+.card {
+  @apply bg-white rounded-sm shadow-md overflow-hidden
+         hover:shadow-xl transform hover:-translate-y-1
+         transition-all duration-300;
+}
+
+// Loading skeleton
+.skeleton {
+  @apply bg-gradient-to-r from-warm-200 via-warm-100 to-warm-200 bg-[length:200%_100%]
+         animate-shimmer;
+}
