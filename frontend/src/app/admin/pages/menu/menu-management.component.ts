@@ -124,7 +124,7 @@ import { MenuService, MenuCategory, MenuItem } from '../../../core/services/menu
                     </div>
                     <div class="flex gap-2">
                       <a 
-                        [routerLink]="['/admin/menu/categories', category._id, 'edit']"
+                        [routerLink]="['/admin/menu/categories', category._id]"
                         class="px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded hover:bg-stone-300 transition-colors"
                       >
                         Edytuj
@@ -221,7 +221,7 @@ import { MenuService, MenuCategory, MenuItem } from '../../../core/services/menu
                     </div>
                     <div class="flex gap-2 flex-col">
                       <a 
-                        [routerLink]="['/admin/menu/items', item._id, 'edit']"
+                        [routerLink]="['/admin/menu/items', item._id]"
                         class="px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded hover:bg-stone-300 transition-colors text-center"
                       >
                         Edytuj

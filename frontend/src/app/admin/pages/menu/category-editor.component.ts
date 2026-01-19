@@ -165,9 +165,17 @@ export class CategoryEditorComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
-    if (id) {
+    if (id && id !== 'new') {
       this.isEditMode.set(true);
       this.loadCategory(id);
+    } else {
+      // Tryb tworzenia - ustaw domyślną kolejność
+      this.menuService.getCategories(true).subscribe(res => {
+        if (res.success && res.data.length > 0) {
+          const maxOrder = Math.max(...res.data.map(c => c.order));
+          this.formData.order = maxOrder + 1;
+        }
+      });
     }
   }
 

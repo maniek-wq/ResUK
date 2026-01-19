@@ -308,7 +308,7 @@ export class ItemEditorComponent implements OnInit {
     this.loadCategories();
     
     const id = this.route.snapshot.params['id'];
-    if (id) {
+    if (id && id !== 'new') {
       this.isEditMode.set(true);
       this.loadItem(id);
     }
