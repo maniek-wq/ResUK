@@ -170,10 +170,18 @@ export class CategoryEditorComponent implements OnInit {
       this.loadCategory(id);
     } else {
       // Tryb tworzenia - ustaw domyślną kolejność
-      this.menuService.getCategories(true).subscribe(res => {
-        if (res.success && res.data.length > 0) {
-          const maxOrder = Math.max(...res.data.map(c => c.order));
-          this.formData.order = maxOrder + 1;
+      this.menuService.getCategories(true).subscribe({
+        next: (res) => {
+          if (res.success && res.data.length > 0) {
+            const maxOrder = Math.max(...res.data.map(c => c.order));
+            this.formData.order = maxOrder + 1;
+          }
+        },
+        error: (err) => {
+          console.error('Error loading categories:', err);
+          if (err?.status === 401 || err?.status === 403) {
+            this.router.navigate(['/admin/login']);
+          }
         }
       });
     }
