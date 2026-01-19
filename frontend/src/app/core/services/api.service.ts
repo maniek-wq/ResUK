@@ -34,7 +34,10 @@ export class ApiService {
       });
     }
     
-    return this.http.get<T>(`${this.apiUrl}${endpoint}`, {
+    const fullUrl = `${this.apiUrl}${endpoint}`;
+    console.log(`ApiService.get - fullUrl: ${fullUrl}, endpoint: ${endpoint}, apiUrl: ${this.apiUrl}`);
+    
+    return this.http.get<T>(fullUrl, {
       headers: this.getHeaders(),
       params: httpParams
     });

@@ -124,10 +124,18 @@ const mongoIdValidation = [
   handleValidation
 ];
 
+// Walidacja MongoDB ID dla categoryId
+const categoryIdValidation = [
+  param('categoryId')
+    .isMongoId().withMessage('Nieprawidłowy format ID kategorii'),
+  handleValidation
+];
+
 module.exports = {
   categoryValidation,
   menuItemValidation,
   reorderCategoriesValidation,
   reorderItemsValidation,
-  mongoIdValidation
+  mongoIdValidation,
+  categoryIdValidation
 };

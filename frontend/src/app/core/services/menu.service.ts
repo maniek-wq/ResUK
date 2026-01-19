@@ -137,7 +137,9 @@ export class MenuService {
   }
 
   getItemsByCategory(categoryId: string): Observable<{ success: boolean; count: number; data: MenuItem[] }> {
-    return this.api.get<{ success: boolean; count: number; data: MenuItem[] }>(`/menu/items/category/${categoryId}`);
+    const endpoint = `/menu/items/category/${categoryId}`;
+    console.log(`MenuService.getItemsByCategory - endpoint: ${endpoint}, categoryId: ${categoryId}, type: ${typeof categoryId}`);
+    return this.api.get<{ success: boolean; count: number; data: MenuItem[] }>(endpoint);
   }
 
   getItem(id: string): Observable<{ success: boolean; data: MenuItem }> {

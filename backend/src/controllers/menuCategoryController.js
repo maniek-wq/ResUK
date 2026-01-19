@@ -6,9 +6,12 @@ const MenuItem = require('../models/MenuItem');
 // @access  Public
 exports.getCategories = async (req, res) => {
   try {
+    console.log('GET /api/menu/categories - Pobieranie aktywnych kategorii');
     const categories = await MenuCategory.find({ isActive: true })
       .sort({ order: 1 })
       .select('-createdAt -updatedAt');
+    
+    console.log(`Znaleziono ${categories.length} aktywnych kategorii`);
     
     res.status(200).json({
       success: true,
@@ -16,9 +19,11 @@ exports.getCategories = async (req, res) => {
       data: categories
     });
   } catch (error) {
+    console.error('Błąd pobierania kategorii:', error);
     res.status(500).json({
       success: false,
-      message: 'Błąd pobierania kategorii'
+      message: 'Błąd pobierania kategorii',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

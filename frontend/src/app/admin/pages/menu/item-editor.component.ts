@@ -128,6 +128,7 @@ import { MenuService, MenuItem, MenuCategory, CreateMenuItemDto } from '../../..
                       <input 
                         type="checkbox"
                         [(ngModel)]="tags.vege"
+                        name="tag-vege"
                         (change)="updateTags()"
                         class="w-4 h-4 text-brown-700 border-stone-300 rounded"
                       >
@@ -137,6 +138,7 @@ import { MenuService, MenuItem, MenuCategory, CreateMenuItemDto } from '../../..
                       <input 
                         type="checkbox"
                         [(ngModel)]="tags.ostre"
+                        name="tag-ostre"
                         (change)="updateTags()"
                         class="w-4 h-4 text-brown-700 border-stone-300 rounded"
                       >
@@ -146,6 +148,7 @@ import { MenuService, MenuItem, MenuCategory, CreateMenuItemDto } from '../../..
                       <input 
                         type="checkbox"
                         [(ngModel)]="tags.szefPoleca"
+                        name="tag-szefPoleca"
                         (change)="updateTags()"
                         class="w-4 h-4 text-brown-700 border-stone-300 rounded"
                       >
@@ -155,6 +158,7 @@ import { MenuService, MenuItem, MenuCategory, CreateMenuItemDto } from '../../..
                       <input 
                         type="checkbox"
                         [(ngModel)]="tags.glutenFree"
+                        name="tag-glutenFree"
                         (change)="updateTags()"
                         class="w-4 h-4 text-brown-700 border-stone-300 rounded"
                       >
@@ -164,6 +168,7 @@ import { MenuService, MenuItem, MenuCategory, CreateMenuItemDto } from '../../..
                       <input 
                         type="checkbox"
                         [(ngModel)]="tags.weganskie"
+                        name="tag-weganskie"
                         (change)="updateTags()"
                         class="w-4 h-4 text-brown-700 border-stone-300 rounded"
                       >
@@ -173,6 +178,7 @@ import { MenuService, MenuItem, MenuCategory, CreateMenuItemDto } from '../../..
                       <input 
                         type="checkbox"
                         [(ngModel)]="tags.wegetarianskie"
+                        name="tag-wegetarianskie"
                         (change)="updateTags()"
                         class="w-4 h-4 text-brown-700 border-stone-300 rounded"
                       >
@@ -182,6 +188,7 @@ import { MenuService, MenuItem, MenuCategory, CreateMenuItemDto } from '../../..
                       <input 
                         type="checkbox"
                         [(ngModel)]="tags.bezLaktozy"
+                        name="tag-bezLaktozy"
                         (change)="updateTags()"
                         class="w-4 h-4 text-brown-700 border-stone-300 rounded"
                       >

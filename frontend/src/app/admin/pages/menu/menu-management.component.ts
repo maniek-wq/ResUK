@@ -1,9 +1,10 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
 import { MenuService, MenuCategory, MenuItem } from '../../../core/services/menu.service';
+import { filter, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-menu-management',
@@ -252,29 +253,30 @@ import { MenuService, MenuCategory, MenuItem } from '../../../core/services/menu
     </div>
   `
 })
-export class MenuManagementComponent implements OnInit {
+export class MenuManagementComponent implements OnInit, OnDestroy {
   activeTab = signal<'categories' | 'items'>('categories');
   loading = signal(false);
   categories = signal<MenuCategory[]>([]);
   items = signal<MenuItem[]>([]);
-  selectedCategoryFilter = signal<string>('');
-  availabilityFilter = signal<string>('');
+  selectedCategoryFilter: string = '';
+  availabilityFilter: string = '';
+  private routerSubscription?: Subscription;
 
   filteredItems = computed(() => {
     let filtered = this.items();
     
     // Filtruj po kategorii
-    if (this.selectedCategoryFilter()) {
+    if (this.selectedCategoryFilter) {
       filtered = filtered.filter(item => {
         const categoryId = typeof item.category === 'string' ? item.category : item.category._id;
-        return categoryId === this.selectedCategoryFilter();
+        return categoryId === this.selectedCategoryFilter;
       });
     }
     
     // Filtruj po dostępności
-    if (this.availabilityFilter() === 'available') {
+    if (this.availabilityFilter === 'available') {
       filtered = filtered.filter(item => item.isAvailable);
-    } else if (this.availabilityFilter() === 'unavailable') {
+    } else if (this.availabilityFilter === 'unavailable') {
       filtered = filtered.filter(item => !item.isAvailable);
     }
     
@@ -307,10 +309,29 @@ export class MenuManagementComponent implements OnInit {
     this.items().filter(item => !item.isAvailable)
   );
 
-  constructor(public menuService: MenuService) {}
+  constructor(
+    public menuService: MenuService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadData();
+    
+    // Odśwież dane po każdej nawigacji (np. po powrocie z edytora)
+    this.routerSubscription = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      // Odśwież tylko jeśli jesteśmy na tej samej stronie (/admin/menu)
+      if (event.url === '/admin/menu' || event.url.startsWith('/admin/menu?')) {
+        this.loadData();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
   }
 
   loadData(): void {

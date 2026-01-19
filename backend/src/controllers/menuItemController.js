@@ -86,11 +86,26 @@ exports.getAllItems = async (req, res) => {
 // @access  Public
 exports.getItemsByCategory = async (req, res) => {
   try {
+    const categoryId = req.params.categoryId;
+    console.log(`GET /api/menu/items/category/${categoryId} - Pobieranie pozycji dla kategorii`);
+    
+    // Sprawdź wszystkie pozycje dla tej kategorii (również niedostępne dla debugowania)
+    const allItems = await MenuItem.find({ category: categoryId }).sort({ order: 1 });
+    console.log(`Wszystkie pozycje (łącznie z niedostępnymi) dla kategorii ${categoryId}: ${allItems.length}`);
+    
+    // Filtruj tylko dostępne
     const items = await MenuItem.find({
-      category: req.params.categoryId,
+      category: categoryId,
       isAvailable: true
     })
       .sort({ order: 1 });
+    
+    console.log(`Znaleziono ${items.length} dostępnych pozycji dla kategorii ${categoryId}`);
+    
+    // Jeśli nie ma pozycji, ale są jakieś w kategorii, wyświetl ostrzeżenie
+    if (items.length === 0 && allItems.length > 0) {
+      console.warn(`UWAGA: Kategoria ${categoryId} ma ${allItems.length} pozycji, ale wszystkie są oznaczone jako niedostępne (isAvailable: false)`);
+    }
     
     res.status(200).json({
       success: true,
@@ -98,9 +113,11 @@ exports.getItemsByCategory = async (req, res) => {
       data: items
     });
   } catch (error) {
+    console.error('Błąd pobierania pozycji menu:', error);
     res.status(500).json({
       success: false,
-      message: 'Błąd pobierania pozycji menu'
+      message: 'Błąd pobierania pozycji menu',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

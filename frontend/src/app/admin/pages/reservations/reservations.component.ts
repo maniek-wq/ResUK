@@ -2,9 +2,10 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { ReservationService, Reservation, ReservationFilters } from '../../../core/services/reservation.service';
+import { ReservationService, Reservation, ReservationFilters, CreateReservationDto, AvailabilitySlot } from '../../../core/services/reservation.service';
 import { LocationService, Location } from '../../../core/services/location.service';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-admin-reservations',
@@ -22,6 +23,12 @@ import { AdminSidebarComponent } from '../../components/sidebar/sidebar.componen
               <h1 class="font-display text-2xl text-stone-800 font-semibold">Rezerwacje</h1>
               <p class="text-stone-500 text-sm">Zarządzaj rezerwacjami w obu lokalach</p>
             </div>
+            <button 
+              (click)="openAddModal()"
+              class="btn-primary text-sm px-6"
+            >
+              + Dodaj rezerwację
+            </button>
           </div>
         </header>
 
@@ -120,7 +127,7 @@ import { AdminSidebarComponent } from '../../components/sidebar/sidebar.componen
                 <p class="font-medium text-stone-800">
                   {{ reservation.customer.firstName }} {{ reservation.customer.lastName }}
                 </p>
-                <p class="text-stone-500 text-sm">{{ reservation.customer.email }}</p>
+                <p *ngIf="reservation.customer.email" class="text-stone-500 text-sm">{{ reservation.customer.email }}</p>
                 <p class="text-stone-400 text-xs">{{ reservation.customer.phone }}</p>
               </div>
               
@@ -199,6 +206,214 @@ import { AdminSidebarComponent } from '../../components/sidebar/sidebar.componen
             </div>
           </div>
         </main>
+      </div>
+
+      <!-- Add Reservation Modal -->
+      <div *ngIf="showAddModal()" 
+           class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div class="bg-white rounded-sm shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div class="p-6 border-b border-warm-200 flex items-center justify-between">
+            <h2 class="font-display text-xl text-stone-800 font-semibold">Dodaj rezerwację</h2>
+            <button (click)="closeAddModal()" class="text-stone-400 hover:text-stone-600">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="p-6 space-y-4">
+            <!-- Location -->
+            <div>
+              <label class="block text-stone-600 text-sm font-medium mb-2">Lokal *</label>
+              <select 
+                [(ngModel)]="newReservation.location"
+                (change)="onAddLocationChange()"
+                class="form-input text-sm"
+                required
+              >
+                <option value="">Wybierz lokal</option>
+                <option *ngFor="let loc of locations()" [value]="loc._id">
+                  {{ loc.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Type -->
+            <div>
+              <label class="block text-stone-600 text-sm font-medium mb-2">Typ rezerwacji *</label>
+              <select [(ngModel)]="newReservation.type" (change)="onAddTypeChange()" class="form-input text-sm" required>
+                <option value="">Wybierz typ</option>
+                <option value="table">Stolik</option>
+                <option value="event">Wydarzenie</option>
+                <option value="full_venue">Cały lokal</option>
+              </select>
+            </div>
+
+            <!-- Date & Guests -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-stone-600 text-sm font-medium mb-2">Data *</label>
+                <input 
+                  type="date"
+                  [(ngModel)]="newReservation.date"
+                  (change)="onAddDateChange()"
+                  [min]="today"
+                  class="form-input text-sm"
+                  required
+                >
+              </div>
+              <div>
+                <label class="block text-stone-600 text-sm font-medium mb-2">Liczba gości *</label>
+                <input 
+                  type="number"
+                  [(ngModel)]="newReservation.guests"
+                  (change)="onAddDateChange()"
+                  min="1"
+                  class="form-input text-sm"
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Time Slot -->
+            <div *ngIf="newReservation.location && newReservation.date" class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-stone-600 text-sm font-medium mb-2">Godzina rozpoczęcia *</label>
+                <select 
+                  [(ngModel)]="newReservation.timeSlot.start"
+                  (change)="calculateEndTime()"
+                  class="form-input text-sm"
+                  required
+                >
+                  <option value="">Wybierz godzinę</option>
+                  <option *ngFor="let slot of availableTimeSlots()" [value]="slot.time">
+                    {{ slot.time }} {{ slot.available ? '' : '(zajęte)' }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-stone-600 text-sm font-medium mb-2">Godzina zakończenia *</label>
+                <input 
+                  type="time"
+                  [(ngModel)]="newReservation.timeSlot.end"
+                  class="form-input text-sm"
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Customer Details -->
+            <div class="border-t border-warm-200 pt-4">
+              <h3 class="font-semibold text-stone-800 mb-4">Dane klienta</h3>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-stone-600 text-sm font-medium mb-2">Imię *</label>
+                  <input 
+                    type="text"
+                    [(ngModel)]="newReservation.customer.firstName"
+                    class="form-input text-sm"
+                    placeholder="Jan"
+                    required
+                  >
+                </div>
+                <div>
+                  <label class="block text-stone-600 text-sm font-medium mb-2">Nazwisko *</label>
+                  <input 
+                    type="text"
+                    [(ngModel)]="newReservation.customer.lastName"
+                    class="form-input text-sm"
+                    placeholder="Kowalski"
+                    required
+                  >
+                </div>
+                <div>
+                  <label class="block text-stone-600 text-sm font-medium mb-2">Email</label>
+                  <input 
+                    type="email"
+                    [(ngModel)]="newReservation.customer.email"
+                    class="form-input text-sm"
+                    placeholder="jan@example.com (opcjonalnie)"
+                  >
+                </div>
+                <div>
+                  <label class="block text-stone-600 text-sm font-medium mb-2">Telefon *</label>
+                  <input 
+                    type="tel"
+                    [(ngModel)]="newReservation.customer.phone"
+                    class="form-input text-sm"
+                    placeholder="+48 123 456 789"
+                    required
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Event Details (if event or full_venue) -->
+            <div *ngIf="(newReservation.type === 'event' || newReservation.type === 'full_venue') && newReservation.eventDetails" class="border-t border-warm-200 pt-4">
+              <h3 class="font-semibold text-stone-800 mb-4">Szczegóły wydarzenia</h3>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-stone-600 text-sm font-medium mb-2">Nazwa wydarzenia</label>
+                  <input 
+                    type="text"
+                    [(ngModel)]="newReservation.eventDetails!.name"
+                    class="form-input text-sm"
+                    placeholder="np. Urodziny, Spotkanie firmowe"
+                  >
+                </div>
+                <div>
+                  <label class="block text-stone-600 text-sm font-medium mb-2">Opis / Specjalne wymagania</label>
+                  <textarea 
+                    [(ngModel)]="newReservation.eventDetails!.specialRequirements"
+                    rows="3"
+                    class="form-input text-sm resize-none"
+                    placeholder="Opisz swoje oczekiwania..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+              <label class="block text-stone-600 text-sm font-medium mb-2">Notatki (dla personelu)</label>
+              <textarea 
+                [(ngModel)]="newReservation.notes"
+                rows="3"
+                class="form-input text-sm resize-none"
+                placeholder="Dodatkowe informacje..."
+              ></textarea>
+            </div>
+
+            <!-- Status -->
+            <div>
+              <label class="block text-stone-600 text-sm font-medium mb-2">Status *</label>
+              <select [(ngModel)]="newReservation.status" class="form-input text-sm" required>
+                <option value="pending">Oczekująca</option>
+                <option value="confirmed">Potwierdzona</option>
+              </select>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="addErrorMessage()" class="p-4 bg-red-50 border border-red-200 rounded-sm">
+              <p class="text-red-700 text-sm">{{ addErrorMessage() }}</p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-warm-200 flex justify-end gap-4">
+            <button 
+              (click)="closeAddModal()"
+              class="px-4 py-2 text-stone-600 hover:text-stone-800 transition-colors"
+            >
+              Anuluj
+            </button>
+            <button 
+              (click)="saveNewReservation()"
+              [disabled]="!canSaveNewReservation() || addingReservation()"
+              class="px-6 py-2 bg-brown-700 text-white rounded-sm hover:bg-brown-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span *ngIf="!addingReservation()">Dodaj rezerwację</span>
+              <span *ngIf="addingReservation()">Zapisywanie...</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Edit Modal -->
@@ -308,6 +523,36 @@ export class AdminReservationsComponent implements OnInit {
     status: '',
     notes: ''
   };
+
+  showAddModal = signal(false);
+  addingReservation = signal(false);
+  addErrorMessage = signal('');
+  availableTimeSlots = signal<AvailabilitySlot[]>([]);
+  loadingAvailability = signal(false);
+
+  newReservation: CreateReservationDto & { 
+    status?: 'pending' | 'confirmed';
+    eventDetails?: { name?: string; specialRequirements?: string };
+  } = {
+    location: '',
+    type: 'table',
+    customer: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: ''
+    },
+    date: '',
+    timeSlot: {
+      start: '',
+      end: ''
+    },
+    guests: 1,
+    status: 'pending',
+    eventDetails: {}
+  };
+
+  today = new Date().toISOString().split('T')[0];
 
   constructor(
     private reservationService: ReservationService,
@@ -433,5 +678,201 @@ export class AdminReservationsComponent implements OnInit {
       full_venue: 'Lokal'
     };
     return labels[type] || type;
+  }
+
+  openAddModal(): void {
+    this.showAddModal.set(true);
+    this.addErrorMessage.set('');
+    this.newReservation = {
+      location: '',
+      type: 'table',
+      customer: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: ''
+      },
+      date: '',
+      timeSlot: {
+        start: '',
+        end: ''
+      },
+      guests: 1,
+      status: 'pending',
+      eventDetails: {}
+    };
+    this.availableTimeSlots.set([]);
+  }
+
+  closeAddModal(): void {
+    this.showAddModal.set(false);
+    this.addErrorMessage.set('');
+    this.availableTimeSlots.set([]);
+  }
+
+  async onAddLocationChange(): Promise<void> {
+    if (this.newReservation.location && this.newReservation.date) {
+      await this.loadAvailability();
+    }
+  }
+
+  async onAddTypeChange(): Promise<void> {
+    // Reset czasów przy zmianie typu
+    this.newReservation.timeSlot.start = '';
+    this.newReservation.timeSlot.end = '';
+    if (this.newReservation.location && this.newReservation.date) {
+      await this.loadAvailability();
+    }
+  }
+
+  async onAddDateChange(): Promise<void> {
+    if (this.newReservation.location && this.newReservation.date) {
+      await this.loadAvailability();
+    }
+  }
+
+  async loadAvailability(): Promise<void> {
+    if (!this.newReservation.location || !this.newReservation.date) {
+      return;
+    }
+
+    this.loadingAvailability.set(true);
+    this.addErrorMessage.set('');
+
+    try {
+      const res = await firstValueFrom(
+        this.reservationService.getAvailability(
+          this.newReservation.location,
+          this.newReservation.date,
+          this.newReservation.guests
+        )
+      );
+
+      if (res.success) {
+        this.availableTimeSlots.set(res.data.slots);
+        
+        // Ustaw domyślny czas zakończenia na podstawie wybranego czasu rozpoczęcia
+        if (this.newReservation.timeSlot.start && !this.newReservation.timeSlot.end) {
+          this.calculateEndTime();
+        }
+      }
+    } catch (error: any) {
+      console.error('Błąd pobierania dostępności:', error);
+      this.addErrorMessage.set('Błąd sprawdzania dostępności. Spróbuj ponownie.');
+      this.availableTimeSlots.set([]);
+    } finally {
+      this.loadingAvailability.set(false);
+    }
+  }
+
+  calculateEndTime(): void {
+    if (!this.newReservation.timeSlot.start) {
+      return;
+    }
+
+    // Parsuj godzinę rozpoczęcia
+    const [hours, minutes] = this.newReservation.timeSlot.start.split(':').map(Number);
+    const startDate = new Date();
+    startDate.setHours(hours, minutes, 0, 0);
+
+    // Dodaj 2 godziny (standardowy czas rezerwacji)
+    const endDate = new Date(startDate);
+    endDate.setHours(endDate.getHours() + 2);
+
+    // Formatuj jako HH:MM
+    const endHours = endDate.getHours().toString().padStart(2, '0');
+    const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+    this.newReservation.timeSlot.end = `${endHours}:${endMinutes}`;
+  }
+
+  canSaveNewReservation(): boolean {
+    return !!(
+      this.newReservation.location &&
+      this.newReservation.type &&
+      this.newReservation.date &&
+      this.newReservation.timeSlot.start &&
+      this.newReservation.timeSlot.end &&
+      this.newReservation.guests > 0 &&
+      this.newReservation.customer.firstName &&
+      this.newReservation.customer.lastName &&
+      this.newReservation.customer.phone &&
+      this.newReservation.status
+    );
+  }
+
+  async saveNewReservation(): Promise<void> {
+    if (!this.canSaveNewReservation()) {
+      return;
+    }
+
+    this.addingReservation.set(true);
+    this.addErrorMessage.set('');
+
+    try {
+      // Przygotuj dane do wysłania
+      const reservationData: any = {
+        location: this.newReservation.location,
+        type: this.newReservation.type,
+        customer: {
+          firstName: this.newReservation.customer.firstName.trim(),
+          lastName: this.newReservation.customer.lastName.trim(),
+          phone: this.newReservation.customer.phone.trim()
+        },
+        date: this.newReservation.date,
+        timeSlot: {
+          start: this.newReservation.timeSlot.start,
+          end: this.newReservation.timeSlot.end
+        },
+        guests: this.newReservation.guests
+      };
+
+      // Email jest opcjonalny
+      if (this.newReservation.customer.email && this.newReservation.customer.email.trim()) {
+        reservationData.customer.email = this.newReservation.customer.email.trim().toLowerCase();
+      }
+
+      // Email jest opcjonalny
+      if (this.newReservation.customer.email && this.newReservation.customer.email.trim()) {
+        reservationData.customer.email = this.newReservation.customer.email.trim().toLowerCase();
+      }
+
+      // Dodaj status, jeśli jest ustawiony (backend go zaakceptuje)
+      if (this.newReservation.status) {
+        reservationData.status = this.newReservation.status;
+      }
+
+      // Dodaj opcjonalne pola
+      if (this.newReservation.notes) {
+        reservationData.notes = this.newReservation.notes.trim();
+      }
+
+      if ((this.newReservation.type === 'event' || this.newReservation.type === 'full_venue') && this.newReservation.eventDetails) {
+        reservationData.eventDetails = {};
+        if (this.newReservation.eventDetails.name) {
+          reservationData.eventDetails.name = this.newReservation.eventDetails.name.trim();
+        }
+        if (this.newReservation.eventDetails.specialRequirements) {
+          reservationData.eventDetails.specialRequirements = this.newReservation.eventDetails.specialRequirements.trim();
+        }
+      }
+
+      const res = await firstValueFrom(
+        this.reservationService.createReservation(reservationData)
+      );
+
+      if (res.success) {
+        // Odśwież listę rezerwacji
+        this.applyFilters();
+        // Zamknij modal
+        this.closeAddModal();
+      }
+    } catch (error: any) {
+      console.error('Błąd dodawania rezerwacji:', error);
+      this.addErrorMessage.set(
+        error?.error?.message || 'Błąd dodawania rezerwacji. Sprawdź dane i spróbuj ponownie.'
+      );
+    } finally {
+      this.addingReservation.set(false);
+    }
   }
 }

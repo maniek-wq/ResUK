@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { MenuService, MenuCategory, MenuItem } from '../../core/services/menu.service';
@@ -171,42 +172,86 @@ export class MenuComponent implements OnInit {
     this.loadMenu();
   }
 
-  loadMenu(): void {
+  async loadMenu(): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
 
-    // Pobierz kategorie i pozycje
-    this.menuService.getCategories().subscribe({
-      next: (categoriesRes) => {
-        if (categoriesRes.success) {
-          // Pobierz pozycje dla każdej kategorii
-          const categoryPromises = categoriesRes.data.map(category =>
-            this.menuService.getItemsByCategory(category._id).toPromise().then(itemsRes => ({
-              ...category,
-              items: itemsRes?.success ? itemsRes.data : []
-            }))
-          );
-
-          Promise.all(categoryPromises).then(categoriesWithItems => {
-            this.menuCategories.set(categoriesWithItems);
-            
-            // Ustaw pierwszą kategorię jako domyślną
-            if (categoriesWithItems.length > 0 && !this.selectedCategory()) {
-              this.selectedCategory.set(categoriesWithItems[0].name);
-            }
-            
-            this.loading.set(false);
-          }).catch(() => {
-            this.error.set('Błąd pobierania menu');
-            this.loading.set(false);
-          });
-        }
-      },
-      error: () => {
-        this.error.set('Błąd pobierania menu');
-        this.loading.set(false);
+    try {
+      // Pobierz kategorie
+      const categoriesRes = await firstValueFrom(this.menuService.getCategories());
+      
+      if (!categoriesRes.success) {
+        throw new Error('Nie udało się pobrać kategorii');
       }
-    });
+
+      // Jeśli nie ma kategorii, ustaw pustą listę
+      if (!categoriesRes.data || categoriesRes.data.length === 0) {
+        this.menuCategories.set([]);
+        this.loading.set(false);
+        return;
+      }
+
+      // Pobierz pozycje dla każdej kategorii równolegle
+      const categoryPromises = categoriesRes.data.map(async (category) => {
+        try {
+          // Upewnij się, że _id jest stringiem
+          const categoryId = typeof category._id === 'string' ? category._id : String(category._id);
+          console.log(`Pobieranie pozycji dla kategorii: ${category.name} (ID: ${categoryId}, type: ${typeof category._id})`);
+          console.log(`Pełny obiekt kategorii:`, category);
+          
+          const itemsRes = await firstValueFrom(
+            this.menuService.getItemsByCategory(categoryId)
+          );
+          console.log(`Otrzymano odpowiedź dla kategorii ${category.name}:`, itemsRes);
+          
+          const items = itemsRes?.success ? (itemsRes.data || []) : [];
+          console.log(`Liczba pozycji dla kategorii ${category.name}: ${items.length}`);
+          
+          return {
+            ...category,
+            items: items
+          };
+        } catch (error) {
+          // Jeśli błąd dla jednej kategorii, zwróć kategorię z pustą listą pozycji
+          console.error(`Błąd pobierania pozycji dla kategorii ${category.name}:`, error);
+          return {
+            ...category,
+            items: []
+          };
+        }
+      });
+
+      const categoriesWithItems = await Promise.all(categoryPromises);
+      
+      // Filtruj tylko kategorie z aktywnymi pozycjami (opcjonalnie - może też pokazać puste)
+      this.menuCategories.set(categoriesWithItems);
+      
+      // Ustaw pierwszą kategorię jako domyślną
+      if (categoriesWithItems.length > 0 && !this.selectedCategory()) {
+        this.selectedCategory.set(categoriesWithItems[0].name);
+      }
+      
+      this.loading.set(false);
+    } catch (error: any) {
+      console.error('Błąd pobierania menu:', error);
+      
+      let errorMessage = 'Błąd pobierania menu. ';
+      
+      if (error?.status === 0 || error?.status === undefined) {
+        errorMessage += 'Nie można połączyć się z serwerem. Upewnij się, że serwer backend działa na http://localhost:3000';
+      } else if (error?.status === 404) {
+        errorMessage += 'Endpoint nie został znaleziony.';
+      } else if (error?.status === 500) {
+        errorMessage += 'Błąd serwera. Sprawdź logi serwera.';
+      } else if (error?.error?.message) {
+        errorMessage += error.error.message;
+      } else if (error?.message) {
+        errorMessage += error.message;
+      }
+      
+      this.error.set(errorMessage);
+      this.loading.set(false);
+    }
   }
 
   selectCategory(category: string): void {

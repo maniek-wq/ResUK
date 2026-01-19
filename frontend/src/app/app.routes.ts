@@ -81,6 +81,21 @@ export const routes: Routes = [
         path: 'menu/items/:id',
         loadComponent: () => import('./admin/pages/menu/item-editor.component').then(m => m.ItemEditorComponent),
         canActivate: [authGuard]
+      },
+      {
+        path: 'tables',
+        loadComponent: () => import('./admin/pages/tables/tables-management.component').then(m => m.TablesManagementComponent),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'tables/manage',
+        loadComponent: () => import('./admin/pages/tables/table-management.component').then(m => m.TableManagementComponent),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'locations',
+        loadComponent: () => import('./admin/pages/locations/locations-management.component').then(m => m.LocationsManagementComponent),
+        canActivate: [authGuard]
       }
     ]
   },

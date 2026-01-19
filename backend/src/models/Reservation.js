@@ -32,7 +32,7 @@ const reservationSchema = new mongoose.Schema({
     },
     email: {
       type: String,
-      required: [true, 'Email jest wymagany'],
+      required: false,
       trim: true,
       lowercase: true
     },

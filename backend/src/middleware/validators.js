@@ -32,8 +32,8 @@ const reservationValidation = [
     .notEmpty().withMessage('Nazwisko jest wymagane')
     .isLength({ min: 2, max: 50 }).withMessage('Nazwisko musi mieć 2-50 znaków'),
   body('customer.email')
+    .optional()
     .trim()
-    .notEmpty().withMessage('Email jest wymagany')
     .isEmail().withMessage('Nieprawidłowy format email'),
   body('customer.phone')
     .trim()

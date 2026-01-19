@@ -33,21 +33,13 @@ const {
   menuItemValidation,
   reorderCategoriesValidation,
   reorderItemsValidation,
-  mongoIdValidation
+  mongoIdValidation,
+  categoryIdValidation
 } = require('../middleware/menuValidators');
 
-// ========== PUBLIC ROUTES (Klienci) ==========
-
-// Kategorie
-router.get('/categories', getCategories);
-router.get('/categories/:id', mongoIdValidation, getCategory);
-
-// Pozycje menu
-router.get('/items', getItems);
-router.get('/items/:id', mongoIdValidation, getItem);
-router.get('/items/category/:categoryId', mongoIdValidation, getItemsByCategory);
-
 // ========== ADMIN/MANAGER ROUTES ==========
+// UWAGA: Chronione route'y muszą być PRZED publicznymi z parametrami dynamicznymi
+// Express dopasowuje route'y w kolejności - /all musi być przed /:id
 
 // Kategorie - zarządzanie
 router.get('/categories/all', protect, authorize('admin', 'manager'), getAllCategories);
@@ -65,5 +57,17 @@ router.delete('/items/:id', protect, authorize('admin', 'manager'), mongoIdValid
 router.patch('/items/:id/toggle-availability', protect, authorize('admin', 'manager'), mongoIdValidation, toggleAvailability);
 router.patch('/items/reorder', protect, authorize('admin', 'manager'), reorderItemsValidation, reorderItems);
 router.post('/items/:id/duplicate', protect, authorize('admin', 'manager'), mongoIdValidation, duplicateItem);
+
+// ========== PUBLIC ROUTES (Klienci) ==========
+// Publiczne route'y po chronionych (aby /categories/:id nie przechwytywało /categories/all)
+
+// Kategorie
+router.get('/categories', getCategories);
+router.get('/categories/:id', mongoIdValidation, getCategory);
+
+// Pozycje menu
+router.get('/items', getItems);
+router.get('/items/category/:categoryId', categoryIdValidation, getItemsByCategory);
+router.get('/items/:id', mongoIdValidation, getItem);
 
 module.exports = router;
