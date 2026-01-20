@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
+import { SidebarService } from '../../services/sidebar.service';
 import { LocationService, Location } from '../../../core/services/location.service';
 import { ApiService } from '../../../core/services/api.service';
 import { firstValueFrom } from 'rxjs';
@@ -47,19 +48,30 @@ interface StatisticsFromReservations {
     <div class="min-h-screen bg-warm-100 flex">
       <app-admin-sidebar></app-admin-sidebar>
 
-      <div class="flex-1 ml-64">
+      <div class="flex-1 md:ml-64">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-warm-200 px-8 py-4">
+        <header class="bg-white shadow-sm border-b border-warm-200 px-4 md:px-8 py-4">
           <div class="flex items-center justify-between">
-            <div>
-              <h1 class="font-display text-2xl text-stone-800 font-semibold">Zarządzanie Lokalmi</h1>
-              <p class="text-stone-500 text-sm">Zarządzaj lokalami i wprowadzaj dzienne raporty</p>
+            <div class="flex items-center gap-4">
+              <!-- Hamburger button (mobile only) -->
+              <button 
+                (click)="sidebarService.toggle()"
+                class="md:hidden p-2 text-stone-600 hover:text-stone-800 hover:bg-warm-50 rounded-sm transition-colors flex-shrink-0"
+              >
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+              <div>
+                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">Zarządzanie Lokalmi</h1>
+                <p class="text-stone-500 text-sm hidden md:block">Zarządzaj lokalami i wprowadzaj dzienne raporty</p>
+              </div>
             </div>
           </div>
         </header>
 
         <!-- Content -->
-        <main class="p-8">
+        <main class="p-4 md:p-8">
           <!-- Navigation Tabs -->
           <div class="bg-white rounded-sm shadow-sm mb-6">
             <div class="border-b border-warm-200">
@@ -723,7 +735,8 @@ export class LocationsManagementComponent implements OnInit {
 
   constructor(
     private locationService: LocationService,
-    private api: ApiService
+    private api: ApiService,
+    public sidebarService: SidebarService
   ) {}
 
   ngOnInit(): void {

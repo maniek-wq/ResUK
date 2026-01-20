@@ -90,36 +90,40 @@ interface MenuCategoryWithItems extends MenuCategory {
                   *ngFor="let item of category.items"
                   class="group p-6 bg-white rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300"
                 >
-                  <div class="flex justify-between items-start gap-4">
-                    <div class="flex-1">
-                      <div class="flex items-center gap-3 mb-2">
-                        <h3 class="font-display text-xl text-stone-800 font-semibold 
-                                   group-hover:text-brown-700 transition-colors">
-                          {{ item.name }}
-                        </h3>
-                        <div *ngIf="item.tags && item.tags.length > 0" class="flex gap-2">
-                          <span 
-                            *ngFor="let tag of item.tags"
-                            class="px-2 py-0.5 text-xs font-body tracking-wide rounded-full"
-                            [ngClass]="{
-                              'bg-green-100 text-green-700': tag === 'vege' || tag === 'wegetariańskie',
-                              'bg-orange-100 text-orange-700': tag === 'ostre',
-                              'bg-yellow-100 text-yellow-700': tag === 'szef poleca',
-                              'bg-blue-100 text-blue-700': tag === 'gluten-free' || tag === 'bez laktozy',
-                              'bg-purple-100 text-purple-700': tag === 'wegańskie'
-                            }"
-                          >
-                            {{ tag }}
-                          </span>
-                        </div>
+                  <div class="flex-1">
+                    <!-- Nazwa i cena w jednej linii -->
+                    <div class="flex justify-between items-start gap-4 mb-2">
+                      <h3 class="font-display text-xl text-stone-800 font-semibold flex-1
+                                 group-hover:text-brown-700 transition-colors">
+                        {{ item.name }}
+                      </h3>
+                      <div class="font-display text-xl text-brown-700 font-semibold whitespace-nowrap">
+                        {{ formatPrice(item.price, item.currency) }}
                       </div>
-                      <p *ngIf="item.description" class="text-stone-600 text-sm leading-relaxed">
-                        {{ item.description }}
-                      </p>
                     </div>
-                    <div class="font-display text-xl text-brown-700 font-semibold whitespace-nowrap">
-                      {{ formatPrice(item.price, item.currency) }}
+                    
+                    <!-- Tagi - pod nazwą -->
+                    <div *ngIf="item.tags && item.tags.length > 0" 
+                         class="flex flex-wrap gap-2 mb-3">
+                      <span 
+                        *ngFor="let tag of item.tags"
+                        class="px-2 py-0.5 text-xs font-body tracking-wide rounded-full whitespace-nowrap"
+                        [ngClass]="{
+                          'bg-green-100 text-green-700': tag === 'vege' || tag === 'wegetariańskie',
+                          'bg-orange-100 text-orange-700': tag === 'ostre',
+                          'bg-yellow-100 text-yellow-700': tag === 'szef poleca',
+                          'bg-blue-100 text-blue-700': tag === 'gluten-free' || tag === 'bez laktozy',
+                          'bg-purple-100 text-purple-700': tag === 'wegańskie'
+                        }"
+                      >
+                        {{ tag }}
+                      </span>
                     </div>
+                    
+                    <!-- Opis -->
+                    <p *ngIf="item.description" class="text-stone-600 text-sm leading-relaxed">
+                      {{ item.description }}
+                    </p>
                   </div>
                 </div>
               </div>

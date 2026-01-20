@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
+import { SidebarService } from '../../services/sidebar.service';
 import { MenuService, MenuCategory, MenuItem } from '../../../core/services/menu.service';
 import { filter, Subscription } from 'rxjs';
 
@@ -14,27 +15,40 @@ import { filter, Subscription } from 'rxjs';
     <div class="min-h-screen bg-warm-100 flex">
       <app-admin-sidebar></app-admin-sidebar>
 
-      <div class="flex-1 ml-64">
+      <div class="flex-1 md:ml-64">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-warm-200 px-8 py-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <h1 class="font-display text-2xl text-stone-800 font-semibold">Zarządzanie Menu</h1>
-              <p class="text-stone-500 text-sm">Edycja kategorii i pozycji menu</p>
+        <header class="bg-white shadow-sm border-b border-warm-200 px-4 md:px-8 py-4">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+              <!-- Hamburger button (mobile only) -->
+              <button 
+                (click)="sidebarService.toggle()"
+                class="md:hidden p-2 text-stone-600 hover:text-stone-800 hover:bg-warm-50 rounded-sm transition-colors flex-shrink-0"
+              >
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+              <div class="min-w-0">
+                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">Zarządzanie Menu</h1>
+                <p class="text-stone-500 text-sm hidden md:block">Edycja kategorii i pozycji menu</p>
+              </div>
             </div>
-            <div class="flex gap-4">
-              <a routerLink="/admin/menu/categories/new" class="btn-primary text-sm">
-                + Dodaj kategorię
+            <div class="flex gap-2 md:gap-4 flex-shrink-0">
+              <a routerLink="/admin/menu/categories/new" class="btn-primary text-sm px-3 md:px-4 whitespace-nowrap">
+                <span class="hidden md:inline">+ Dodaj kategorię</span>
+                <span class="md:hidden">+ Kategoria</span>
               </a>
-              <a routerLink="/admin/menu/items/new" class="btn-primary text-sm">
-                + Dodaj pozycję
+              <a routerLink="/admin/menu/items/new" class="btn-primary text-sm px-3 md:px-4 whitespace-nowrap">
+                <span class="hidden md:inline">+ Dodaj pozycję</span>
+                <span class="md:hidden">+ Pozycja</span>
               </a>
             </div>
           </div>
         </header>
 
         <!-- Content -->
-        <main class="p-8">
+        <main class="p-4 md:p-8">
           <!-- Stats -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-white p-6 rounded-sm shadow-sm">
@@ -313,7 +327,8 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
 
   constructor(
     public menuService: MenuService,
-    private router: Router
+    private router: Router,
+    public sidebarService: SidebarService
   ) {}
 
   ngOnInit(): void {

@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
+import { SidebarService } from '../../services/sidebar.service';
 import { LocationService, Table, Location } from '../../../core/services/location.service';
 import { ApiService } from '../../../core/services/api.service';
 import { ReservationService, CreateReservationDto } from '../../../core/services/reservation.service';
@@ -35,19 +36,30 @@ interface AvailabilityResponse {
     <div class="min-h-screen bg-warm-100 flex">
       <app-admin-sidebar></app-admin-sidebar>
 
-      <div class="flex-1 ml-64">
+      <div class="flex-1 md:ml-64">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-warm-200 px-8 py-4">
+        <header class="bg-white shadow-sm border-b border-warm-200 px-4 md:px-8 py-4">
           <div class="flex items-center justify-between">
-            <div>
-              <h1 class="font-display text-2xl text-stone-800 font-semibold">Sprawdzanie Dostępności</h1>
-              <p class="text-stone-500 text-sm">Sprawdź dostępność stolików dla rezerwacji telefonicznej</p>
+            <div class="flex items-center gap-4">
+              <!-- Hamburger button (mobile only) -->
+              <button 
+                (click)="sidebarService.toggle()"
+                class="md:hidden p-2 text-stone-600 hover:text-stone-800 hover:bg-warm-50 rounded-sm transition-colors flex-shrink-0"
+              >
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+              <div>
+                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">Sprawdzanie Dostępności</h1>
+                <p class="text-stone-500 text-sm hidden md:block">Sprawdź dostępność stolików dla rezerwacji telefonicznej</p>
+              </div>
             </div>
           </div>
         </header>
 
         <!-- Content -->
-        <main class="p-8">
+        <main class="p-4 md:p-8">
           <!-- Search Form -->
           <div class="bg-white rounded-sm shadow-sm p-6 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -437,7 +449,8 @@ export class TablesManagementComponent implements OnInit {
   constructor(
     private locationService: LocationService,
     private api: ApiService,
-    private reservationService: ReservationService
+    private reservationService: ReservationService,
+    public sidebarService: SidebarService
   ) {
     // Generuj sloty czasowe (co 30 minut od 10:00 do 22:00)
     this.generateTimeSlots();

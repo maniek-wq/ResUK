@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { ReservationService, Reservation, ReservationFilters, CreateReservationDto, AvailabilitySlot } from '../../../core/services/reservation.service';
 import { LocationService, Location } from '../../../core/services/location.service';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
+import { SidebarService } from '../../services/sidebar.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -15,25 +16,37 @@ import { firstValueFrom } from 'rxjs';
     <div class="min-h-screen bg-warm-100 flex">
       <app-admin-sidebar></app-admin-sidebar>
 
-      <div class="flex-1 ml-64">
+      <div class="flex-1 md:ml-64">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-warm-200 px-8 py-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <h1 class="font-display text-2xl text-stone-800 font-semibold">Rezerwacje</h1>
-              <p class="text-stone-500 text-sm">Zarządzaj rezerwacjami w obu lokalach</p>
+        <header class="bg-white shadow-sm border-b border-warm-200 px-4 md:px-8 py-4">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+              <!-- Hamburger button (mobile only) -->
+              <button 
+                (click)="sidebarService.toggle()"
+                class="md:hidden p-2 text-stone-600 hover:text-stone-800 hover:bg-warm-50 rounded-sm transition-colors flex-shrink-0"
+              >
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+              <div class="min-w-0">
+                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">Rezerwacje</h1>
+                <p class="text-stone-500 text-sm hidden md:block">Zarządzaj rezerwacjami w obu lokalach</p>
+              </div>
             </div>
             <button 
               (click)="openAddModal()"
-              class="btn-primary text-sm px-6"
+              class="btn-primary text-sm px-4 md:px-6 flex-shrink-0 whitespace-nowrap"
             >
-              + Dodaj rezerwację
+              <span class="hidden md:inline">+ Dodaj rezerwację</span>
+              <span class="md:hidden">+ Dodaj</span>
             </button>
           </div>
         </header>
 
         <!-- Content -->
-        <main class="p-8">
+        <main class="p-4 md:p-8">
           <!-- Filters -->
           <div class="bg-white rounded-sm shadow-sm p-6 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -98,8 +111,8 @@ import { firstValueFrom } from 'rxjs';
 
           <!-- Reservations List -->
           <div class="bg-white rounded-sm shadow-sm overflow-hidden">
-            <!-- Table Header -->
-            <div class="grid grid-cols-12 gap-4 p-4 bg-warm-50 border-b border-warm-200 text-sm font-semibold text-stone-600">
+            <!-- Table Header (Desktop only) -->
+            <div class="hidden md:grid grid-cols-12 gap-4 p-4 bg-warm-50 border-b border-warm-200 text-sm font-semibold text-stone-600">
               <div class="col-span-3">Klient</div>
               <div class="col-span-2">Lokal</div>
               <div class="col-span-2">Data i godzina</div>
@@ -119,89 +132,181 @@ import { firstValueFrom } from 'rxjs';
               Brak rezerwacji spełniających kryteria
             </div>
 
-            <!-- Reservation Rows -->
-            <div *ngFor="let reservation of reservations()" 
-                 class="grid grid-cols-12 gap-4 p-4 border-b border-warm-100 hover:bg-warm-50 transition-colors items-center">
-              <!-- Customer -->
-              <div class="col-span-3">
-                <p class="font-medium text-stone-800">
-                  {{ reservation.customer.firstName }} {{ reservation.customer.lastName }}
-                </p>
-                <p *ngIf="reservation.customer.email" class="text-stone-500 text-sm">{{ reservation.customer.email }}</p>
-                <p class="text-stone-400 text-xs">{{ reservation.customer.phone }}</p>
+            <!-- Mobile Card Layout -->
+            <div *ngIf="!loading() && reservations().length > 0" class="md:hidden space-y-4 p-4">
+              <div *ngFor="let reservation of reservations()" 
+                   class="bg-white border border-warm-200 rounded-sm p-4 shadow-sm hover:shadow-md transition-shadow">
+                <!-- Header: Customer & Status -->
+                <div class="flex items-start justify-between mb-3">
+                  <div class="flex-1">
+                    <h3 class="font-semibold text-stone-800 mb-1">
+                      {{ reservation.customer.firstName }} {{ reservation.customer.lastName }}
+                    </h3>
+                    <p *ngIf="reservation.customer.email" class="text-stone-500 text-sm mb-1">{{ reservation.customer.email }}</p>
+                    <p class="text-stone-400 text-xs">{{ reservation.customer.phone }}</p>
+                  </div>
+                  <span 
+                    class="text-xs px-2 py-1 rounded-full font-medium ml-2 flex-shrink-0"
+                    [ngClass]="{
+                      'bg-yellow-100 text-yellow-800': reservation.status === 'pending',
+                      'bg-green-100 text-green-800': reservation.status === 'confirmed',
+                      'bg-red-100 text-red-800': reservation.status === 'cancelled',
+                      'bg-stone-100 text-stone-800': reservation.status === 'completed'
+                    }"
+                  >
+                    {{ getStatusLabel(reservation.status) }}
+                  </span>
+                </div>
+
+                <!-- Details Grid -->
+                <div class="grid grid-cols-2 gap-3 mb-4 text-sm">
+                  <div>
+                    <p class="text-stone-500 text-xs mb-1">Lokal</p>
+                    <p class="text-stone-800 font-medium">{{ reservation.location?.name || 'N/A' }}</p>
+                  </div>
+                  <div>
+                    <p class="text-stone-500 text-xs mb-1">Goście</p>
+                    <p class="text-stone-800 font-medium">{{ reservation.guests }} {{ reservation.guests === 1 ? 'osoba' : (reservation.guests < 5 ? 'osoby' : 'osób') }}</p>
+                  </div>
+                  <div>
+                    <p class="text-stone-500 text-xs mb-1">Data</p>
+                    <p class="text-stone-800 font-medium">{{ formatDate(reservation.date) }}</p>
+                  </div>
+                  <div>
+                    <p class="text-stone-500 text-xs mb-1">Godzina</p>
+                    <p class="text-stone-800 font-medium">{{ reservation.timeSlot.start }} - {{ reservation.timeSlot.end }}</p>
+                  </div>
+                </div>
+
+                <!-- Type Badge -->
+                <div class="mb-4">
+                  <span class="text-xs px-2 py-1 rounded-full"
+                        [ngClass]="{
+                          'bg-blue-100 text-blue-800': reservation.type === 'table',
+                          'bg-purple-100 text-purple-800': reservation.type === 'event',
+                          'bg-amber-100 text-amber-800': reservation.type === 'full_venue'
+                        }">
+                    {{ getTypeLabel(reservation.type) }}
+                  </span>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-wrap gap-2 pt-3 border-t border-warm-100">
+                  <button 
+                    *ngIf="reservation.status === 'pending'"
+                    (click)="updateStatus(reservation._id, 'confirmed')"
+                    class="flex-1 px-3 py-2 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                  >
+                    Potwierdź
+                  </button>
+                  <button 
+                    *ngIf="reservation.status === 'pending' || reservation.status === 'confirmed'"
+                    (click)="updateStatus(reservation._id, 'cancelled')"
+                    class="flex-1 px-3 py-2 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+                  >
+                    Anuluj
+                  </button>
+                  <button 
+                    (click)="openEditModal(reservation)"
+                    class="flex-1 px-3 py-2 bg-stone-600 text-white text-xs rounded hover:bg-stone-700 transition-colors"
+                  >
+                    Edytuj
+                  </button>
+                  <button 
+                    (click)="deleteReservation(reservation._id)"
+                    class="flex-1 px-3 py-2 bg-stone-200 text-stone-600 text-xs rounded hover:bg-stone-300 transition-colors"
+                  >
+                    Usuń
+                  </button>
+                </div>
               </div>
-              
-              <!-- Location -->
-              <div class="col-span-2">
-                <p class="text-stone-800 text-sm">{{ reservation.location?.name || 'N/A' }}</p>
-              </div>
-              
-              <!-- Date & Time -->
-              <div class="col-span-2">
-                <p class="text-stone-800 text-sm">{{ formatDate(reservation.date) }}</p>
-                <p class="text-stone-500 text-sm">{{ reservation.timeSlot.start }} - {{ reservation.timeSlot.end }}</p>
-              </div>
-              
-              <!-- Guests -->
-              <div class="col-span-1">
-                <p class="text-stone-800">{{ reservation.guests }}</p>
-              </div>
-              
-              <!-- Type -->
-              <div class="col-span-1">
-                <span class="text-xs px-2 py-1 rounded-full"
-                      [ngClass]="{
-                        'bg-blue-100 text-blue-800': reservation.type === 'table',
-                        'bg-purple-100 text-purple-800': reservation.type === 'event',
-                        'bg-amber-100 text-amber-800': reservation.type === 'full_venue'
-                      }">
-                  {{ getTypeLabel(reservation.type) }}
-                </span>
-              </div>
-              
-              <!-- Status -->
-              <div class="col-span-1">
-                <span 
-                  class="text-xs px-2 py-1 rounded-full font-medium"
-                  [ngClass]="{
-                    'bg-yellow-100 text-yellow-800': reservation.status === 'pending',
-                    'bg-green-100 text-green-800': reservation.status === 'confirmed',
-                    'bg-red-100 text-red-800': reservation.status === 'cancelled',
-                    'bg-stone-100 text-stone-800': reservation.status === 'completed'
-                  }"
-                >
-                  {{ getStatusLabel(reservation.status) }}
-                </span>
-              </div>
-              
-              <!-- Actions -->
-              <div class="col-span-2 flex justify-end gap-2">
-                <button 
-                  *ngIf="reservation.status === 'pending'"
-                  (click)="updateStatus(reservation._id, 'confirmed')"
-                  class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
-                >
-                  Potwierdź
-                </button>
-                <button 
-                  *ngIf="reservation.status === 'pending' || reservation.status === 'confirmed'"
-                  (click)="updateStatus(reservation._id, 'cancelled')"
-                  class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
-                >
-                  Anuluj
-                </button>
-                <button 
-                  (click)="openEditModal(reservation)"
-                  class="px-3 py-1 bg-stone-600 text-white text-xs rounded hover:bg-stone-700 transition-colors"
-                >
-                  Edytuj
-                </button>
-                <button 
-                  (click)="deleteReservation(reservation._id)"
-                  class="px-3 py-1 bg-stone-200 text-stone-600 text-xs rounded hover:bg-stone-300 transition-colors"
-                >
-                  Usuń
-                </button>
+            </div>
+
+            <!-- Desktop Table Rows -->
+            <div *ngIf="!loading() && reservations().length > 0" class="hidden md:block">
+              <div *ngFor="let reservation of reservations()" 
+                   class="grid grid-cols-12 gap-4 p-4 border-b border-warm-100 hover:bg-warm-50 transition-colors items-center">
+                <!-- Customer -->
+                <div class="col-span-3">
+                  <p class="font-medium text-stone-800">
+                    {{ reservation.customer.firstName }} {{ reservation.customer.lastName }}
+                  </p>
+                  <p *ngIf="reservation.customer.email" class="text-stone-500 text-sm">{{ reservation.customer.email }}</p>
+                  <p class="text-stone-400 text-xs">{{ reservation.customer.phone }}</p>
+                </div>
+                
+                <!-- Location -->
+                <div class="col-span-2">
+                  <p class="text-stone-800 text-sm">{{ reservation.location?.name || 'N/A' }}</p>
+                </div>
+                
+                <!-- Date & Time -->
+                <div class="col-span-2">
+                  <p class="text-stone-800 text-sm">{{ formatDate(reservation.date) }}</p>
+                  <p class="text-stone-500 text-sm">{{ reservation.timeSlot.start }} - {{ reservation.timeSlot.end }}</p>
+                </div>
+                
+                <!-- Guests -->
+                <div class="col-span-1">
+                  <p class="text-stone-800">{{ reservation.guests }}</p>
+                </div>
+                
+                <!-- Type -->
+                <div class="col-span-1">
+                  <span class="text-xs px-2 py-1 rounded-full"
+                        [ngClass]="{
+                          'bg-blue-100 text-blue-800': reservation.type === 'table',
+                          'bg-purple-100 text-purple-800': reservation.type === 'event',
+                          'bg-amber-100 text-amber-800': reservation.type === 'full_venue'
+                        }">
+                    {{ getTypeLabel(reservation.type) }}
+                  </span>
+                </div>
+                
+                <!-- Status -->
+                <div class="col-span-1">
+                  <span 
+                    class="text-xs px-2 py-1 rounded-full font-medium"
+                    [ngClass]="{
+                      'bg-yellow-100 text-yellow-800': reservation.status === 'pending',
+                      'bg-green-100 text-green-800': reservation.status === 'confirmed',
+                      'bg-red-100 text-red-800': reservation.status === 'cancelled',
+                      'bg-stone-100 text-stone-800': reservation.status === 'completed'
+                    }"
+                  >
+                    {{ getStatusLabel(reservation.status) }}
+                  </span>
+                </div>
+                
+                <!-- Actions -->
+                <div class="col-span-2 flex justify-end gap-2">
+                  <button 
+                    *ngIf="reservation.status === 'pending'"
+                    (click)="updateStatus(reservation._id, 'confirmed')"
+                    class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                  >
+                    Potwierdź
+                  </button>
+                  <button 
+                    *ngIf="reservation.status === 'pending' || reservation.status === 'confirmed'"
+                    (click)="updateStatus(reservation._id, 'cancelled')"
+                    class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+                  >
+                    Anuluj
+                  </button>
+                  <button 
+                    (click)="openEditModal(reservation)"
+                    class="px-3 py-1 bg-stone-600 text-white text-xs rounded hover:bg-stone-700 transition-colors"
+                  >
+                    Edytuj
+                  </button>
+                  <button 
+                    (click)="deleteReservation(reservation._id)"
+                    class="px-3 py-1 bg-stone-200 text-stone-600 text-xs rounded hover:bg-stone-300 transition-colors"
+                  >
+                    Usuń
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -556,7 +661,8 @@ export class AdminReservationsComponent implements OnInit {
 
   constructor(
     private reservationService: ReservationService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    public sidebarService: SidebarService
   ) {}
 
   ngOnInit(): void {

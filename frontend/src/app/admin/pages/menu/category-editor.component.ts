@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
+import { SidebarService } from '../../services/sidebar.service';
 import { MenuService, MenuCategory, CreateCategoryDto } from '../../../core/services/menu.service';
 
 @Component({
@@ -13,23 +14,34 @@ import { MenuService, MenuCategory, CreateCategoryDto } from '../../../core/serv
     <div class="min-h-screen bg-warm-100 flex">
       <app-admin-sidebar></app-admin-sidebar>
 
-      <div class="flex-1 ml-64">
+      <div class="flex-1 md:ml-64">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-warm-200 px-8 py-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <h1 class="font-display text-2xl text-stone-800 font-semibold">
-                {{ isEditMode() ? 'Edytuj kategorię' : 'Dodaj kategorię' }}
-              </h1>
+        <header class="bg-white shadow-sm border-b border-warm-200 px-4 md:px-8 py-4">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+              <!-- Hamburger button (mobile only) -->
+              <button 
+                (click)="sidebarService.toggle()"
+                class="md:hidden p-2 text-stone-600 hover:text-stone-800 hover:bg-warm-50 rounded-sm transition-colors flex-shrink-0"
+              >
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+              <div class="min-w-0">
+                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">
+                  {{ isEditMode() ? 'Edytuj kategorię' : 'Dodaj kategorię' }}
+                </h1>
+              </div>
             </div>
-            <a routerLink="/admin/menu" class="text-stone-500 hover:text-stone-700">
+            <a routerLink="/admin/menu" class="text-stone-500 hover:text-stone-700 flex-shrink-0 whitespace-nowrap hidden md:inline">
               ← Powrót do menu
             </a>
           </div>
         </header>
 
         <!-- Form -->
-        <main class="p-8">
+        <main class="p-4 md:p-8">
           <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-sm shadow-sm p-8">
               <form (ngSubmit)="onSubmit()" class="space-y-6">
@@ -160,7 +172,8 @@ export class CategoryEditorComponent implements OnInit {
   constructor(
     private menuService: MenuService,
     private route: ActivatedRoute,
-    public router: Router
+    public router: Router,
+    public sidebarService: SidebarService
   ) {}
 
   ngOnInit(): void {

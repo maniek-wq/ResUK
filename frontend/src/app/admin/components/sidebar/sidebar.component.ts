@@ -1,14 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { SidebarService } from '../../services/sidebar.service';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-admin-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <aside class="fixed left-0 top-0 bottom-0 w-64 bg-stone-900 text-warm-200 flex flex-col">
+    <!-- Mobile overlay -->
+    <div *ngIf="sidebarService.isOpen()" 
+         (click)="sidebarService.close()"
+         class="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"></div>
+    
+    <!-- Sidebar -->
+    <aside class="fixed left-0 top-0 bottom-0 w-64 bg-stone-900 text-warm-200 flex flex-col z-50
+                  transform transition-transform duration-300 ease-in-out
+                  -translate-x-full md:translate-x-0"
+           [class.translate-x-0]="sidebarService.isOpen()">
       <!-- Logo -->
       <div class="p-6 border-b border-stone-800">
         <div class="flex items-center gap-3">
@@ -28,6 +39,7 @@ import { AuthService } from '../../../core/services/auth.service';
         <a 
           routerLink="/admin/dashboard"
           routerLinkActive="bg-brown-900/50 text-brown-400"
+          (click)="onNavClick()"
           class="flex items-center gap-3 px-4 py-3 rounded-sm text-warm-300 
                  hover:bg-stone-800 hover:text-warm-100 transition-colors"
         >
@@ -41,6 +53,7 @@ import { AuthService } from '../../../core/services/auth.service';
         <a 
           routerLink="/admin/reservations"
           routerLinkActive="bg-brown-900/50 text-brown-400"
+          (click)="onNavClick()"
           class="flex items-center gap-3 px-4 py-3 rounded-sm text-warm-300 
                  hover:bg-stone-800 hover:text-warm-100 transition-colors"
         >
@@ -57,6 +70,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <a 
             routerLink="/admin/menu"
             routerLinkActive="bg-brown-900/50 text-brown-400"
+            (click)="onNavClick()"
             class="flex items-center gap-3 px-4 py-3 rounded-sm text-warm-300 
                    hover:bg-stone-800 hover:text-warm-100 transition-colors"
           >
@@ -70,6 +84,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <a 
             routerLink="/admin/locations"
             routerLinkActive="bg-brown-900/50 text-brown-400"
+            (click)="onNavClick()"
             class="flex items-center gap-3 px-4 py-3 rounded-sm text-warm-300 
                    hover:bg-stone-800 hover:text-warm-100 transition-colors"
           >
@@ -83,6 +98,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <a 
             routerLink="/admin/tables"
             routerLinkActive="bg-brown-900/50 text-brown-400"
+            (click)="onNavClick()"
             class="flex items-center gap-3 px-4 py-3 rounded-sm text-warm-300 
                    hover:bg-stone-800 hover:text-warm-100 transition-colors"
           >
@@ -95,6 +111,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <a 
             routerLink="/admin/tables/manage"
             routerLinkActive="bg-brown-900/50 text-brown-400"
+            (click)="onNavClick()"
             class="flex items-center gap-3 px-4 py-3 rounded-sm text-warm-300 
                    hover:bg-stone-800 hover:text-warm-100 transition-colors"
           >
@@ -137,7 +154,35 @@ import { AuthService } from '../../../core/services/auth.service';
   `
 })
 export class AdminSidebarComponent {
-  constructor(public authService: AuthService) {}
+  constructor(
+    public authService: AuthService,
+    public sidebarService: SidebarService,
+    private router: Router
+  ) {
+    // Auto-close sidebar on route change (mobile only)
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        if (window.innerWidth < 768) {
+          this.sidebarService.close();
+        }
+      });
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    // Auto-close on desktop
+    if (event.target.innerWidth >= 768) {
+      this.sidebarService.close();
+    }
+  }
+
+  onNavClick(): void {
+    // Close sidebar on mobile when navigation link is clicked
+    if (window.innerWidth < 768) {
+      this.sidebarService.close();
+    }
+  }
 
   getUserInitials(): string {
     const admin = this.authService.admin();
