@@ -37,6 +37,7 @@ export const routes: Routes = [
     path: 'rezerwacja',
     loadComponent: () => import('./pages/reservation/reservation.component').then(m => m.ReservationComponent)
   },
+
   
   // ========== Panel Admin ==========
   {

@@ -35,6 +35,16 @@ import { SidebarService } from '../../services/sidebar.service';
               </div>
             </div>
             <div class="flex items-center gap-4">
+              <a 
+                routerLink="/"
+                target="_blank"
+                class="px-4 py-2 bg-brown-700 text-white text-sm rounded-sm hover:bg-brown-800 transition-colors flex items-center gap-2 whitespace-nowrap"
+              >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+                <span>Idź do restauracji</span>
+              </a>
               <span class="text-stone-500 text-sm hidden md:inline">{{ currentDate }}</span>
             </div>
           </div>
