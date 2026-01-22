@@ -44,7 +44,10 @@ export class ApiService {
   }
 
   post<T>(endpoint: string, body: any): Observable<T> {
-    return this.http.post<T>(`${this.apiUrl}${endpoint}`, body, {
+    const fullUrl = `${this.apiUrl}${endpoint}`;
+    console.log(`ApiService.post - fullUrl: ${fullUrl}, endpoint: ${endpoint}, apiUrl: ${this.apiUrl}`);
+    console.log(`ApiService.post - body:`, body);
+    return this.http.post<T>(fullUrl, body, {
       headers: this.getHeaders()
     });
   }
