@@ -20,15 +20,23 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Pozwól na requesty bez origin (np. Postman, mobile apps)
-    if (!origin) return callback(null, true);
+    // Pozwól na requesty bez origin (np. Postman, curl, direct API calls)
+    if (!origin) {
+      return callback(null, true);
+    }
     
     // Sprawdź czy origin jest na liście dozwolonych
-    if (allowedOrigins.indexOf(origin) !== -1 || !process.env.FRONTEND_URL) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
     }
+    
+    // W development (gdy FRONTEND_URL nie jest ustawione) pozwól na wszystko
+    if (!process.env.FRONTEND_URL) {
+      return callback(null, true);
+    }
+    
+    // W produkcji blokuj nieznane originy
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -56,13 +64,14 @@ app.get('/', (req, res) => {
 });
 
 // Routes
+// UWAGA: Route /api/seed musi być przed innymi route'ami z parametrami dynamicznymi
+app.use('/api/seed', require('./routes/seed'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/locations', require('./routes/locations'));
 app.use('/api/reservations', require('./routes/reservations'));
 app.use('/api/tables', require('./routes/tables'));
 app.use('/api/menu', require('./routes/menu'));
 app.use('/api/daily-reports', require('./routes/dailyReports'));
-app.use('/api/seed', require('./routes/seed'));
 
 // Health check
 app.get('/api/health', (req, res) => {

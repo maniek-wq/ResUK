@@ -4,7 +4,8 @@ const { seedDatabase } = require('../controllers/seedController');
 
 // Endpoint do seedowania (tylko w development lub z specjalnym tokenem)
 // W produkcji powinien być chroniony!
-router.post('/seed', async (req, res) => {
+// UWAGA: Route jest /seed, ale w server.js jest już /api/seed, więc tutaj tylko '/'
+router.post('/', async (req, res) => {
   try {
     // Prosta ochrona - sprawdź czy jest specjalny token w body
     const { seedToken } = req.body;
