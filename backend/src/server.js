@@ -37,6 +37,24 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Root endpoint - informacja o API
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Restauracja Złota API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      locations: '/api/locations',
+      reservations: '/api/reservations',
+      tables: '/api/tables',
+      menu: '/api/menu',
+      dailyReports: '/api/daily-reports'
+    }
+  });
+});
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/locations', require('./routes/locations'));
