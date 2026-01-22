@@ -36,38 +36,39 @@ const {
   mongoIdValidation,
   categoryIdValidation
 } = require('../middleware/menuValidators');
+const { publicLimiter, adminLimiter, writeLimiter } = require('../middleware/rateLimiter');
 
 // ========== ADMIN/MANAGER ROUTES ==========
 // UWAGA: Chronione route'y muszą być PRZED publicznymi z parametrami dynamicznymi
 // Express dopasowuje route'y w kolejności - /all musi być przed /:id
 
-// Kategorie - zarządzanie
-router.get('/categories/all', protect, authorize('admin', 'manager'), getAllCategories);
-router.post('/categories', protect, authorize('admin', 'manager'), categoryValidation, createCategory);
-router.put('/categories/:id', protect, authorize('admin', 'manager'), mongoIdValidation, categoryValidation, updateCategory);
-router.delete('/categories/:id', protect, authorize('admin'), mongoIdValidation, deleteCategory);
-router.patch('/categories/reorder', protect, authorize('admin', 'manager'), reorderCategoriesValidation, reorderCategories);
-router.patch('/categories/:id/toggle', protect, authorize('admin', 'manager'), mongoIdValidation, toggleCategory);
+// Kategorie - zarządzanie - z rate limitingiem
+router.get('/categories/all', protect, authorize('admin', 'manager'), adminLimiter, getAllCategories);
+router.post('/categories', protect, authorize('admin', 'manager'), writeLimiter, categoryValidation, createCategory);
+router.put('/categories/:id', protect, authorize('admin', 'manager'), writeLimiter, mongoIdValidation, categoryValidation, updateCategory);
+router.delete('/categories/:id', protect, authorize('admin'), writeLimiter, mongoIdValidation, deleteCategory);
+router.patch('/categories/reorder', protect, authorize('admin', 'manager'), writeLimiter, reorderCategoriesValidation, reorderCategories);
+router.patch('/categories/:id/toggle', protect, authorize('admin', 'manager'), writeLimiter, mongoIdValidation, toggleCategory);
 
-// Pozycje menu - zarządzanie
-router.get('/items/all', protect, authorize('admin', 'manager'), getAllItems);
-router.post('/items', protect, authorize('admin', 'manager'), menuItemValidation, createItem);
-router.put('/items/:id', protect, authorize('admin', 'manager'), mongoIdValidation, menuItemValidation, updateItem);
-router.delete('/items/:id', protect, authorize('admin', 'manager'), mongoIdValidation, deleteItem);
-router.patch('/items/:id/toggle-availability', protect, authorize('admin', 'manager'), mongoIdValidation, toggleAvailability);
-router.patch('/items/reorder', protect, authorize('admin', 'manager'), reorderItemsValidation, reorderItems);
-router.post('/items/:id/duplicate', protect, authorize('admin', 'manager'), mongoIdValidation, duplicateItem);
+// Pozycje menu - zarządzanie - z rate limitingiem
+router.get('/items/all', protect, authorize('admin', 'manager'), adminLimiter, getAllItems);
+router.post('/items', protect, authorize('admin', 'manager'), writeLimiter, menuItemValidation, createItem);
+router.put('/items/:id', protect, authorize('admin', 'manager'), writeLimiter, mongoIdValidation, menuItemValidation, updateItem);
+router.delete('/items/:id', protect, authorize('admin', 'manager'), writeLimiter, mongoIdValidation, deleteItem);
+router.patch('/items/:id/toggle-availability', protect, authorize('admin', 'manager'), writeLimiter, mongoIdValidation, toggleAvailability);
+router.patch('/items/reorder', protect, authorize('admin', 'manager'), writeLimiter, reorderItemsValidation, reorderItems);
+router.post('/items/:id/duplicate', protect, authorize('admin', 'manager'), writeLimiter, mongoIdValidation, duplicateItem);
 
 // ========== PUBLIC ROUTES (Klienci) ==========
 // Publiczne route'y po chronionych (aby /categories/:id nie przechwytywało /categories/all)
 
-// Kategorie
-router.get('/categories', getCategories);
-router.get('/categories/:id', mongoIdValidation, getCategory);
+// Kategorie - publiczne z rate limitingiem
+router.get('/categories', publicLimiter, getCategories);
+router.get('/categories/:id', publicLimiter, mongoIdValidation, getCategory);
 
-// Pozycje menu
-router.get('/items', getItems);
-router.get('/items/category/:categoryId', categoryIdValidation, getItemsByCategory);
-router.get('/items/:id', mongoIdValidation, getItem);
+// Pozycje menu - publiczne z rate limitingiem
+router.get('/items', publicLimiter, getItems);
+router.get('/items/category/:categoryId', publicLimiter, categoryIdValidation, getItemsByCategory);
+router.get('/items/:id', publicLimiter, mongoIdValidation, getItem);
 
 module.exports = router;

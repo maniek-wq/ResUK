@@ -11,15 +11,16 @@ const {
 } = require('../controllers/tableController');
 const { protect, authorize } = require('../middleware/auth');
 const { mongoIdValidation } = require('../middleware/validators');
+const { adminLimiter, writeLimiter } = require('../middleware/rateLimiter');
 
-// Prywatne - zarządzanie stolikami
+// Prywatne - zarządzanie stolikami - z rate limitingiem
 // UWAGA: Endpointy /availability i /:id/availability muszą być przed /:id, bo inaczej Express dopasuje 'availability' do :id
-router.get('/', protect, getTables);
-router.get('/availability', protect, checkAvailability);
-router.get('/:id/availability', protect, mongoIdValidation, getTableAvailability);
-router.get('/:id', protect, mongoIdValidation, getTable);
-router.post('/', protect, authorize('admin', 'manager'), createTable);
-router.put('/:id', protect, authorize('admin', 'manager'), mongoIdValidation, updateTable);
-router.delete('/:id', protect, authorize('admin', 'manager'), mongoIdValidation, deleteTable);
+router.get('/', protect, adminLimiter, getTables);
+router.get('/availability', protect, adminLimiter, checkAvailability);
+router.get('/:id/availability', protect, adminLimiter, mongoIdValidation, getTableAvailability);
+router.get('/:id', protect, adminLimiter, mongoIdValidation, getTable);
+router.post('/', protect, authorize('admin', 'manager'), writeLimiter, createTable);
+router.put('/:id', protect, authorize('admin', 'manager'), writeLimiter, mongoIdValidation, updateTable);
+router.delete('/:id', protect, authorize('admin', 'manager'), writeLimiter, mongoIdValidation, deleteTable);
 
 module.exports = router;

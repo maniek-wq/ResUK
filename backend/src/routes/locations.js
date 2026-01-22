@@ -10,15 +10,16 @@ const {
 } = require('../controllers/locationController');
 const { protect, authorize } = require('../middleware/auth');
 const { mongoIdValidation } = require('../middleware/validators');
+const { publicLimiter, adminLimiter, writeLimiter } = require('../middleware/rateLimiter');
 
 // Publiczne
-router.get('/', getLocations);
-router.get('/:id', mongoIdValidation, getLocation);
-router.get('/:id/tables', mongoIdValidation, getLocationTables);
+router.get('/', publicLimiter, getLocations);
+router.get('/:id', publicLimiter, mongoIdValidation, getLocation);
+router.get('/:id/tables', publicLimiter, mongoIdValidation, getLocationTables);
 
-// Prywatne - tylko admin
-router.post('/', protect, authorize('admin'), createLocation);
-router.put('/:id', protect, authorize('admin'), mongoIdValidation, updateLocation);
-router.delete('/:id', protect, authorize('admin'), mongoIdValidation, deleteLocation);
+// Prywatne - tylko admin - z rate limitingiem
+router.post('/', protect, authorize('admin'), writeLimiter, createLocation);
+router.put('/:id', protect, authorize('admin'), writeLimiter, mongoIdValidation, updateLocation);
+router.delete('/:id', protect, authorize('admin'), writeLimiter, mongoIdValidation, deleteLocation);
 
 module.exports = router;

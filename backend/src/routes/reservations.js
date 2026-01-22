@@ -11,16 +11,17 @@ const {
 } = require('../controllers/reservationController');
 const { protect, checkLocationAccess } = require('../middleware/auth');
 const { reservationValidation, mongoIdValidation } = require('../middleware/validators');
+const { publicLimiter, adminLimiter, writeLimiter } = require('../middleware/rateLimiter');
 
 // Publiczne
-router.post('/', reservationValidation, createReservation);
-router.get('/availability/:locationId', getAvailability);
+router.post('/', publicLimiter, reservationValidation, createReservation);
+router.get('/availability/:locationId', publicLimiter, getAvailability);
 
-// Prywatne (wymagają autoryzacji admina)
-router.get('/', protect, getReservations);
-router.get('/:id', protect, mongoIdValidation, getReservation);
-router.put('/:id', protect, mongoIdValidation, updateReservation);
-router.delete('/:id', protect, mongoIdValidation, deleteReservation);
-router.patch('/:id/status', protect, mongoIdValidation, updateReservationStatus);
+// Prywatne (wymagają autoryzacji admina) - z rate limitingiem
+router.get('/', protect, adminLimiter, getReservations);
+router.get('/:id', protect, adminLimiter, mongoIdValidation, getReservation);
+router.put('/:id', protect, writeLimiter, mongoIdValidation, updateReservation);
+router.delete('/:id', protect, writeLimiter, mongoIdValidation, deleteReservation);
+router.patch('/:id/status', protect, writeLimiter, mongoIdValidation, updateReservationStatus);
 
 module.exports = router;
