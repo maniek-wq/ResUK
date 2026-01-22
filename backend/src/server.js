@@ -20,7 +20,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Pozwól na requesty bez origin (np. Postman, curl, direct API calls)
+    // Pozwól na requesty bez origin (np. Postman, curl, direct API calls, mobile apps)
     if (!origin) {
       return callback(null, true);
     }
@@ -35,12 +35,19 @@ app.use(cors({
       return callback(null, true);
     }
     
-    // W produkcji blokuj nieznane originy
-    callback(new Error('Not allowed by CORS'));
+    // W produkcji - loguj ale pozwól (dla debugowania)
+    // TODO: W produkcji powinno blokować nieznane originy
+    console.log(`CORS: Unknown origin: ${origin}, allowing for now`);
+    return callback(null, true);
+    
+    // W produkcji blokuj nieznane originy (odkomentuj po testach)
+    // callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
