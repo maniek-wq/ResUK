@@ -11,10 +11,28 @@ connectDB();
 
 const app = express();
 
-// Middleware
+// Middleware CORS
+// Obsługuje zarówno lokalny development jak i produkcję (Vercel)
+const allowedOrigins = [
+  'http://localhost:4200', // Local development
+  process.env.FRONTEND_URL   // Production (Vercel)
+].filter(Boolean); // Usuwa undefined wartości
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
-  credentials: true
+  origin: function (origin, callback) {
+    // Pozwól na requesty bez origin (np. Postman, mobile apps)
+    if (!origin) return callback(null, true);
+    
+    // Sprawdź czy origin jest na liście dozwolonych
+    if (allowedOrigins.indexOf(origin) !== -1 || !process.env.FRONTEND_URL) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

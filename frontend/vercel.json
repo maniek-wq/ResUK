@@ -1,0 +1,13 @@
+{
+  "buildCommand": "npm run build -- --configuration production",
+  "outputDirectory": "dist/frontend",
+  "devCommand": "npm start",
+  "installCommand": "npm install",
+  "framework": "angular",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
