@@ -62,6 +62,7 @@ app.use('/api/reservations', require('./routes/reservations'));
 app.use('/api/tables', require('./routes/tables'));
 app.use('/api/menu', require('./routes/menu'));
 app.use('/api/daily-reports', require('./routes/dailyReports'));
+app.use('/api/seed', require('./routes/seed'));
 
 // Health check
 app.get('/api/health', (req, res) => {
