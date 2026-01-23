@@ -1,4 +1,4 @@
-import { Component, signal, HostListener } from '@angular/core';
+import { Component, signal, HostListener, ViewEncapsulation, OnInit, AfterViewInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -6,10 +6,18 @@ import { RouterModule } from '@angular/router';
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
+  encapsulation: ViewEncapsulation.None,
   template: `
+    <!-- Navbar - scrolluje się na mobile, fixed na desktop -->
     <nav 
-      class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-      [class]="isScrolled() ? 'bg-stone-900/95 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-6'"
+      [class]="'restauracja-navbar ' + (isMobile() ? 'navbar-relative' : 'navbar-fixed') + ' z-50 w-full bg-stone-900/95 backdrop-blur-md shadow-lg py-4 md:py-3'"
+      [style.position]="isMobile() ? 'relative' : 'fixed'"
+      [style.top]="isMobile() ? 'auto' : '0'"
+      [style.left]="isMobile() ? 'auto' : '0'"
+      [style.right]="isMobile() ? 'auto' : '0'"
+      [style.width]="'100%'"
+      [attr.data-mobile]="isMobile() ? 'true' : 'false'"
+      [attr.data-width]="windowWidth()"
     >
       <div class="container mx-auto px-6 flex items-center justify-between">
         <!-- Logo -->
@@ -18,8 +26,7 @@ import { RouterModule } from '@angular/router';
             <span class="font-display text-white text-lg font-bold">Z</span>
           </div>
           <div class="hidden sm:block">
-            <span class="font-display text-xl font-semibold" 
-                  [class]="isScrolled() ? 'text-warm-100' : 'text-white'">
+            <span class="font-display text-xl font-semibold text-warm-100">
               Restauracja
             </span>
             <span class="font-accent text-brown-400 text-lg ml-1 italic">Złota</span>
@@ -32,8 +39,7 @@ import { RouterModule } from '@angular/router';
              [routerLink]="item.path"
              routerLinkActive="text-brown-400"
              [routerLinkActiveOptions]="{exact: item.exact}"
-             class="font-body text-sm tracking-wider uppercase transition-colors duration-300 elegant-underline"
-             [class]="isScrolled() ? 'text-warm-200 hover:text-brown-400' : 'text-white/90 hover:text-white'">
+             class="font-body text-sm tracking-wider uppercase transition-colors duration-300 elegant-underline text-warm-200 hover:text-brown-400">
             {{ item.label }}
           </a>
           
@@ -48,8 +54,8 @@ import { RouterModule } from '@angular/router';
         <!-- Mobile Menu Button -->
         <button 
           (click)="toggleMobileMenu()"
-          class="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5"
-          [class]="isScrolled() ? 'text-warm-100' : 'text-white'"
+          class="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 text-warm-100"
+          aria-label="Toggle menu"
         >
           <span 
             class="w-6 h-0.5 bg-current transition-all duration-300"
@@ -67,11 +73,27 @@ import { RouterModule } from '@angular/router';
           ></span>
         </button>
       </div>
+    </nav>
 
-      <!-- Mobile Menu Overlay -->
+    <!-- Mobile Offcanvas - wysuwa się z prawej strony -->
+    <div 
+      class="md:hidden fixed inset-0 z-[60] offcanvas-container"
+      [class.offcanvas-open]="isMobileMenuOpen()"
+      [class.offcanvas-closed]="!isMobileMenuOpen()"
+    >
+      <!-- Backdrop -->
       <div 
-        *ngIf="isMobileMenuOpen()"
-        class="md:hidden fixed inset-0 z-[60] bg-gradient-to-br from-stone-900 via-stone-800 to-brown-950 overflow-y-auto"
+        (click)="closeMobileMenu()"
+        class="absolute inset-0 bg-black/50 transition-opacity duration-300 ease-out"
+        [class.opacity-0]="!isMobileMenuOpen()"
+        [class.opacity-100]="isMobileMenuOpen()"
+      ></div>
+      
+      <!-- Offcanvas Panel - wysuwa się z prawej, pełna szerokość (100dvw) -->
+      <div 
+        class="absolute right-0 top-0 bottom-0 bg-gradient-to-br from-stone-900 via-stone-800 to-brown-950 
+               shadow-2xl overflow-y-auto pointer-events-auto offcanvas-panel"
+        [style.width]="'100dvw'"
       >
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-6 border-b border-warm-800/30 bg-stone-900/50 backdrop-blur-sm sticky top-0 z-10">
@@ -85,6 +107,7 @@ import { RouterModule } from '@angular/router';
           <button 
             (click)="closeMobileMenu()"
             class="w-10 h-10 flex items-center justify-center text-warm-200 hover:text-white transition-colors"
+            aria-label="Close menu"
           >
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -93,9 +116,9 @@ import { RouterModule } from '@angular/router';
         </div>
 
         <!-- Menu Content -->
-        <div class="container mx-auto px-6 py-8 flex flex-col gap-6">
+        <div class="px-6 py-8 flex flex-col gap-6">
           <nav class="flex flex-col gap-2">
-            <a *ngFor="let item of menuItems; let i = index" 
+            <a *ngFor="let item of menuItems" 
                [routerLink]="item.path"
                routerLinkActive="bg-warm-800/50 text-brown-400 border-l-4 border-brown-600"
                [routerLinkActiveOptions]="{exact: item.exact}"
@@ -116,7 +139,7 @@ import { RouterModule } from '@angular/router';
             </a>
           </div>
 
-          <!-- Location Info (optional, if you have locations data) -->
+          <!-- Location Info -->
           <div class="pt-8 border-t border-warm-800/30 mt-6 space-y-6">
             <div class="text-center text-warm-300 text-sm">
               <p class="font-semibold mb-4 text-warm-100">Godziny otwarcia</p>
@@ -127,17 +150,63 @@ import { RouterModule } from '@angular/router';
           </div>
         </div>
       </div>
-    </nav>
+    </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      position: static;
+    }
+
     .elegant-underline::after {
       bottom: -4px;
     }
+
+    /* Offcanvas container - ukryty gdy zamknięty, ale w DOM dla animacji */
+    .offcanvas-container.offcanvas-closed {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .offcanvas-container.offcanvas-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* Offcanvas panel - animacja slide-in z prawej */
+    .offcanvas-panel {
+      transform: translateX(100%);
+      transition: transform 0.3s ease-out;
+    }
+
+    .offcanvas-container.offcanvas-open .offcanvas-panel {
+      transform: translateX(0);
+    }
+
+    /* Smooth transition dla container */
+    .offcanvas-container {
+      transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+    }
   `]
 })
-export class NavbarComponent {
-  isScrolled = signal(false);
+export class NavbarComponent implements OnInit, AfterViewInit {
   isMobileMenuOpen = signal(false);
+  
+  // Inicjalizacja windowWidth - domyślnie 0, potem ustawiane w ngOnInit
+  // Używamy 0 zamiast window.innerWidth żeby uniknąć problemów z SSR i pierwszym renderowaniem
+  windowWidth = signal(0);
+
+  // Computed signal dla isMobile - automatycznie się aktualizuje
+  // Jeśli width jest 0 (nie zainicjalizowany), zwracamy true (mobile-first approach)
+  isMobile = computed(() => {
+    const width = this.windowWidth();
+    // Jeśli width jest 0, zwracamy true (mobile-first)
+    // Jeśli width jest >= 768, zwracamy false (desktop)
+    // Jeśli width jest < 768, zwracamy true (mobile)
+    return width === 0 || width < 768;
+  });
 
   menuItems = [
     { label: 'Strona główna', path: '/', exact: true },
@@ -146,56 +215,134 @@ export class NavbarComponent {
     { label: 'Kontakt', path: '/kontakt', exact: false }
   ];
 
-  @HostListener('window:scroll')
-  onWindowScroll() {
-    this.isScrolled.set(window.scrollY > 50);
+  ngOnInit(): void {
+    // Ustaw szerokość od razu - CRITICAL dla poprawnego działania
+    if (typeof window !== 'undefined') {
+      const width = window.innerWidth;
+      this.windowWidth.set(width);
+      console.log('[Navbar] ngOnInit - windowWidth:', width, 'isMobile:', this.isMobile());
+    }
+  }
+
+  ngAfterViewInit(): void {
+    // Upewnij się że szerokość jest ustawiona po renderowaniu
+    if (typeof window !== 'undefined') {
+      // Użyj requestAnimationFrame dla pewności że DOM jest gotowy
+      requestAnimationFrame(() => {
+        const width = window.innerWidth;
+        this.windowWidth.set(width);
+        console.log('[Navbar] ngAfterViewInit - windowWidth:', width, 'isMobile:', this.isMobile());
+        
+        // DEBUG: Sprawdź computed style navbar i rodziców
+        setTimeout(() => {
+          const navElement = document.querySelector('app-navbar nav');
+          const hostElement = document.querySelector('app-navbar');
+          if (navElement && hostElement) {
+            const navStyle = window.getComputedStyle(navElement);
+            const hostStyle = window.getComputedStyle(hostElement);
+            const bodyStyle = window.getComputedStyle(document.body);
+            const htmlStyle = window.getComputedStyle(document.documentElement);
+            
+            // Sprawdź rodziców
+            let parent = navElement.parentElement;
+            const parentStyles: any[] = [];
+            while (parent && parent !== document.body) {
+              const parentStyle = window.getComputedStyle(parent);
+              parentStyles.push({
+                tag: parent.tagName,
+                class: parent.className,
+                position: parentStyle.position,
+                overflow: parentStyle.overflow,
+                overflowY: parentStyle.overflowY,
+                height: parentStyle.height,
+                maxHeight: parentStyle.maxHeight
+              });
+              parent = parent.parentElement;
+            }
+            
+            // Sprawdź czy scrollowanie działa
+            const scrollTest = {
+              windowScrollY: window.scrollY,
+              documentHeight: document.documentElement.scrollHeight,
+              windowHeight: window.innerHeight,
+              canScroll: document.documentElement.scrollHeight > window.innerHeight
+            };
+            
+            console.log('[Navbar] DEBUG - Full analysis:', {
+              nav: {
+                position: navStyle.position,
+                top: navStyle.top,
+                left: navStyle.left,
+                right: navStyle.right,
+                width: navStyle.width,
+                zIndex: navStyle.zIndex,
+                dataMobile: navElement.getAttribute('data-mobile'),
+                dataWidth: navElement.getAttribute('data-width')
+              },
+              host: {
+                position: hostStyle.position,
+                display: hostStyle.display,
+                width: hostStyle.width
+              },
+              body: {
+                overflow: bodyStyle.overflow,
+                overflowY: bodyStyle.overflowY,
+                position: bodyStyle.position,
+                height: bodyStyle.height
+              },
+              html: {
+                overflow: htmlStyle.overflow,
+                overflowY: htmlStyle.overflowY,
+                position: htmlStyle.position,
+                height: htmlStyle.height
+              },
+              parents: parentStyles,
+              scrollTest: scrollTest
+            });
+            
+            // Jeśli nie można scrollować, wymuś scrollowanie
+            if (!scrollTest.canScroll) {
+              console.warn('[Navbar] WARNING - Page cannot scroll! Document height:', scrollTest.documentHeight, 'Window height:', scrollTest.windowHeight);
+            }
+            
+            // Test: Spróbuj scrollować programatically
+            if (this.isMobile()) {
+              console.log('[Navbar] Mobile detected - testing scroll behavior...');
+              // Sprawdź czy navbar jest w viewport
+              const navRect = navElement.getBoundingClientRect();
+              console.log('[Navbar] Navbar position in viewport:', {
+                top: navRect.top,
+                left: navRect.left,
+                bottom: navRect.bottom,
+                right: navRect.right,
+                width: navRect.width,
+                height: navRect.height
+              });
+            }
+          }
+        }, 100);
+      });
+    }
   }
 
   toggleMobileMenu(): void {
-    const newValue = !this.isMobileMenuOpen();
-    this.isMobileMenuOpen.set(newValue);
-    
-    // Blokuj scroll strony gdy menu jest otwarte
-    // Offcanvas jest fixed, więc będzie widoczny niezależnie od pozycji scrolla
-    if (newValue) {
-      // Zapisz aktualną pozycję scrolla
-      const scrollY = window.scrollY;
-      document.body.style.overflow = 'hidden';
-      // Przywróć pozycję scrolla (zapobiega skakaniu do góry)
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-    } else {
-      // Przywróć scroll
-      const scrollY = document.body.style.top;
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
-    }
+    this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
   }
 
   closeMobileMenu(): void {
-    // Przywróć scroll przed zamknięciem
-    const scrollY = document.body.style.top;
     this.isMobileMenuOpen.set(false);
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    if (scrollY) {
-      window.scrollTo(0, parseInt(scrollY || '0') * -1);
-    }
   }
 
-  @HostListener('window:resize')
-  onWindowResize() {
-    // Zamknij menu na większych ekranach
-    if (window.innerWidth >= 768 && this.isMobileMenuOpen()) {
-      this.closeMobileMenu();
+  @HostListener('window:resize', ['$event'])
+  onWindowResize(event?: Event) {
+    if (typeof window !== 'undefined') {
+      const width = window.innerWidth;
+      this.windowWidth.set(width);
+      console.log('[Navbar] resize - windowWidth:', width, 'isMobile:', this.isMobile());
+      // Zamknij menu na większych ekranach
+      if (width >= 768 && this.isMobileMenuOpen()) {
+        this.closeMobileMenu();
+      }
     }
   }
 }

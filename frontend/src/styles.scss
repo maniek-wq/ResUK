@@ -140,3 +140,79 @@ a, button {
   @apply bg-gradient-to-r from-warm-200 via-warm-100 to-warm-200 bg-[length:200%_100%]
          animate-shimmer;
 }
+
+// ============================================
+// NAVBAR - CRITICAL FIX FOR MOBILE SCROLLING
+// ============================================
+// Problem: Navbar nie scrolluje się na mobile mimo position: relative
+// Rozwiązanie: Wymuszamy relative przez media query + inline styles + CSS
+// Używamy NAJWYŻSZEJ możliwej specyficzności i !important
+
+// CRITICAL: Upewnij się że body i html mogą scrollować
+@media (max-width: 767px) {
+  html, body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    position: relative !important;
+  }
+}
+
+// Mobile FIRST - wymuszamy relative na wszystkich ekranach < 768px
+// Używamy bardzo wysokiej specyficzności - wszystkie możliwe kombinacje
+@media (max-width: 767px) {
+  // Wszystkie możliwe selektory dla navbara na mobile - NAJWYŻSZA SPECYFICZNOŚĆ
+  html body app-root router-outlet app-home app-navbar nav,
+  html body app-root router-outlet app-home app-navbar nav.restauracja-navbar,
+  html body app-root router-outlet app-home app-navbar nav.navbar-relative,
+  html body app-root router-outlet app-home app-navbar nav.navbar-fixed,
+  html body app-root router-outlet app-home app-navbar nav[data-mobile="true"],
+  html body app-root router-outlet app-home app-navbar nav[data-mobile="false"],
+  app-navbar nav,
+  app-navbar .restauracja-navbar,
+  app-navbar nav.restauracja-navbar,
+  app-navbar nav.navbar-relative,
+  app-navbar nav.navbar-fixed,
+  app-navbar nav[data-mobile="true"],
+  app-navbar nav[data-mobile="false"] {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    z-index: 50 !important;
+  }
+  
+  // Upewnij się że :host nie blokuje - NAJWYŻSZA SPECYFICZNOŚĆ
+  html body app-root router-outlet app-home app-navbar,
+  app-navbar {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  
+  // Upewnij się że router-outlet i app-home nie blokują
+  router-outlet,
+  app-home {
+    position: relative !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+}
+
+// Desktop - fixed positioning tylko na >= 768px
+@media (min-width: 768px) {
+  html body app-root router-outlet app-home app-navbar nav.navbar-fixed,
+  html body app-root router-outlet app-home app-navbar nav[data-mobile="false"],
+  app-navbar nav.navbar-fixed,
+  app-navbar .restauracja-navbar.navbar-fixed,
+  app-navbar nav[data-mobile="false"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+}
