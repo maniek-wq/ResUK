@@ -9,15 +9,10 @@ import { RouterModule } from '@angular/router';
   encapsulation: ViewEncapsulation.None,
   template: `
     <!-- Navbar - scrolluje się na mobile, fixed na desktop -->
+    <!-- Używamy Tailwind responsive classes: relative na mobile, fixed na desktop -->
     <nav 
-      [class]="'restauracja-navbar ' + (isMobile() ? 'navbar-relative' : 'navbar-fixed') + ' z-50 w-full bg-stone-900/95 backdrop-blur-md shadow-lg py-4 md:py-3'"
-      [style.position]="isMobile() ? 'relative' : 'fixed'"
-      [style.top]="isMobile() ? 'auto' : '0'"
-      [style.left]="isMobile() ? 'auto' : '0'"
-      [style.right]="isMobile() ? 'auto' : '0'"
-      [style.width]="'100%'"
+      class="restauracja-navbar w-full bg-stone-900/95 md:backdrop-blur-md shadow-lg py-4 md:py-3  md:relative md:top-0 md:left-0 md:right-0 md:z-50"
       [attr.data-mobile]="isMobile() ? 'true' : 'false'"
-      [attr.data-width]="windowWidth()"
     >
       <div class="container mx-auto px-6 flex items-center justify-between">
         <!-- Logo -->
@@ -234,9 +229,32 @@ export class NavbarComponent implements OnInit, AfterViewInit {
         console.log('[Navbar] ngAfterViewInit - windowWidth:', width, 'isMobile:', this.isMobile());
         
         // DEBUG: Sprawdź computed style navbar i rodziców
+        // WAŻNE: Używamy ViewChild lub bezpośredniego dostępu do głównego navbara
+        // Offcanvas też ma <nav>, więc querySelector może znaleźć zły element!
         setTimeout(() => {
-          const navElement = document.querySelector('app-navbar nav');
+          // Znajdź główny navbar - pierwszy <nav> który jest bezpośrednim dzieckiem app-navbar
+          // NIE offcanvas nav (który jest wewnątrz offcanvas-container)
           const hostElement = document.querySelector('app-navbar');
+          if (!hostElement) return;
+          
+          // Główny navbar to pierwszy <nav> który NIE jest w offcanvas-container
+          const allNavs = hostElement.querySelectorAll('nav');
+          let navElement: Element | null = null;
+          for (let i = 0; i < allNavs.length; i++) {
+            const nav = allNavs[i];
+            // Sprawdź czy nav NIE jest w offcanvas-container
+            if (!nav.closest('.offcanvas-container')) {
+              navElement = nav;
+              break;
+            }
+          }
+          
+          if (!navElement) {
+            console.error('[Navbar] Could not find main navbar element!');
+            return;
+          }
+          
+          console.log('[Navbar] Found main navbar:', navElement, 'Class:', navElement.className);
           if (navElement && hostElement) {
             const navStyle = window.getComputedStyle(navElement);
             const hostStyle = window.getComputedStyle(hostElement);
@@ -305,18 +323,73 @@ export class NavbarComponent implements OnInit, AfterViewInit {
               console.warn('[Navbar] WARNING - Page cannot scroll! Document height:', scrollTest.documentHeight, 'Window height:', scrollTest.windowHeight);
             }
             
-            // Test: Spróbuj scrollować programatically
+            // Test: Sprawdź czy GŁÓWNY navbar scrolluje się ze stroną (nie offcanvas!)
             if (this.isMobile()) {
-              console.log('[Navbar] Mobile detected - testing scroll behavior...');
-              // Sprawdź czy navbar jest w viewport
+              console.log('[Navbar] Mobile detected - testing MAIN navbar scroll behavior...');
               const navRect = navElement.getBoundingClientRect();
-              console.log('[Navbar] Navbar position in viewport:', {
+              const navPosition = window.getComputedStyle(navElement).position;
+              
+              console.log('[Navbar] Main navbar state:', {
+                position: navPosition,
                 top: navRect.top,
-                left: navRect.left,
-                bottom: navRect.bottom,
-                right: navRect.right,
-                width: navRect.width,
-                height: navRect.height
+                className: navElement.className,
+                isMainNavbar: !navElement.closest('.offcanvas-container')
+              });
+              
+              // Jeśli navbar ma position: fixed, to nie będzie scrollować się
+              if (navPosition === 'fixed') {
+                console.error('[Navbar] PROBLEM: Main navbar has position: fixed on mobile! Should be relative!');
+              }
+              
+              // Zapisz początkową pozycję GŁÓWNEGO navbara
+              const initialNavTop = navRect.top;
+              const initialScrollY = window.scrollY;
+              
+              console.log('[Navbar] Initial state of MAIN navbar:', {
+                navbarTop: initialNavTop,
+                scrollY: initialScrollY,
+                position: navPosition
+              });
+              
+              // Listener na scroll - sprawdź czy GŁÓWNY navbar się przesuwa
+              let scrollCount = 0;
+              const scrollListener = () => {
+                // Upewnij się że sprawdzamy główny navbar, nie offcanvas
+                const mainNav = hostElement.querySelector('nav:not(.offcanvas-container nav)');
+                if (!mainNav || mainNav !== navElement) {
+                  console.warn('[Navbar] Wrong navbar element detected in scroll listener!');
+                  return;
+                }
+                
+                scrollCount++;
+                const currentNavRect = navElement.getBoundingClientRect();
+                const currentScrollY = window.scrollY;
+                const navbarMoved = Math.abs(currentNavRect.top - initialNavTop) > 1;
+                
+                // Loguj tylko pierwsze 5 eventów, żeby nie spamować
+                if (scrollCount <= 5) {
+                  console.log(`[Navbar] MAIN navbar scroll event #${scrollCount}:`, {
+                    scrollY: currentScrollY,
+                    navbarTop: currentNavRect.top,
+                    navbarMoved: navbarMoved,
+                    'navbarScrollingWithPage': navbarMoved && currentScrollY > 0,
+                    'If navbarMoved=false, navbar is FIXED (not scrolling)!': !navbarMoved && currentScrollY > 0
+                  });
+                }
+              };
+              
+              window.addEventListener('scroll', scrollListener, { passive: true });
+              console.log('[Navbar] Scroll listener added for MAIN navbar - scroll the page and check if navbar moves!');
+              
+              // Sprawdź czy navbar jest w normalnym flow
+              const navParent = navElement.parentElement;
+              const navParentStyle = navParent ? window.getComputedStyle(navParent) : null;
+              console.log('[Navbar] Parent element:', {
+                tag: navParent?.tagName,
+                class: navParent?.className,
+                position: navParentStyle?.position,
+                overflow: navParentStyle?.overflow,
+                display: navParentStyle?.display
               });
             }
           }
