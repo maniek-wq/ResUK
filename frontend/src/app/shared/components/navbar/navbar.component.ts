@@ -71,9 +71,7 @@ import { RouterModule } from '@angular/router';
       <!-- Mobile Menu Overlay -->
       <div 
         *ngIf="isMobileMenuOpen()"
-        class="md:hidden fixed inset-0 z-[60] bg-gradient-to-br from-stone-900 via-stone-800 to-brown-950 overflow-y-auto transition-opacity duration-300"
-        [class.opacity-0]="!isMobileMenuOpen()"
-        [class.opacity-100]="isMobileMenuOpen()"
+        class="md:hidden fixed inset-0 z-[60] bg-gradient-to-br from-stone-900 via-stone-800 to-brown-950 overflow-y-auto"
       >
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-6 border-b border-warm-800/30 bg-stone-900/50 backdrop-blur-sm sticky top-0 z-10">
