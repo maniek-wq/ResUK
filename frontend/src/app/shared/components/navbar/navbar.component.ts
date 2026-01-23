@@ -158,12 +158,25 @@ export class NavbarComponent {
     this.isMobileMenuOpen.set(newValue);
     
     // Blokuj scroll strony gdy menu jest otwarte
+    // Offcanvas jest fixed, więc będzie widoczny niezależnie od pozycji scrolla
     if (newValue) {
+      // Zapisz aktualną pozycję scrolla
+      const scrollY = window.scrollY;
       document.body.style.overflow = 'hidden';
-      // Scroll do góry, żeby menu było widoczne
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Przywróć pozycję scrolla (zapobiega skakaniu do góry)
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
     } else {
+      // Przywróć scroll
+      const scrollY = document.body.style.top;
       document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
     }
   }
 
