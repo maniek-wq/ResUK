@@ -181,8 +181,16 @@ export class NavbarComponent {
   }
 
   closeMobileMenu(): void {
+    // Przywróć scroll przed zamknięciem
+    const scrollY = document.body.style.top;
     this.isMobileMenuOpen.set(false);
     document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    if (scrollY) {
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
   }
 
   @HostListener('window:resize')
