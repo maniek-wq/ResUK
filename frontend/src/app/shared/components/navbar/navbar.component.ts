@@ -71,7 +71,7 @@ import { RouterModule } from '@angular/router';
       <!-- Mobile Menu Overlay -->
       <div 
         *ngIf="isMobileMenuOpen()"
-        class="md:hidden fixed inset-0 top-0 left-0 right-0 bottom-0 z-40 bg-gradient-to-br from-stone-900 via-stone-800 to-brown-950 overflow-y-auto transition-opacity duration-300"
+        class="md:hidden fixed inset-0 z-[60] bg-gradient-to-br from-stone-900 via-stone-800 to-brown-950 overflow-y-auto transition-opacity duration-300"
         [class.opacity-0]="!isMobileMenuOpen()"
         [class.opacity-100]="isMobileMenuOpen()"
       >
@@ -160,6 +160,8 @@ export class NavbarComponent {
     // Blokuj scroll strony gdy menu jest otwarte
     if (newValue) {
       document.body.style.overflow = 'hidden';
+      // Scroll do góry, żeby menu było widoczne
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       document.body.style.overflow = '';
     }

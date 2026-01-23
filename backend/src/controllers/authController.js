@@ -27,15 +27,16 @@ exports.login = async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
     console.log(`🔍 Login attempt for email: "${email}" (normalized: "${normalizedEmail}")`);
     
-    // Znajdź admina z hasłem - spróbuj najpierw z normalized email
-    let admin = await Admin.findOne({ email: normalizedEmail }).select('+password');
+    // Znajdź admina z hasłem - użyj case-insensitive search
+    // Mongoose powinien automatycznie konwertować na lowercase, ale na wszelki wypadek użyj regex
+    let admin = await Admin.findOne({ 
+      email: { $regex: new RegExp(`^${normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+    }).select('+password');
     
-    // Jeśli nie znaleziono, spróbuj bez normalizacji (dla debugowania)
+    // Jeśli nie znaleziono, spróbuj dokładnego matcha (dla debugowania)
     if (!admin) {
-      console.log(`⚠️ Admin not found with normalized email, trying case-insensitive search...`);
-      admin = await Admin.findOne({ 
-        $regex: new RegExp(`^${normalizedEmail}$`, 'i') 
-      }).select('+password');
+      console.log(`⚠️ Admin not found with case-insensitive search, trying exact match...`);
+      admin = await Admin.findOne({ email: normalizedEmail }).select('+password');
     }
     
     // Jeśli nadal nie znaleziono, sprawdź wszystkie adminy (dla debugowania)
