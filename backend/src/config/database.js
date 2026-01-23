@@ -6,7 +6,10 @@ const connectDB = async () => {
       // Mongoose 8+ nie wymaga tych opcji, ale zostawiam dla kompatybilności
     });
     
-    console.log(`✅ MongoDB połączono: ${conn.connection.host}`);
+    const dbName = conn.connection.name;
+    const host = conn.connection.host;
+    console.log(`✅ MongoDB połączono: ${host}`);
+    console.log(`📦 Baza danych: ${dbName}`);
   } catch (error) {
     console.error(`❌ Błąd połączenia z MongoDB: ${error.message}`);
     process.exit(1);
