@@ -23,16 +23,33 @@ exports.login = async (req, res) => {
       });
     }
     
-    // Znajdź admina z hasłem
-    const admin = await Admin.findOne({ email: email.toLowerCase().trim() }).select('+password');
+    // Normalizuj email
+    const normalizedEmail = email.toLowerCase().trim();
+    console.log(`🔍 Login attempt for email: "${email}" (normalized: "${normalizedEmail}")`);
     
+    // Znajdź admina z hasłem - spróbuj najpierw z normalized email
+    let admin = await Admin.findOne({ email: normalizedEmail }).select('+password');
+    
+    // Jeśli nie znaleziono, spróbuj bez normalizacji (dla debugowania)
     if (!admin) {
-      console.log(`❌ Login failed: Admin not found for email: ${email}`);
+      console.log(`⚠️ Admin not found with normalized email, trying case-insensitive search...`);
+      admin = await Admin.findOne({ 
+        $regex: new RegExp(`^${normalizedEmail}$`, 'i') 
+      }).select('+password');
+    }
+    
+    // Jeśli nadal nie znaleziono, sprawdź wszystkie adminy (dla debugowania)
+    if (!admin) {
+      const allAdmins = await Admin.find({}).select('email');
+      console.log(`📋 All admins in database:`, allAdmins.map(a => a.email));
+      console.log(`❌ Login failed: Admin not found for email: "${email}" (normalized: "${normalizedEmail}")`);
       return res.status(401).json({
         success: false,
         message: 'Nieprawidłowy email lub hasło'
       });
     }
+    
+    console.log(`✅ Admin found: ${admin.email} (ID: ${admin._id})`);
     
     // Sprawdź czy konto aktywne
     if (!admin.isActive) {
@@ -44,15 +61,19 @@ exports.login = async (req, res) => {
     }
     
     // Sprawdź hasło
+    console.log(`🔐 Comparing password...`);
     const isMatch = await admin.comparePassword(password);
     
     if (!isMatch) {
       console.log(`❌ Login failed: Invalid password for email: ${email}`);
+      console.log(`⚠️ Password comparison failed - check if password hash is correct`);
       return res.status(401).json({
         success: false,
         message: 'Nieprawidłowy email lub hasło'
       });
     }
+    
+    console.log(`✅ Password match successful`);
     
     // Aktualizuj ostatnie logowanie
     admin.lastLogin = new Date();
