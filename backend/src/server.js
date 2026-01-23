@@ -6,12 +6,23 @@ const connectDB = require('./config/database');
 // Załaduj zmienne środowiskowe
 dotenv.config();
 
+// Walidacja wymaganych zmiennych środowiskowych
+if (!process.env.JWT_SECRET) {
+  console.error('❌ BŁĄD: JWT_SECRET nie jest ustawione!');
+  process.exit(1);
+}
+if (!process.env.MONGODB_URI) {
+  console.error('❌ BŁĄD: MONGODB_URI nie jest ustawione!');
+  process.exit(1);
+}
+
 // Połącz z bazą danych
 connectDB();
 
 const app = express();
 
 // Trust proxy - wymagane dla Render (używa X-Forwarded-For)
+// MUSI być przed wszystkimi middleware, szczególnie przed rate limitingiem
 app.set('trust proxy', 1);
 
 // Middleware CORS

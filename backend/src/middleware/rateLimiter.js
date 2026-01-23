@@ -1,6 +1,8 @@
 const rateLimit = require('express-rate-limit');
 
 // Rate limiting dla endpointów publicznych (rezerwacje, menu)
+// UWAGA: Trust proxy MUSI być ustawione w server.js PRZED użyciem rate limitingu
+// Trust proxy jest ustawione w server.js (linia 15), więc rate limiting będzie działał poprawnie
 const publicLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minut
   max: 100, // maksymalnie 100 requestów na IP w oknie czasowym
@@ -9,7 +11,7 @@ const publicLimiter = rateLimit({
     message: 'Zbyt wiele requestów z tego adresu IP. Spróbuj ponownie za 15 minut.'
   },
   standardHeaders: true, // Zwraca informacje o limicie w nagłówkach `RateLimit-*`
-  legacyHeaders: false, // Wyłącza nagłówki `X-RateLimit-*`
+  legacyHeaders: false // Wyłącza nagłówki `X-RateLimit-*`
 });
 
 // Rate limiting dla logowania (bardziej restrykcyjny)
@@ -22,7 +24,7 @@ const loginLimiter = rateLimit({
   },
   skipSuccessfulRequests: false, // Liczy wszystkie próby (również nieudane)
   standardHeaders: true,
-  legacyHeaders: false,
+  legacyHeaders: false
 });
 
 // Rate limiting dla endpointów admin/manager (umiarkowany)

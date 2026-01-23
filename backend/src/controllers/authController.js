@@ -15,10 +15,19 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     
+    // Walidacja danych wejściowych
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email i hasło są wymagane'
+      });
+    }
+    
     // Znajdź admina z hasłem
-    const admin = await Admin.findOne({ email }).select('+password');
+    const admin = await Admin.findOne({ email: email.toLowerCase().trim() }).select('+password');
     
     if (!admin) {
+      console.log(`❌ Login failed: Admin not found for email: ${email}`);
       return res.status(401).json({
         success: false,
         message: 'Nieprawidłowy email lub hasło'
@@ -27,6 +36,7 @@ exports.login = async (req, res) => {
     
     // Sprawdź czy konto aktywne
     if (!admin.isActive) {
+      console.log(`❌ Login failed: Account inactive for email: ${email}`);
       return res.status(401).json({
         success: false,
         message: 'Konto zostało dezaktywowane'
@@ -37,6 +47,7 @@ exports.login = async (req, res) => {
     const isMatch = await admin.comparePassword(password);
     
     if (!isMatch) {
+      console.log(`❌ Login failed: Invalid password for email: ${email}`);
       return res.status(401).json({
         success: false,
         message: 'Nieprawidłowy email lub hasło'
