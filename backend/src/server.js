@@ -11,6 +11,9 @@ connectDB();
 
 const app = express();
 
+// Trust proxy - wymagane dla Render (używa X-Forwarded-For)
+app.set('trust proxy', 1);
+
 // Middleware CORS
 // Obsługuje zarówno lokalny development jak i produkcję (Vercel)
 const allowedOrigins = [
