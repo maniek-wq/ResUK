@@ -6,11 +6,13 @@ import { ReservationService, Reservation } from '../../../core/services/reservat
 import { LocationService, Location } from '../../../core/services/location.service';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
 import { SidebarService } from '../../services/sidebar.service';
+import { NotificationBellComponent } from '../../components/notification-bell/notification-bell.component';
+import { PushStatusComponent } from '../../components/push-status/push-status.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, AdminSidebarComponent],
+  imports: [CommonModule, RouterModule, AdminSidebarComponent, NotificationBellComponent, PushStatusComponent],
   template: `
     <div class="min-h-screen bg-warm-100 flex">
       <app-admin-sidebar></app-admin-sidebar>
@@ -35,6 +37,7 @@ import { SidebarService } from '../../services/sidebar.service';
               </div>
             </div>
             <div class="flex items-center gap-4">
+              <app-notification-bell></app-notification-bell>
               <a 
                 routerLink="/"
                 target="_blank"
@@ -52,6 +55,9 @@ import { SidebarService } from '../../services/sidebar.service';
 
         <!-- Content -->
         <main class="p-4 md:p-8">
+          <!-- Push Notifications Status -->
+          <app-push-status></app-push-status>
+
           <!-- Stats Cards -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white p-6 rounded-sm shadow-sm">
@@ -262,6 +268,10 @@ export class AdminDashboardComponent implements OnInit {
   getLocationReservations(locationId: string): number {
     const today = new Date();
     return this.reservations().filter(r => {
+      // Sprawdź czy location istnieje i ma _id
+      if (!r.location || !r.location._id) {
+        return false;
+      }
       const resDate = new Date(r.date);
       return r.location._id === locationId && 
              resDate >= today && 

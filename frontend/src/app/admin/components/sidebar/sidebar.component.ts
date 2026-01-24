@@ -13,13 +13,15 @@ import { filter } from 'rxjs';
     <!-- Mobile overlay -->
     <div *ngIf="sidebarService.isOpen()" 
          (click)="sidebarService.close()"
-         class="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"></div>
+         class="fixed inset-0 bg-black/50 z-[55] md:hidden transition-opacity"
+         style="will-change: opacity;"></div>
     
     <!-- Sidebar -->
-    <aside class="fixed left-0 top-0 bottom-0 w-64 bg-stone-900 text-warm-200 flex flex-col z-50
+    <aside class="fixed left-0 top-0 bottom-0 w-64 bg-stone-900 text-warm-200 flex flex-col z-[60]
                   transform transition-transform duration-300 ease-in-out
                   -translate-x-full md:translate-x-0"
-           [class.translate-x-0]="sidebarService.isOpen()">
+           [class.translate-x-0]="sidebarService.isOpen()"
+           style="will-change: transform;">
       <!-- Logo -->
       <div class="p-6 border-b border-stone-800">
         <div class="flex items-center gap-3">
@@ -62,6 +64,20 @@ import { filter } from 'rxjs';
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
           <span>Rezerwacje</span>
+        </a>
+
+        <a 
+          routerLink="/admin/powiadomienia"
+          routerLinkActive="bg-brown-900/50 text-brown-400"
+          (click)="onNavClick()"
+          class="flex items-center gap-3 px-4 py-3 rounded-sm text-warm-300 
+                 hover:bg-stone-800 hover:text-warm-100 transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          <span>Powiadomienia</span>
         </a>
 
         <div class="pt-4 mt-4 border-t border-stone-800">
@@ -162,9 +178,11 @@ export class AdminSidebarComponent {
     // Auto-close sidebar on route change (mobile only)
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        if (window.innerWidth < 768) {
-          this.sidebarService.close();
+      .subscribe((event) => {
+        if (event instanceof NavigationEnd) {
+          if (window.innerWidth < 768) {
+            this.sidebarService.close();
+          }
         }
       });
   }

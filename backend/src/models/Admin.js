@@ -12,7 +12,14 @@ const adminSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Hasło jest wymagane'],
-    minlength: [8, 'Hasło musi mieć minimum 8 znaków'],
+    minlength: [12, 'Hasło musi mieć minimum 12 znaków'],
+    validate: {
+      validator: function(v) {
+        // Wymagania: min. 12 znaków, wielka litera, mała litera, cyfra, znak specjalny
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/.test(v);
+      },
+      message: 'Hasło musi zawierać: minimum 12 znaków, wielką literę, małą literę, cyfrę i znak specjalny (@$!%*?&)'
+    },
     select: false // Domyślnie nie pobieraj hasła
   },
   firstName: {
@@ -41,7 +48,36 @@ const adminSchema = new mongoose.Schema({
   },
   lastLogin: {
     type: Date
-  }
+  },
+  // Push subscriptions dla Web Push Notifications
+  pushSubscriptions: [{
+    endpoint: {
+      type: String,
+      required: true
+    },
+    keys: {
+      p256dh: {
+        type: String,
+        required: true
+      },
+      auth: {
+        type: String,
+        required: true
+      }
+    },
+    deviceInfo: {
+      type: String,
+      default: ''
+    },
+    userAgent: {
+      type: String,
+      default: ''
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 }, {
   timestamps: true
 });

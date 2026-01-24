@@ -1,6 +1,8 @@
 const Reservation = require('../models/Reservation');
 const Location = require('../models/Location');
 const Table = require('../models/Table');
+const { createNotification } = require('./notificationController');
+const pushService = require('../services/pushNotification.service');
 
 // @desc    Pobierz wszystkie rezerwacje (admin)
 // @route   GET /api/reservations
@@ -168,6 +170,62 @@ exports.createReservation = async (req, res) => {
     const populatedReservation = await Reservation.findById(reservation._id)
       .populate('location', 'name address')
       .populate('tables', 'tableNumber seats');
+    
+    // Utwórz powiadomienie dla adminów o nowej rezerwacji
+    try {
+      const customerName = `${req.body.customer?.firstName || ''} ${req.body.customer?.lastName || ''}`.trim();
+      const locationName = locationDoc.name;
+      const dateStr = new Date(date).toLocaleDateString('pl-PL');
+      const timeStr = timeSlot?.start || '';
+      
+      await createNotification({
+        type: 'reservation_new',
+        title: 'Nowa rezerwacja',
+        message: `Nowa rezerwacja od ${customerName} na ${dateStr} o ${timeStr} w lokalu ${locationName}`,
+        reservation: reservation._id,
+        location: location,
+        recipient: null, // Dla wszystkich adminów
+        metadata: {
+          customerName,
+          date: date,
+          timeSlot: timeSlot,
+          guests: req.body.guests,
+          locationName
+        }
+      });
+
+      // Wyślij Web Push Notification do wszystkich adminów
+      console.log('[Reservation] Sprawdzam czy push service jest zainicjalizowany:', pushService.isInitialized());
+      if (pushService.isInitialized()) {
+        try {
+          console.log('[Reservation] Wysyłam push notification o nowej rezerwacji...');
+          const pushResult = await pushService.sendToAllAdmins({
+            title: 'Nowa rezerwacja',
+            body: `Nowa rezerwacja od ${customerName} na ${dateStr} o ${timeStr} w lokalu ${locationName}`,
+            icon: '/assets/icons/icon-192x192.svg',
+            badge: '/assets/icons/badge-72x72.svg',
+            data: {
+              url: `/admin/reservations?reservationId=${reservation._id}`,
+              reservationId: reservation._id.toString(),
+              type: 'reservation_new',
+              notificationId: reservation._id.toString()
+            },
+            requireInteraction: false,
+            tag: `reservation-${reservation._id}`,
+            timestamp: Date.now()
+          });
+          console.log('[Reservation] Wynik wysyłania push:', pushResult);
+        } catch (pushError) {
+          // Nie przerywaj procesu jeśli push się nie powiódł
+          console.error('[Reservation] ❌ Error sending push notification:', pushError);
+        }
+      } else {
+        console.log('[Reservation] ⚠️ Push service nie jest zainicjalizowany');
+      }
+    } catch (notificationError) {
+      // Nie przerywaj procesu tworzenia rezerwacji jeśli powiadomienie się nie powiodło
+      console.error('Error creating notification:', notificationError);
+    }
     
     res.status(201).json({
       success: true,

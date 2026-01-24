@@ -97,6 +97,11 @@ export const routes: Routes = [
         path: 'locations',
         loadComponent: () => import('./admin/pages/locations/locations-management.component').then(m => m.LocationsManagementComponent),
         canActivate: [authGuard]
+      },
+      {
+        path: 'powiadomienia',
+        loadComponent: () => import('./admin/pages/notifications/notifications.component').then(m => m.NotificationsComponent),
+        canActivate: [authGuard]
       }
     ]
   },

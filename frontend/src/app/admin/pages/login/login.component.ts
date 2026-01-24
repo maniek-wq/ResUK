@@ -3,6 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { PushService } from '../../../core/services/push.service';
+// import { environment } from '../../../../environments/environment'; // ZAKOMENTOWANE - do dodania później
+
+// Deklaracja typu dla Google reCAPTCHA - ZAKOMENTOWANE
+// declare global {
+//   interface Window {
+//     grecaptcha: {
+//       ready: (callback: () => void) => void;
+//       execute: (siteKey: string, options: { action: string }) => Promise<string>;
+//     };
+//   }
+// }
 
 @Component({
   selector: 'app-admin-login',
@@ -79,6 +91,10 @@ import { AuthService } from '../../../core/services/auth.service';
 
             <div *ngIf="errorMessage()" class="p-3 bg-red-900/30 border border-red-800 rounded-sm">
               <p class="text-red-400 text-sm">{{ errorMessage() }}</p>
+              <!-- TODO: Odkomentuj gdy klient się zdecyduje na CAPTCHA -->
+              <!-- <p *ngIf="requiresCaptcha()" class="text-red-300 text-xs mt-2">
+                Weryfikacja CAPTCHA jest wymagana. Odśwież stronę i spróbuj ponownie.
+              </p> -->
             </div>
 
             <button 
@@ -119,14 +135,120 @@ export class AdminLoginComponent {
   showPassword = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
+  // requiresCaptcha = signal(false); // ZAKOMENTOWANE - do dodania później
+  // recaptchaLoaded = signal(false); // ZAKOMENTOWANE - do dodania później
+
+  // Klucz reCAPTCHA z environment variables - ZAKOMENTOWANE
+  // private readonly RECAPTCHA_SITE_KEY = environment.recaptchaSiteKey;
 
   patternStyle = 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")';
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pushService: PushService
   ) {}
+
+  // ngOnInit(): void {
+  //   this.loadRecaptcha();
+  // } // ZAKOMENTOWANE - do dodania później
+
+  // ngOnDestroy(): void {
+  //   // Cleanup jeśli potrzebne
+  // } // ZAKOMENTOWANE - do dodania później
+
+  /**
+   * Ładuje skrypt Google reCAPTCHA - ZAKOMENTOWANE
+   */
+  // private loadRecaptcha(): void {
+  //   // Sprawdź czy skrypt już został załadowany
+  //   if (window.grecaptcha) {
+  //     this.recaptchaLoaded.set(true);
+  //     return;
+  //   }
+
+  //   // Utwórz element script
+  //   const script = document.createElement('script');
+  //   script.src = `https://www.google.com/recaptcha/api.js?render=${this.RECAPTCHA_SITE_KEY}`;
+  //   script.async = true;
+  //   script.defer = true;
+    
+  //   script.onload = () => {
+  //     window.grecaptcha.ready(() => {
+  //       this.recaptchaLoaded.set(true);
+  //     });
+  //   };
+
+  //   script.onerror = () => {
+  //     console.error('❌ Błąd ładowania Google reCAPTCHA');
+  //     this.errorMessage.set('Błąd ładowania weryfikacji. Odśwież stronę.');
+  //   };
+
+  //   document.head.appendChild(script);
+  // }
+
+  /**
+   * Generuje token reCAPTCHA - ZAKOMENTOWANE
+   */
+  // private async getRecaptchaToken(): Promise<string | null> {
+  //   if (!this.recaptchaLoaded() || !window.grecaptcha) {
+  //     console.error('reCAPTCHA nie jest załadowane');
+  //     return null;
+  //   }
+
+  //   try {
+  //     const token = await window.grecaptcha.execute(this.RECAPTCHA_SITE_KEY, {
+  //       action: 'login'
+  //     });
+  //     return token;
+  //   } catch (error) {
+  //     console.error('Błąd generowania tokenu reCAPTCHA:', error);
+  //     return null;
+  //   }
+  // }
+
+  /**
+   * Rejestruje push notifications po udanym logowaniu
+   */
+  private async registerPushNotifications(): Promise<void> {
+    if (!this.pushService.isSupported()) {
+      console.log('[Login] Web Push Notifications nie są wspierane w tej przeglądarce');
+      return;
+    }
+
+    // Jeśli użytkownik już odmówił, nie pytaj ponownie
+    if (this.pushService.isPermissionDenied()) {
+      console.log('[Login] Użytkownik odmówił zgody na powiadomienia');
+      return;
+    }
+
+    // Jeśli już ma zgodę, od razu zarejestruj
+    if (this.pushService.isPermissionGranted()) {
+      console.log('[Login] Użytkownik już udzielił zgody, rejestruję subscription...');
+      try {
+        await this.pushService.subscribeAndRegister();
+      } catch (error) {
+        console.error('[Login] Błąd rejestracji push notifications:', error);
+      }
+      return;
+    }
+
+    // Jeśli można zapytać (status: default), zapytaj o zgodę
+    if (this.pushService.canAskPermission()) {
+      console.log('[Login] Pytam o zgodę na powiadomienia...');
+      try {
+        const success = await this.pushService.subscribeAndRegister();
+        if (success) {
+          console.log('[Login] Push notifications zarejestrowane pomyślnie');
+        } else {
+          console.log('[Login] Użytkownik nie udzielił zgody na powiadomienia');
+        }
+      } catch (error) {
+        console.error('[Login] Błąd rejestracji push notifications:', error);
+      }
+    }
+  }
 
   onSubmit(): void {
     if (!this.credentials.email || !this.credentials.password) {
@@ -137,12 +259,65 @@ export class AdminLoginComponent {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
+    // TODO: Odkomentuj gdy klient się zdecyduje na CAPTCHA
+    // try {
+    //   // Generuj token reCAPTCHA przed wysłaniem formularza
+    //   const recaptchaToken = await this.getRecaptchaToken();
+    //   
+    //   if (!recaptchaToken) {
+    //     this.isLoading.set(false);
+    //     this.errorMessage.set('Błąd weryfikacji CAPTCHA. Odśwież stronę i spróbuj ponownie.');
+    //     this.requiresCaptcha.set(true);
+    //     return;
+    //   }
+
+    //   // Wywołaj login z tokenem CAPTCHA
+    //   this.authService.login(
+    //     this.credentials.email, 
+    //     this.credentials.password,
+    //     recaptchaToken
+    //   ).subscribe({
+    //     next: (response) => {
+    //       this.isLoading.set(false);
+    //       if (response.success) {
+    //         const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/dashboard';
+    //         this.router.navigate([returnUrl]);
+    //       }
+    //     },
+    //     error: (error) => {
+    //       this.isLoading.set(false);
+    //       const errorMsg = error.error?.message || 'Wystąpił błąd podczas logowania';
+    //       this.errorMessage.set(errorMsg);
+    //       
+    //       // Jeśli błąd wskazuje na wymaganą CAPTCHA, ustaw flagę
+    //       if (error.error?.requiresCaptcha) {
+    //         this.requiresCaptcha.set(true);
+    //       }
+    //     }
+    //   });
+    // } catch (error) {
+    //   this.isLoading.set(false);
+    //   this.errorMessage.set('Błąd podczas weryfikacji. Spróbuj ponownie.');
+    //   this.requiresCaptcha.set(true);
+    // }
+
+    // Wersja bez CAPTCHA (aktualna)
     this.authService.login(this.credentials.email, this.credentials.password).subscribe({
       next: (response) => {
-        this.isLoading.set(false);
         if (response.success) {
+          this.isLoading.set(false);
+          
+          // Nawigacja NATYCHMIAST - nie czekamy na push
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/dashboard';
           this.router.navigate([returnUrl]);
+          
+          // Push notifications rejestrujemy W TLE po nawigacji (fire and forget)
+          // Nie blokujemy logowania
+          this.registerPushNotifications().catch(e => {
+            console.warn('[Login] Push registration failed (non-blocking):', e?.message || e);
+          });
+        } else {
+          this.isLoading.set(false);
         }
       },
       error: (error) => {
