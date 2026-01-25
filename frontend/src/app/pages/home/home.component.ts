@@ -14,9 +14,9 @@ import { LocationService, Location } from '../../core/services/location.service'
 
     <!-- Hero Section -->
     <section class="relative h-screen flex items-center justify-center overflow-hidden">
-      <!-- Background Image Placeholder -->
+      <!-- Background Image -->
       <div class="absolute inset-0 bg-gradient-to-br from-stone-900 via-brown-950 to-stone-900">
-        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] 
+        <div class="absolute inset-0 bg-[url('/assets/images/bg.jpg')] 
                     bg-cover bg-center opacity-40"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/50"></div>
       </div>
@@ -66,7 +66,7 @@ import { LocationService, Location } from '../../core/services/location.service'
           <div class="relative">
             <div class="aspect-[4/5] bg-warm-200 rounded-sm overflow-hidden shadow-2xl">
               <img 
-                src="https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80" 
+                src="/assets/images/historia.jpg" 
                 alt="Wnętrze restauracji"
                 class="w-full h-full object-cover"
               >
@@ -106,51 +106,27 @@ import { LocationService, Location } from '../../core/services/location.service'
         <div class="text-center mb-16">
           <span class="font-accent text-brown-400 text-lg tracking-wider">Odwiedź nas</span>
           <h2 class="font-display text-4xl md:text-5xl font-semibold mt-2">
-            Nasze Lokale
+            Nasz Lokal
           </h2>
           <div class="section-divider !bg-gradient-to-r !from-transparent !via-brown-500 !to-transparent"></div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <!-- Location 1 -->
+        <div class="max-w-4xl mx-auto">
+          <!-- Location -->
           <div class="group relative overflow-hidden rounded-sm">
             <div class="aspect-[16/10] bg-stone-800">
               <img 
-                src="https://images.unsplash.com/photo-1552566626-52f8b828add9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
-                alt="Restauracja Centrum"
+                src="/assets/images/bg.jpg"
+                alt="U Kelnerów"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               >
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent"></div>
             <div class="absolute bottom-0 left-0 right-0 p-8">
-              <h3 class="font-display text-2xl font-semibold mb-2">Centrum</h3>
-              <p class="text-warm-400 mb-1">ul. Złota 15, Warszawa</p>
-              <p class="text-brown-400">+48 22 123 45 67</p>
+              <h3 class="font-display text-2xl font-semibold mb-2">U Kelnerów</h3>
+              <p class="text-warm-400 mb-1">al. Wyzwolenia 41/u3a, Szczecin</p>
+              <p class="text-brown-400">+48 734 213 403</p>
               <a routerLink="/rezerwacja" 
-                 [queryParams]="{location: 'centrum'}"
-                 class="inline-block mt-4 text-sm text-warm-200 border-b border-warm-200 
-                        hover:text-brown-400 hover:border-brown-400 transition-colors">
-                Zarezerwuj stolik →
-              </a>
-            </div>
-          </div>
-
-          <!-- Location 2 -->
-          <div class="group relative overflow-hidden rounded-sm">
-            <div class="aspect-[16/10] bg-stone-800">
-              <img 
-                src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80"
-                alt="Restauracja Mokotów"
-                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              >
-            </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-8">
-              <h3 class="font-display text-2xl font-semibold mb-2">Mokotów</h3>
-              <p class="text-warm-400 mb-1">ul. Puławska 152, Warszawa</p>
-              <p class="text-brown-400">+48 22 987 65 43</p>
-              <a routerLink="/rezerwacja" 
-                 [queryParams]="{location: 'mokotow'}"
                  class="inline-block mt-4 text-sm text-warm-200 border-b border-warm-200 
                         hover:text-brown-400 hover:border-brown-400 transition-colors">
                 Zarezerwuj stolik →

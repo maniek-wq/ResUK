@@ -15,6 +15,7 @@ export interface Admin {
 export interface LoginResponse {
   success: boolean;
   token: string;
+  refreshToken?: string; // Opcjonalne, bo może nie być w starszych wersjach
   admin: Admin;
 }
 
@@ -46,11 +47,23 @@ export class AuthService {
     }
   }
 
-  login(email: string, password: string): Observable<LoginResponse> {
-    return this.api.post<LoginResponse>('/auth/login', { email, password }).pipe(
+  login(email: string, password: string, recaptchaToken?: string): Observable<LoginResponse> {
+    const body: any = { email, password };
+    
+    // TODO: Odkomentuj gdy klient się zdecyduje na CAPTCHA
+    // Dodaj token CAPTCHA jeśli został podany
+    // if (recaptchaToken) {
+    //   body.recaptchaToken = recaptchaToken;
+    // }
+    
+    return this.api.post<LoginResponse>('/auth/login', body).pipe(
       tap(response => {
         if (response.success) {
           localStorage.setItem('token', response.token);
+          // Zapisz refresh token jeśli istnieje
+          if (response.refreshToken) {
+            localStorage.setItem('refreshToken', response.refreshToken);
+          }
           localStorage.setItem('admin', JSON.stringify(response.admin));
           this.tokenSignal.set(response.token);
           this.adminSignal.set(response.admin);

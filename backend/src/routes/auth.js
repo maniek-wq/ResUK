@@ -1,12 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { login, getMe, changePassword, logout } = require('../controllers/authController');
+const { login, getMe, changePassword, logout, refreshToken } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 const { loginValidation } = require('../middleware/validators');
-const { loginLimiter, adminLimiter } = require('../middleware/rateLimiter');
+const { loginLimiter, adminLimiter, publicLimiter } = require('../middleware/rateLimiter');
+// const { verifyRecaptcha } = require('../middleware/recaptcha'); // ZAKOMENTOWANE - do dodania później
 
 // Publiczne
-router.post('/login', loginLimiter, loginValidation, login);
+// CAPTCHA jest wymagana dla logowania (ochrona przed botami i brute force)
+// TODO: Odkomentuj gdy klient się zdecyduje na CAPTCHA
+router.post('/login', loginLimiter, /* verifyRecaptcha, */ loginValidation, login);
+router.post('/refresh', publicLimiter, refreshToken); // Refresh token endpoint
 
 // Prywatne (wymagają autoryzacji) - z rate limitingiem dla admin/manager
 router.get('/me', protect, adminLimiter, getMe);

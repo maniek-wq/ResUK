@@ -63,7 +63,7 @@ interface StatisticsFromReservations {
                 </svg>
               </button>
               <div>
-                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">Zarządzanie Lokalmi</h1>
+                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">Zarządzanie Lokalami</h1>
                 <p class="text-stone-500 text-sm hidden md:block">Zarządzaj lokalami i wprowadzaj dzienne raporty</p>
               </div>
             </div>
@@ -116,7 +116,7 @@ interface StatisticsFromReservations {
                 <p>Brak lokali</p>
               </div>
 
-              <div *ngIf="!loading() && locations().length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div *ngIf="!loading() && locations().length > 0" class="max-w-2xl mx-auto">
                 <div 
                   *ngFor="let location of locations()"
                   class="p-6 border border-warm-200 rounded-sm hover:shadow-md transition-shadow bg-white"
@@ -940,17 +940,19 @@ export class LocationsManagementComponent implements OnInit {
     this.loadReports();
   }
 
-  getLocationName(location: string | Location): string {
+  getLocationName(location: string | Location | null | undefined): string {
+    if (!location) return 'Nieznany lokal';
     if (typeof location === 'string') {
       const loc = this.locations().find(l => l._id === location);
       return loc?.name || 'Nieznany lokal';
     }
-    return location.name;
+    return location.name || 'Nieznany lokal';
   }
 
-  getLocationId(location: string | Location): string {
+  getLocationId(location: string | Location | null | undefined): string {
+    if (!location) return '';
     if (typeof location === 'string') return location;
-    return location._id;
+    return location._id || '';
   }
 
   formatDate(dateStr: string): string {

@@ -5,7 +5,7 @@ import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
 import { SidebarService } from '../../services/sidebar.service';
 import { MenuService, MenuCategory, MenuItem } from '../../../core/services/menu.service';
-import { filter, Subscription } from 'rxjs';
+import { filter, Subscription, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-menu-management',
@@ -50,33 +50,33 @@ import { filter, Subscription } from 'rxjs';
         <!-- Content -->
         <main class="p-4 md:p-8">
           <!-- Stats -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-sm shadow-sm">
-              <h3 class="text-stone-500 text-sm font-medium mb-2">Kategorie</h3>
-              <p class="font-display text-3xl text-stone-800 font-bold">{{ categories().length }}</p>
-              <p class="text-stone-500 text-sm mt-1">{{ activeCategories().length }} aktywnych</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+            <div class="bg-white p-4 md:p-6 rounded-sm shadow-sm">
+              <h3 class="text-stone-500 text-xs md:text-sm font-medium mb-2">Kategorie</h3>
+              <p class="font-display text-2xl md:text-3xl text-stone-800 font-bold">{{ categories().length }}</p>
+              <p class="text-stone-500 text-xs md:text-sm mt-1">{{ activeCategories().length }} aktywnych</p>
             </div>
-            <div class="bg-white p-6 rounded-sm shadow-sm">
-              <h3 class="text-stone-500 text-sm font-medium mb-2">Pozycje menu</h3>
-              <p class="font-display text-3xl text-stone-800 font-bold">{{ items().length }}</p>
-              <p class="text-stone-500 text-sm mt-1">{{ availableItems().length }} dostępnych</p>
+            <div class="bg-white p-4 md:p-6 rounded-sm shadow-sm">
+              <h3 class="text-stone-500 text-xs md:text-sm font-medium mb-2">Pozycje menu</h3>
+              <p class="font-display text-2xl md:text-3xl text-stone-800 font-bold">{{ items().length }}</p>
+              <p class="text-stone-500 text-xs md:text-sm mt-1">{{ availableItems().length }} dostępnych</p>
             </div>
-            <div class="bg-white p-6 rounded-sm shadow-sm">
-              <h3 class="text-stone-500 text-sm font-medium mb-2">Nieaktywne</h3>
-              <p class="font-display text-3xl text-stone-800 font-bold">
+            <div class="bg-white p-4 md:p-6 rounded-sm shadow-sm sm:col-span-2 md:col-span-1">
+              <h3 class="text-stone-500 text-xs md:text-sm font-medium mb-2">Nieaktywne</h3>
+              <p class="font-display text-2xl md:text-3xl text-stone-800 font-bold">
                 {{ inactiveCategories().length + unavailableItems().length }}
               </p>
-              <p class="text-stone-500 text-sm mt-1">Wymaga uwagi</p>
+              <p class="text-stone-500 text-xs md:text-sm mt-1">Wymaga uwagi</p>
             </div>
           </div>
 
           <!-- Navigation Tabs -->
           <div class="bg-white rounded-sm shadow-sm mb-6">
             <div class="border-b border-warm-200">
-              <nav class="flex -mb-px">
+              <nav class="flex -mb-px overflow-x-auto">
                 <button 
                   (click)="activeTab.set('categories')"
-                  class="px-6 py-4 text-sm font-medium border-b-2 transition-colors"
+                  class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0"
                   [class]="activeTab() === 'categories'
                            ? 'border-brown-700 text-brown-700'
                            : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'"
@@ -85,7 +85,7 @@ import { filter, Subscription } from 'rxjs';
                 </button>
                 <button 
                   (click)="activeTab.set('items')"
-                  class="px-6 py-4 text-sm font-medium border-b-2 transition-colors"
+                  class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0"
                   [class]="activeTab() === 'items'
                            ? 'border-brown-700 text-brown-700'
                            : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'"
@@ -96,7 +96,7 @@ import { filter, Subscription } from 'rxjs';
             </div>
 
             <!-- Categories Tab -->
-            <div *ngIf="activeTab() === 'categories'" class="p-6">
+            <div *ngIf="activeTab() === 'categories'" class="p-4 md:p-6">
               <div *ngIf="loading()" class="text-center py-12">
                 <div class="inline-block w-8 h-8 border-4 border-brown-200 border-t-brown-700 rounded-full animate-spin"></div>
               </div>
@@ -111,16 +111,16 @@ import { filter, Subscription } from 'rxjs';
               <div *ngIf="!loading() && categories().length > 0" class="space-y-4">
                 <div 
                   *ngFor="let category of categories()"
-                  class="p-6 border border-warm-200 rounded-sm hover:shadow-md transition-shadow"
+                  class="p-4 md:p-6 border border-warm-200 rounded-sm hover:shadow-md transition-shadow"
                 >
-                  <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                      <div class="flex items-center gap-3 mb-2">
-                        <h3 class="font-display text-lg text-stone-800 font-semibold">
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                        <h3 class="font-display text-base md:text-lg text-stone-800 font-semibold">
                           {{ category.name }}
                         </h3>
                         <span 
-                          class="px-2 py-1 text-xs rounded-full"
+                          class="px-2 py-1 text-xs rounded-full self-start sm:self-center"
                           [class]="category.isActive 
                                    ? 'bg-green-100 text-green-800' 
                                    : 'bg-stone-100 text-stone-800'"
@@ -128,19 +128,21 @@ import { filter, Subscription } from 'rxjs';
                           {{ category.isActive ? 'Aktywna' : 'Nieaktywna' }}
                         </span>
                       </div>
-                      <p *ngIf="category.description" class="text-stone-600 text-sm mb-2">
+                      <p *ngIf="category.description" class="text-stone-600 text-xs md:text-sm mb-2">
                         {{ category.description }}
                       </p>
-                      <div class="flex items-center gap-4 text-sm text-stone-500">
+                      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs md:text-sm text-stone-500">
                         <span>{{ category.itemCount || 0 }} pozycji</span>
+                        <span class="hidden sm:inline">•</span>
                         <span>{{ category.activeItemCount || 0 }} aktywnych</span>
+                        <span class="hidden sm:inline">•</span>
                         <span>Kolejność: {{ category.order }}</span>
                       </div>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0">
                       <a 
                         [routerLink]="['/admin/menu/categories', category._id]"
-                        class="px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded hover:bg-stone-300 transition-colors"
+                        class="px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded hover:bg-stone-300 transition-colors text-center"
                       >
                         Edytuj
                       </a>
@@ -160,13 +162,13 @@ import { filter, Subscription } from 'rxjs';
             </div>
 
             <!-- Items Tab -->
-            <div *ngIf="activeTab() === 'items'" class="p-6">
+            <div *ngIf="activeTab() === 'items'" class="p-4 md:p-6">
               <!-- Filters -->
-              <div class="mb-6 flex gap-4">
+              <div class="mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <select 
                   [ngModel]="selectedCategoryFilter()"
                   (ngModelChange)="selectedCategoryFilter.set($event)"
-                  class="form-input text-sm w-48"
+                  class="form-input text-sm w-full sm:w-48"
                 >
                   <option value="">Wszystkie kategorie</option>
                   <option *ngFor="let cat of categories()" [value]="cat._id">{{ cat.name }}</option>
@@ -174,7 +176,7 @@ import { filter, Subscription } from 'rxjs';
                 <select 
                   [ngModel]="availabilityFilter()"
                   (ngModelChange)="availabilityFilter.set($event)"
-                  class="form-input text-sm w-48"
+                  class="form-input text-sm w-full sm:w-48"
                 >
                   <option value="">Wszystkie</option>
                   <option value="available">Dostępne</option>
@@ -196,16 +198,16 @@ import { filter, Subscription } from 'rxjs';
               <div *ngIf="!loading() && filteredItems().length > 0" class="space-y-4">
                 <div 
                   *ngFor="let item of filteredItems()"
-                  class="p-6 border border-warm-200 rounded-sm hover:shadow-md transition-shadow"
+                  class="p-4 md:p-6 border border-warm-200 rounded-sm hover:shadow-md transition-shadow"
                 >
-                  <div class="flex items-start justify-between gap-4">
-                    <div class="flex-1">
-                      <div class="flex items-center gap-3 mb-2">
-                        <h3 class="font-display text-lg text-stone-800 font-semibold">
+                  <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                        <h3 class="font-display text-base md:text-lg text-stone-800 font-semibold">
                           {{ item.name }}
                         </h3>
                         <span 
-                          class="px-2 py-1 text-xs rounded-full"
+                          class="px-2 py-1 text-xs rounded-full self-start sm:self-center"
                           [class]="item.isAvailable 
                                    ? 'bg-green-100 text-green-800' 
                                    : 'bg-stone-100 text-stone-800'"
@@ -213,14 +215,16 @@ import { filter, Subscription } from 'rxjs';
                           {{ item.isAvailable ? 'Dostępne' : 'Niedostępne' }}
                         </span>
                       </div>
-                      <p *ngIf="item.description" class="text-stone-600 text-sm mb-3">
+                      <p *ngIf="item.description" class="text-stone-600 text-xs md:text-sm mb-3">
                         {{ item.description }}
                       </p>
-                      <div class="flex items-center gap-4 text-sm text-stone-500 mb-2">
+                      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs md:text-sm text-stone-500 mb-2">
                         <span class="font-semibold text-brown-700">
                           {{ menuService.formatPrice(item.price, item.currency) }}
                         </span>
+                        <span class="hidden sm:inline">•</span>
                         <span *ngIf="item.prepTime">{{ item.prepTime }} min</span>
+                        <span class="hidden sm:inline" *ngIf="item.prepTime">•</span>
                         <span>
                           {{ getCategoryName(item.category) }}
                         </span>
@@ -234,16 +238,16 @@ import { filter, Subscription } from 'rxjs';
                         </span>
                       </div>
                     </div>
-                    <div class="flex gap-2 flex-col">
+                    <div class="flex flex-row sm:flex-col gap-2 flex-shrink-0">
                       <a 
                         [routerLink]="['/admin/menu/items', item._id]"
-                        class="px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded hover:bg-stone-300 transition-colors text-center"
+                        class="px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded hover:bg-stone-300 transition-colors text-center flex-1 sm:flex-none"
                       >
                         Edytuj
                       </a>
                       <button 
                         (click)="toggleItemAvailability(item._id)"
-                        class="px-4 py-2 text-sm rounded transition-colors"
+                        class="px-4 py-2 text-sm rounded transition-colors flex-1 sm:flex-none"
                         [class]="item.isAvailable
                                  ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
                                  : 'bg-green-100 text-green-800 hover:bg-green-200'"
@@ -252,7 +256,7 @@ import { filter, Subscription } from 'rxjs';
                       </button>
                       <button 
                         (click)="duplicateItem(item._id)"
-                        class="px-4 py-2 bg-blue-100 text-blue-800 text-sm rounded hover:bg-blue-200 transition-colors"
+                        class="px-4 py-2 bg-blue-100 text-blue-800 text-sm rounded hover:bg-blue-200 transition-colors flex-1 sm:flex-none"
                       >
                         Duplikuj
                       </button>
@@ -351,14 +355,16 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadData(): void {
+  async loadData(): Promise<void> {
     this.loading.set(true);
     
-    // Pobierz kategorie i pozycje równolegle
-    Promise.all([
-      this.menuService.getCategories(true).toPromise(),
-      this.menuService.getItems(undefined, true).toPromise()
-    ]).then(([categoriesRes, itemsRes]) => {
+    try {
+      // Pobierz kategorie i pozycje równolegle
+      const [categoriesRes, itemsRes] = await Promise.all([
+        firstValueFrom(this.menuService.getCategories(true)),
+        firstValueFrom(this.menuService.getItems(undefined, true))
+      ]);
+      
       if (categoriesRes?.success) {
         this.categories.set(categoriesRes.data);
       }
@@ -366,14 +372,14 @@ export class MenuManagementComponent implements OnInit, OnDestroy {
         this.items.set(itemsRes.data);
       }
       this.loading.set(false);
-    }).catch((error) => {
+    } catch (error: any) {
       console.error('Error loading menu data:', error);
       this.loading.set(false);
       // Jeśli błąd 401, przekieruj do logowania
       if (error?.status === 401 || error?.status === 403) {
         window.location.href = '/admin/login';
       }
-    });
+    }
   }
 
   filterItems(): void {

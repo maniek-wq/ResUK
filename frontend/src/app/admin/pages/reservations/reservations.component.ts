@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ReservationService, Reservation, ReservationFilters, CreateReservationDto, AvailabilitySlot } from '../../../core/services/reservation.service';
 import { LocationService, Location } from '../../../core/services/location.service';
 import { AdminSidebarComponent } from '../../components/sidebar/sidebar.component';
@@ -662,12 +662,35 @@ export class AdminReservationsComponent implements OnInit {
   constructor(
     private reservationService: ReservationService,
     private locationService: LocationService,
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadLocations();
-    this.applyFilters();
+    
+    // Sprawdź czy jest reservationId w query params (z powiadomienia)
+    this.route.queryParams.subscribe(params => {
+      if (params['reservationId']) {
+        const reservationId = params['reservationId'];
+        // Usuń query param z URL od razu
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
+        });
+        // Załaduj rezerwacje i otwórz modal
+        this.applyFiltersWithCallback(() => {
+          const reservation = this.reservations().find(r => r._id === reservationId);
+          if (reservation) {
+            this.openEditModal(reservation);
+          }
+        });
+      } else {
+        this.applyFilters();
+      }
+    });
   }
 
   loadLocations(): void {
@@ -679,6 +702,10 @@ export class AdminReservationsComponent implements OnInit {
   }
 
   applyFilters(): void {
+    this.applyFiltersWithCallback();
+  }
+
+  applyFiltersWithCallback(callback?: () => void): void {
     this.loading.set(true);
     const cleanFilters: ReservationFilters = {};
     
@@ -694,9 +721,15 @@ export class AdminReservationsComponent implements OnInit {
           this.reservations.set(res.data);
         }
         this.loading.set(false);
+        if (callback) {
+          callback();
+        }
       },
       error: () => {
         this.loading.set(false);
+        if (callback) {
+          callback();
+        }
       }
     });
   }

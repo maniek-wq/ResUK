@@ -46,10 +46,11 @@ interface CreateTableDto {
             </div>
             <button 
               (click)="openCreateModal()"
-              class="btn-primary text-sm"
+              class="btn-primary text-sm px-3 md:px-4 whitespace-nowrap"
               [disabled]="!selectedLocationId()"
             >
-              + Dodaj stolik
+              <span class="hidden sm:inline">+ Dodaj stolik</span>
+              <span class="sm:hidden">+ Dodaj</span>
             </button>
           </div>
         </header>
@@ -57,14 +58,14 @@ interface CreateTableDto {
         <!-- Content -->
         <main class="p-4 md:p-8">
           <!-- Location Filter -->
-          <div class="bg-white rounded-sm shadow-sm p-6 mb-6">
-            <div class="flex items-center gap-4">
+          <div class="bg-white rounded-sm shadow-sm p-4 md:p-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
               <div class="flex-1">
                 <label class="block text-stone-600 text-sm font-medium mb-2">Lokal</label>
                 <select 
                   [(ngModel)]="selectedLocationId"
                   (change)="onLocationChange()"
-                  class="form-input text-sm"
+                  class="form-input text-sm w-full"
                 >
                   <option value="">Wybierz lokal</option>
                   <option *ngFor="let loc of locations()" [value]="loc._id">
@@ -72,7 +73,7 @@ interface CreateTableDto {
                   </option>
                 </select>
               </div>
-              <div *ngIf="selectedLocationId()" class="flex items-end">
+              <div *ngIf="selectedLocationId()" class="flex items-end sm:items-center">
                 <div class="text-sm text-stone-600">
                   <p class="font-semibold text-stone-800">{{ tablesByLocation().length }} stolików</p>
                   <p class="text-xs">{{ activeTables().length }} aktywnych</p>
@@ -91,43 +92,45 @@ interface CreateTableDto {
           <div *ngIf="!loading() && selectedLocationId() && tablesByLocation().length > 0" class="space-y-4">
             <div 
               *ngFor="let table of tablesByLocation(); trackBy: trackByTableId"
-              class="bg-white rounded-sm shadow-sm p-6 hover:shadow-md transition-shadow"
+              class="bg-white rounded-sm shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow"
             >
-              <div class="flex items-center justify-between">
-                <div class="flex-1">
-                  <div class="flex items-center gap-3 mb-2">
-                    <h3 class="font-display text-lg text-stone-800 font-semibold">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                    <h3 class="font-display text-base md:text-lg text-stone-800 font-semibold">
                       Stolik #{{ table.tableNumber }}
                     </h3>
-                    <span 
-                      class="px-2 py-1 text-xs rounded-full"
-                      [class]="table.isActive 
-                               ? 'bg-green-100 text-green-800' 
-                               : 'bg-stone-100 text-stone-800'"
-                    >
-                      {{ table.isActive ? 'Aktywny' : 'Nieaktywny' }}
-                    </span>
-                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                      {{ table.seats }} miejsc
-                    </span>
-                    <span class="px-2 py-1 text-xs rounded-full bg-warm-200 text-stone-700">
-                      {{ getZoneLabel(table.zone) }}
-                    </span>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span 
+                        class="px-2 py-1 text-xs rounded-full whitespace-nowrap"
+                        [class]="table.isActive 
+                                 ? 'bg-green-100 text-green-800' 
+                                 : 'bg-stone-100 text-stone-800'"
+                      >
+                        {{ table.isActive ? 'Aktywny' : 'Nieaktywny' }}
+                      </span>
+                      <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 whitespace-nowrap">
+                        {{ table.seats }} miejsc
+                      </span>
+                      <span class="px-2 py-1 text-xs rounded-full bg-warm-200 text-stone-700 whitespace-nowrap">
+                        {{ getZoneLabel(table.zone) }}
+                      </span>
+                    </div>
                   </div>
-                  <p *ngIf="table.description" class="text-stone-600 text-sm">
+                  <p *ngIf="table.description" class="text-stone-600 text-xs md:text-sm">
                     {{ table.description }}
                   </p>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex flex-row sm:flex-col gap-2 flex-shrink-0">
                   <button 
                     (click)="openEditModal(table)"
-                    class="px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded hover:bg-stone-300 transition-colors"
+                    class="px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded hover:bg-stone-300 transition-colors flex-1 sm:flex-none text-center"
                   >
                     Edytuj
                   </button>
                   <button 
                     (click)="toggleTable(table)"
-                    class="px-4 py-2 text-sm rounded transition-colors"
+                    class="px-4 py-2 text-sm rounded transition-colors flex-1 sm:flex-none"
                     [class]="table.isActive
                              ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
                              : 'bg-green-100 text-green-800 hover:bg-green-200'"
@@ -136,7 +139,7 @@ interface CreateTableDto {
                   </button>
                   <button 
                     (click)="deleteTable(table)"
-                    class="px-4 py-2 bg-red-100 text-red-800 text-sm rounded hover:bg-red-200 transition-colors"
+                    class="px-4 py-2 bg-red-100 text-red-800 text-sm rounded hover:bg-red-200 transition-colors flex-1 sm:flex-none"
                   >
                     Usuń
                   </button>

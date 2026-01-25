@@ -99,9 +99,8 @@ import { RouterModule } from '@angular/router';
               <a routerLink="/kontakt" class="block text-warm-400 text-sm hover:text-brown-400 hover:pl-2 transition-all duration-300">
                 Kontakt
               </a>
-              <a routerLink="/admin/login" class="block text-warm-500 text-sm hover:text-brown-400 hover:pl-2 transition-all duration-300 mt-4 pt-4 border-t border-stone-800">
-                Panel Admina
-              </a>
+              <!-- Link do panelu admina usunięty ze względów bezpieczeństwa -->
+              <!-- Panel admina dostępny tylko przez bezpośredni URL: /admin/login -->
             </nav>
           </div>
         </div>

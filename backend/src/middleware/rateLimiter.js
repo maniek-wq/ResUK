@@ -16,15 +16,24 @@ const publicLimiter = rateLimit({
 
 // Rate limiting dla logowania (bardziej restrykcyjny)
 const loginLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minuta (dla testów - zmień na 15 minut w produkcji)
+  windowMs: 15 * 60 * 1000, // 15 minut
   max: 5, // maksymalnie 5 prób logowania na IP w oknie czasowym
   message: {
     success: false,
-    message: 'Zbyt wiele prób logowania. Spróbuj ponownie za chwilę.'
+    message: 'Zbyt wiele prób logowania. Spróbuj ponownie za 15 minut.',
+    retryAfter: Math.ceil(15 * 60) // sekundy
   },
-  skipSuccessfulRequests: false, // Liczy wszystkie próby (również nieudane)
+  skipSuccessfulRequests: true, // Nie licz udanych logowań
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  // Blokuj IP po przekroczeniu limitu
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: 'Zbyt wiele prób logowania. Spróbuj ponownie za 15 minut.',
+      retryAfter: Math.ceil(15 * 60)
+    });
+  }
 });
 
 // Rate limiting dla endpointów admin/manager (umiarkowany)

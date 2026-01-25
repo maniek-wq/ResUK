@@ -20,7 +20,7 @@ interface MenuCategoryWithItems extends MenuCategory {
     <!-- Hero -->
     <section class="relative h-[50vh] min-h-[400px] flex items-center justify-center">
       <div class="absolute inset-0 bg-stone-900">
-        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] 
+        <div class="absolute inset-0 bg-[url('/assets/images/menu_bg.jpg')] 
                     bg-cover bg-center opacity-50"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/60"></div>
       </div>

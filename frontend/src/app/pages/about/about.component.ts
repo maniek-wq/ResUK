@@ -14,7 +14,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
     <!-- Hero -->
     <section class="relative h-[50vh] min-h-[400px] flex items-center justify-center">
       <div class="absolute inset-0 bg-stone-900">
-        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80')] 
+        <div class="absolute inset-0 bg-[url('/assets/images/about.jpg')] 
                     bg-cover bg-center opacity-50"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/60"></div>
       </div>
@@ -55,7 +55,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
           <div class="relative">
             <div class="aspect-[4/5] bg-warm-200 rounded-sm overflow-hidden shadow-2xl">
               <img 
-                src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" 
+                src="/assets/images/about2.jpg" 
                 alt="Szef kuchni przygotowujący danie"
                 class="w-full h-full object-cover"
               >
@@ -126,35 +126,74 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
     <!-- Chef Section -->
     <section class="py-24 bg-warm-100">
       <div class="container mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div class="order-2 lg:order-1">
-            <span class="font-accent text-brown-600 text-lg tracking-wider">Szef Kuchni</span>
-            <h2 class="font-display text-4xl md:text-5xl text-stone-800 font-semibold mt-2 mb-6">
-              Michał Kowalczyk
-            </h2>
-            <div class="section-divider !mx-0 !my-6"></div>
-            <p class="text-stone-600 leading-relaxed mb-6">
-              Szef kuchni Michał Kowalczyk to wirtuoz smaku z ponad 20-letnim doświadczeniem 
-              w najlepszych restauracjach Europy. Jego kulinarną podróż rozpoczął we Francji, 
-              kontynuował we Włoszech, aby ostatecznie powrócić do Polski i tchnąć nowe życie 
-              w tradycyjne receptury.
-            </p>
-            <p class="text-stone-600 leading-relaxed mb-6">
-              "Gotowanie to sztuka opowiadania historii poprzez smaki. Każde danie w Restauracji 
-              Złotej to moja osobista opowieść o podróżach, wspomnieniach i miłości do dobrego jedzenia."
-            </p>
-            <p class="font-accent text-brown-700 text-lg italic">
-              — Michał Kowalczyk
-            </p>
-          </div>
-          <div class="order-1 lg:order-2 relative">
-            <div class="aspect-square bg-warm-200 rounded-full overflow-hidden shadow-2xl mx-auto max-w-md">
+        <div class="text-center mb-16">
+          <span class="font-accent text-brown-600 text-lg tracking-wider">Nasz zespół</span>
+          <h2 class="font-display text-4xl md:text-5xl text-stone-800 font-semibold mt-2">
+            Szefowie Kuchni
+          </h2>
+          <div class="section-divider"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+          <!-- Chef 1: Piotr Gafiuk -->
+          <div class="text-center">
+            <div class="aspect-square bg-warm-200 rounded-full overflow-hidden shadow-2xl mx-auto max-w-xs mb-6">
               <img 
-                src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1977&q=80" 
-                alt="Szef kuchni Michał Kowalczyk"
+                src="/assets/images/Zdjecie_Piotr.jpg" 
+                alt="Piotr Gafiuk"
                 class="w-full h-full object-cover"
               >
             </div>
+            <h3 class="font-display text-2xl text-stone-800 font-semibold mb-4">
+              Piotr Gafiuk
+            </h3>
+            <p class="text-stone-600 leading-relaxed mb-4">
+              Szef kuchni z pasją do tradycyjnych polskich smaków. Specjalizuje się w nowoczesnej 
+              interpretacji klasycznych dań, łącząc lokalne składniki z europejską finezją.
+            </p>
+            <p class="font-accent text-brown-700 text-lg italic">
+              — Piotr Gafiuk
+            </p>
+          </div>
+
+          <!-- Chef 2: Patryk Krupczyński -->
+          <div class="text-center">
+            <div class="aspect-square bg-warm-200 rounded-full overflow-hidden shadow-2xl mx-auto max-w-xs mb-6">
+              <img 
+                src="/assets/images/Zdjecie_Patryk.jpg" 
+                alt="Patryk Krupczyński"
+                class="w-full h-full object-cover"
+              >
+            </div>
+            <h3 class="font-display text-2xl text-stone-800 font-semibold mb-4">
+              Patryk Krupczyński
+            </h3>
+            <p class="text-stone-600 leading-relaxed mb-4">
+              Mistrz kuchni z doświadczeniem w najlepszych restauracjach. Jego kreatywność i 
+              dbałość o detale sprawiają, że każde danie to prawdziwe dzieło sztuki kulinarnej.
+            </p>
+            <p class="font-accent text-brown-700 text-lg italic">
+              — Patryk Krupczyński
+            </p>
+          </div>
+
+          <!-- Chef 3: Trzeci szef -->
+          <div class="text-center">
+            <div class="aspect-square bg-warm-200 rounded-full overflow-hidden shadow-2xl mx-auto max-w-xs mb-6">
+              <img 
+                src="/assets/images/about2.jpg" 
+                alt="Szef kuchni"
+                class="w-full h-full object-cover"
+              >
+            </div>
+            <h3 class="font-display text-2xl text-stone-800 font-semibold mb-4">
+              Michał Kowalczyk
+            </h3>
+            <p class="text-stone-600 leading-relaxed mb-4">
+              Wirtuoz smaku z ponad 20-letnim doświadczeniem w najlepszych restauracjach Europy. 
+              Jego kulinarną podróż rozpoczął we Francji, kontynuował we Włoszech, aby ostatecznie 
+              powrócić do Polski i tchnąć nowe życie w tradycyjne receptury.
+            </p>
           </div>
         </div>
       </div>

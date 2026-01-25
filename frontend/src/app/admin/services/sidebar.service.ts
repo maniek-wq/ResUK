@@ -9,14 +9,23 @@ export class SidebarService {
   open(): void {
     this.isOpen.set(true);
     if (typeof document !== 'undefined') {
-      document.body.style.overflow = 'hidden';
+      // Ustaw overflow hidden tylko na mobile (gdy szerokość < 768px)
+      if (window.innerWidth < 768) {
+        document.body.style.overflow = 'hidden';
+        // Upewnij się, że html też nie ma overflow
+        document.documentElement.style.overflow = 'hidden';
+      }
     }
   }
 
   close(): void {
     this.isOpen.set(false);
     if (typeof document !== 'undefined') {
-      document.body.style.overflow = '';
+      // Przywróć overflow tylko na mobile
+      if (window.innerWidth < 768) {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+      }
     }
   }
 

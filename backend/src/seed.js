@@ -38,14 +38,14 @@ const seedDatabase = async () => {
     // Utwórz lokale
     const locations = await Location.create([
       {
-        name: 'Restauracja Złota - Centrum',
+        name: 'U Kelnerów',
         address: {
-          street: 'ul. Złota 15',
-          city: 'Warszawa',
-          postalCode: '00-019'
+          street: 'al. Wyzwolenia 41/u3a',
+          city: 'Szczecin',
+          postalCode: '70-206'
         },
-        phone: '+48 22 123 45 67',
-        email: 'centrum@restauracjazlota.pl',
+        phone: '+48 734 213 403',
+        email: 'info@ukelnerow.pl',
         openingHours: {
           monday: { open: '12:00', close: '22:00' },
           tuesday: { open: '12:00', close: '22:00' },
@@ -55,31 +55,9 @@ const seedDatabase = async () => {
           saturday: { open: '11:00', close: '24:00' },
           sunday: { open: '11:00', close: '21:00' }
         },
-        totalTables: 15,
-        maxCapacity: 60,
-        description: 'Elegancka restauracja w sercu Warszawy z wyjątkową kuchnią polską i europejską.'
-      },
-      {
-        name: 'Restauracja Złota - Mokotów',
-        address: {
-          street: 'ul. Puławska 152',
-          city: 'Warszawa',
-          postalCode: '02-624'
-        },
-        phone: '+48 22 987 65 43',
-        email: 'mokotow@restauracjazlota.pl',
-        openingHours: {
-          monday: { open: '12:00', close: '22:00' },
-          tuesday: { open: '12:00', close: '22:00' },
-          wednesday: { open: '12:00', close: '22:00' },
-          thursday: { open: '12:00', close: '22:00' },
-          friday: { open: '12:00', close: '23:00' },
-          saturday: { open: '11:00', close: '23:00' },
-          sunday: { open: '11:00', close: '21:00' }
-        },
-        totalTables: 12,
+        totalTables: 10,
         maxCapacity: 50,
-        description: 'Przytulny lokal na Mokotowie z tarasem i ogrodem.'
+        description: 'Restauracja U Kelnerów w Szczecinie.'
       }
     ]);
     
@@ -127,7 +105,7 @@ const seedDatabase = async () => {
     // Utwórz konto admina
     const admin = await Admin.create({
       email: process.env.ADMIN_EMAIL || 'admin@restauracja.pl',
-      password: process.env.ADMIN_PASSWORD || 'Admin123!',
+      password: process.env.ADMIN_PASSWORD || 'Admin123!@$%',
       firstName: 'Administrator',
       lastName: 'Systemu',
       role: 'admin',
@@ -139,11 +117,11 @@ const seedDatabase = async () => {
     // Utwórz konto managera
     const manager = await Admin.create({
       email: 'manager@restauracja.pl',
-      password: 'Manager123!',
+      password: 'Manager123!@$',
       firstName: 'Jan',
       lastName: 'Kowalski',
       role: 'manager',
-      locations: [locations[0]._id] // Dostęp tylko do Centrum
+      locations: [locations[0]._id] // Dostęp do lokalu
     });
     
     console.log('👤 Utworzono konto managera:', manager.email);
@@ -223,9 +201,15 @@ const seedDatabase = async () => {
     console.log(`🍽️ Utworzono ${itemsData.length} pozycji menu`);
     
     console.log('\n✅ Baza danych została zainicjowana!');
-    console.log('\n📋 Dane logowania:');
-    console.log('   Admin: admin@restauracja.pl / Admin123!');
-    console.log('   Manager: manager@restauracja.pl / Manager123!');
+    
+    // Loguj dane logowania TYLKO w development (bez haseł w produkcji)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('\n📋 Dane logowania (tylko development):');
+      console.log('   Admin: admin@restauracja.pl / [sprawdź .env lub użyj ADMIN_PASSWORD]');
+      console.log('   Manager: manager@restauracja.pl / Manager123!@$');
+    } else {
+      console.log('\n📋 Konta zostały utworzone. Sprawdź zmienne środowiskowe dla danych logowania.');
+    }
     
     process.exit(0);
   } catch (error) {
