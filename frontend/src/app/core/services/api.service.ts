@@ -34,20 +34,14 @@ export class ApiService {
       });
     }
     
-    const fullUrl = `${this.apiUrl}${endpoint}`;
-    console.log(`ApiService.get - fullUrl: ${fullUrl}, endpoint: ${endpoint}, apiUrl: ${this.apiUrl}`);
-    
-    return this.http.get<T>(fullUrl, {
+    return this.http.get<T>(`${this.apiUrl}${endpoint}`, {
       headers: this.getHeaders(),
       params: httpParams
     });
   }
 
   post<T>(endpoint: string, body: any): Observable<T> {
-    const fullUrl = `${this.apiUrl}${endpoint}`;
-    console.log(`ApiService.post - fullUrl: ${fullUrl}, endpoint: ${endpoint}, apiUrl: ${this.apiUrl}`);
-    console.log(`ApiService.post - body:`, body);
-    return this.http.post<T>(fullUrl, body, {
+    return this.http.post<T>(`${this.apiUrl}${endpoint}`, body, {
       headers: this.getHeaders()
     });
   }

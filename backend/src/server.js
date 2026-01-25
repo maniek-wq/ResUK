@@ -31,6 +31,10 @@ connectDB();
 const pushService = require('./services/pushNotification.service');
 pushService.initialize();
 
+// Inicjalizuj Email Service (Resend)
+const emailService = require('./services/emailService');
+emailService.initializeResend();
+
 const app = express();
 
 // Trust proxy - wymagane dla Render (używa X-Forwarded-For)

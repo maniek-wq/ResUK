@@ -162,14 +162,14 @@ import { ReservationService, AvailabilitySlot, CreateReservationDto } from '../.
                 </div>
                 <div>
                   <label class="block text-stone-700 text-sm font-semibold mb-2">Liczba gości</label>
-                  <select [(ngModel)]="guestCount" class="form-input">
+                  <select [(ngModel)]="guestCount" (change)="onGuestCountChange()" class="form-input">
                     <option *ngFor="let n of guestOptions" [value]="n">{{ n }} {{ n === 1 ? 'osoba' : (n < 5 ? 'osoby' : 'osób') }}</option>
                   </select>
                 </div>
               </div>
 
               <!-- Available Time Slots -->
-              <div class="mb-6">
+              <div class="mb-6" *ngIf="selectedDate && guestCount">
                 <label class="block text-stone-700 text-sm font-semibold mb-4">Dostępne godziny</label>
                 
                 <div *ngIf="loadingSlots()" class="text-center py-8">
@@ -178,7 +178,7 @@ import { ReservationService, AvailabilitySlot, CreateReservationDto } from '../.
                 </div>
 
                 <div *ngIf="!loadingSlots() && availableSlots().length === 0" class="text-center py-8 text-stone-500">
-                  Wybierz datę, aby zobaczyć dostępne godziny.
+                  Brak dostępnych terminów dla {{ guestCount }} {{ guestCount === 1 ? 'osoby' : (guestCount < 5 ? 'osób' : 'osób') }}.
                 </div>
 
                 <div *ngIf="!loadingSlots() && availableSlots().length > 0" class="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -479,7 +479,17 @@ export class ReservationComponent implements OnInit {
   }
 
   onDateChange(): void {
-    if (this.selectedDate && this.selectedLocation()) {
+    this.loadAvailability();
+  }
+
+  onGuestCountChange(): void {
+    // Wyczyść wybrany slot przy zmianie liczby gości
+    this.selectedTimeSlot.set(null);
+    this.loadAvailability();
+  }
+
+  private loadAvailability(): void {
+    if (this.selectedDate && this.selectedLocation() && this.guestCount) {
       this.loadingSlots.set(true);
       this.selectedTimeSlot.set(null);
       
@@ -490,7 +500,8 @@ export class ReservationComponent implements OnInit {
       ).subscribe({
         next: (res) => {
           if (res.success) {
-            this.availableSlots.set(res.data.slots);
+            // Pokazuj tylko realnie dostępne godziny
+            this.availableSlots.set(res.data.slots.filter(s => s.available));
           }
           this.loadingSlots.set(false);
         },
@@ -498,6 +509,9 @@ export class ReservationComponent implements OnInit {
           this.loadingSlots.set(false);
         }
       });
+    } else {
+      // Wyczyść sloty jeśli brakuje daty lub liczby gości
+      this.availableSlots.set([]);
     }
   }
 

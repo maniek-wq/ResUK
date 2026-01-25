@@ -3,6 +3,65 @@ const Location = require('../models/Location');
 const Table = require('../models/Table');
 const { createNotification } = require('./notificationController');
 const pushService = require('../services/pushNotification.service');
+const emailService = require('../services/emailService');
+
+/**
+ * Wybiera optymalną kombinację stolików dla danej liczby gości
+ * Algorytm zachłanny - wybiera największe stoliki aż do osiągnięcia wymaganej pojemności
+ * @param {Array} availableTables - dostępne stoliki
+ * @param {number} guestCount - liczba gości
+ * @returns {Array|null} - wybrane stoliki lub null jeśli brak wystarczającej pojemności
+ */
+function selectOptimalTables(availableTables, guestCount) {
+  if (!availableTables || availableTables.length === 0) {
+    return null;
+  }
+  
+  // Sortuj stoliki od największego do najmniejszego
+  const sorted = [...availableTables].sort((a, b) => b.seats - a.seats);
+  
+  const selected = [];
+  let totalSeats = 0;
+  
+  // Wybieraj stoliki od największego aż do osiągnięcia wymaganej pojemności
+  for (const table of sorted) {
+    if (totalSeats >= guestCount) break;
+    selected.push(table);
+    totalSeats += table.seats;
+  }
+  
+  // Sprawdź czy udało się zebrać wystarczającą pojemność
+  return totalSeats >= guestCount ? selected : null;
+}
+
+/**
+ * Pobiera ID stolików zarezerwowanych w danym czasie
+ * @param {string} locationId - ID lokalu
+ * @param {Date} date - data rezerwacji
+ * @param {Object} timeSlot - slot czasowy {start, end}
+ * @returns {Promise<Array<string>>} - tablica ID zarezerwowanych stolików
+ */
+async function getReservedTableIds(locationId, date, timeSlot) {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+  
+  const reservations = await Reservation.find({
+    location: locationId,
+    date: { $gte: startOfDay, $lte: endOfDay },
+    status: { $in: ['pending', 'confirmed'] }
+  });
+  
+  // Znajdź stoliki zarezerwowane w nakładającym się czasie
+  const reservedTableIds = reservations
+    .filter(r => {
+      return r.timeSlot.start < timeSlot.end && r.timeSlot.end > timeSlot.start;
+    })
+    .flatMap(r => r.tables.map(t => t.toString()));
+  
+  return reservedTableIds;
+}
 
 // @desc    Pobierz wszystkie rezerwacje (admin)
 // @route   GET /api/reservations
@@ -163,8 +222,42 @@ exports.createReservation = async (req, res) => {
       }
     }
     
-    // Utwórz rezerwację
-    const reservation = await Reservation.create(req.body);
+    // Automatyczne przypisywanie stolików dla rezerwacji typu 'table'
+    let assignedTables = tables;
+    
+    if (type === 'table' && (!assignedTables || assignedTables.length === 0)) {
+      // Pobierz wszystkie aktywne stoliki lokalu
+      const allTables = await Table.find({ location, isActive: true });
+      
+      // Pobierz ID stolików zarezerwowanych w tym czasie
+      const reservedTableIds = await getReservedTableIds(location, date, timeSlot);
+      
+      // Znajdź dostępne stoliki
+      const availableTables = allTables.filter(t => 
+        !reservedTableIds.includes(t._id.toString())
+      );
+      
+      // Wybierz optymalne stoliki dla liczby gości
+      const guestCount = parseInt(guests) || 1;
+      const optimalTables = selectOptimalTables(availableTables, guestCount);
+      
+      if (!optimalTables) {
+        return res.status(400).json({
+          success: false,
+          message: `Brak dostępnych stolików dla ${guestCount} gości w wybranym terminie`
+        });
+      }
+      
+      assignedTables = optimalTables.map(t => t._id);
+      console.log(`[Reservation] Automatycznie przypisano stoliki: ${optimalTables.map(t => `#${t.tableNumber} (${t.seats} miejsc)`).join(', ')}`);
+    }
+    
+    // Utwórz rezerwację z przypisanymi stolikami
+    const reservationData = {
+      ...req.body,
+      tables: assignedTables || []
+    };
+    const reservation = await Reservation.create(reservationData);
     
     // Pobierz pełne dane
     const populatedReservation = await Reservation.findById(reservation._id)
@@ -225,6 +318,24 @@ exports.createReservation = async (req, res) => {
     } catch (notificationError) {
       // Nie przerywaj procesu tworzenia rezerwacji jeśli powiadomienie się nie powiodło
       console.error('Error creating notification:', notificationError);
+    }
+    
+    // Wyślij email potwierdzenia do klienta
+    try {
+      if (emailService.isInitialized() && req.body.customer?.email) {
+        const emailResult = await emailService.sendReservationConfirmationEmail(
+          { ...req.body, _id: reservation._id },
+          locationDoc
+        );
+        if (emailResult.success) {
+          console.log('[Reservation] ✅ Email potwierdzenia wysłany pomyślnie');
+        } else {
+          console.warn('[Reservation] ⚠️ Nie udało się wysłać emaila:', emailResult.error);
+        }
+      }
+    } catch (emailError) {
+      // Nie przerywaj procesu - email to dodatek
+      console.error('[Reservation] ❌ Error sending email:', emailError);
     }
     
     res.status(201).json({
@@ -324,6 +435,10 @@ exports.updateReservationStatus = async (req, res) => {
       });
     }
     
+    // Pobierz poprzedni status
+    const previousReservation = await Reservation.findById(req.params.id);
+    const previousStatus = previousReservation?.status;
+    
     const updateData = { status };
     
     if (status === 'confirmed') {
@@ -346,6 +461,26 @@ exports.updateReservationStatus = async (req, res) => {
       });
     }
     
+    // Wyślij email jeśli status zmienił się na 'confirmed'
+    if (status === 'confirmed' && previousStatus !== 'confirmed') {
+      try {
+        if (emailService.isInitialized() && reservation.customer?.email) {
+          console.log('[Reservation] Wysyłam email o potwierdzeniu do:', reservation.customer.email);
+          const emailResult = await emailService.sendReservationApprovedEmail(
+            reservation,
+            reservation.location
+          );
+          if (emailResult.success) {
+            console.log('[Reservation] ✅ Email o potwierdzeniu wysłany');
+          } else {
+            console.warn('[Reservation] ⚠️ Nie udało się wysłać emaila:', emailResult.error);
+          }
+        }
+      } catch (emailError) {
+        console.error('[Reservation] ❌ Error sending confirmation email:', emailError);
+      }
+    }
+    
     res.status(200).json({
       success: true,
       data: reservation
@@ -366,6 +501,9 @@ exports.getAvailability = async (req, res) => {
     const { locationId } = req.params;
     const { date, guests } = req.query;
     
+    // Parsuj liczbę gości (domyślnie 1)
+    const guestsNum = parseInt(guests) || 1;
+    
     if (!date) {
       return res.status(400).json({
         success: false,
@@ -383,6 +521,9 @@ exports.getAvailability = async (req, res) => {
     
     // Pobierz wszystkie stoliki lokalu
     const tables = await Table.find({ location: locationId, isActive: true });
+    
+    // Oblicz maksymalną pojemność lokalu
+    const maxCapacity = tables.reduce((sum, t) => sum + t.seats, 0);
     
     // Pobierz rezerwacje na dany dzień
     const startOfDay = new Date(date);
@@ -405,24 +546,30 @@ exports.getAvailability = async (req, res) => {
         const endMin = min === 30 ? 0 : 30;
         const endTimeStr = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`;
         
-        // Znajdź dostępne stoliki
+        // Znajdź stoliki zarezerwowane w tym slocie
         const reservedTableIds = reservations
           .filter(r => {
             return r.timeSlot.start < endTimeStr && r.timeSlot.end > timeStr;
           })
           .flatMap(r => r.tables.map(t => t.toString()));
         
+        // Znajdź dostępne stoliki
         const availableTables = tables.filter(t => 
           !reservedTableIds.includes(t._id.toString())
         );
         
+        // Oblicz łączną pojemność dostępnych stolików
         const totalSeats = availableTables.reduce((sum, t) => sum + t.seats, 0);
+        
+        // Slot jest dostępny tylko jeśli łączna pojemność >= liczba gości
+        const canAccommodate = totalSeats >= guestsNum;
         
         slots.push({
           time: timeStr,
-          available: availableTables.length > 0,
+          available: canAccommodate,
           availableTables: availableTables.length,
-          totalSeats
+          totalSeats,
+          canAccommodate
         });
       }
     }
@@ -432,7 +579,9 @@ exports.getAvailability = async (req, res) => {
       data: {
         location: location.name,
         date,
-        slots
+        slots,
+        maxCapacity,
+        requestedGuests: guestsNum
       }
     });
   } catch (error) {
