@@ -45,40 +45,35 @@ interface StatisticsFromReservations {
   standalone: true,
   imports: [CommonModule, FormsModule, AdminSidebarComponent],
   template: `
-    <div class="min-h-screen bg-warm-100 flex">
+    <div class="min-h-screen bg-warm-100 flex overflow-x-hidden">
       <app-admin-sidebar></app-admin-sidebar>
 
-      <div class="flex-1 md:ml-64">
+      <div class="flex-1 md:ml-64 min-w-0">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-warm-200 px-4 md:px-8 py-4">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <!-- Hamburger button (mobile only) -->
-              <button 
-                (click)="sidebarService.toggle()"
-                class="md:hidden p-2 text-stone-600 hover:text-stone-800 hover:bg-warm-50 rounded-sm transition-colors flex-shrink-0"
-              >
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-              </button>
-              <div>
-                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">Zarządzanie Lokalami</h1>
-                <p class="text-stone-500 text-sm hidden md:block">Zarządzaj lokalami i wprowadzaj dzienne raporty</p>
-              </div>
-            </div>
+        <header class="bg-white shadow-sm border-b border-warm-200 px-3 sm:px-4 md:px-8 py-3 sm:py-4">
+          <div class="flex items-center gap-3">
+            <!-- Hamburger button (mobile only) -->
+            <button 
+              (click)="sidebarService.toggle()"
+              class="md:hidden p-1.5 sm:p-2 text-stone-600 hover:text-stone-800 hover:bg-warm-50 rounded-sm transition-colors flex-shrink-0"
+            >
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+            <h1 class="font-display text-base sm:text-xl md:text-2xl text-stone-800 font-semibold truncate">Zarządzanie Lokalami</h1>
           </div>
         </header>
 
         <!-- Content -->
-        <main class="p-4 md:p-8">
+        <main class="p-3 sm:p-4 md:p-8">
           <!-- Navigation Tabs -->
-          <div class="bg-white rounded-sm shadow-sm mb-6">
+          <div class="bg-white rounded-sm shadow-sm mb-4 sm:mb-6">
             <div class="border-b border-warm-200">
               <nav class="flex -mb-px">
                 <button 
                   (click)="activeTab.set('locations')"
-                  class="px-6 py-4 text-sm font-medium border-b-2 transition-colors"
+                  class="flex-1 sm:flex-none px-3 sm:px-6 py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
                   [class]="activeTab() === 'locations'
                            ? 'border-brown-700 text-brown-700'
                            : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'"
@@ -87,16 +82,17 @@ interface StatisticsFromReservations {
                 </button>
                 <button 
                   (click)="activeTab.set('reports')"
-                  class="px-6 py-4 text-sm font-medium border-b-2 transition-colors"
+                  class="flex-1 sm:flex-none px-3 sm:px-6 py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
                   [class]="activeTab() === 'reports'
                            ? 'border-brown-700 text-brown-700'
                            : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'"
                 >
-                  Raporty dzienne
+                  <span class="sm:hidden">Raporty</span>
+                  <span class="hidden sm:inline">Raporty dzienne</span>
                 </button>
                 <button 
                   (click)="activeTab.set('comparison')"
-                  class="px-6 py-4 text-sm font-medium border-b-2 transition-colors"
+                  class="flex-1 sm:flex-none px-3 sm:px-6 py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
                   [class]="activeTab() === 'comparison'
                            ? 'border-brown-700 text-brown-700'
                            : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'"
@@ -429,29 +425,29 @@ interface StatisticsFromReservations {
             </div>
 
             <!-- Comparison Tab -->
-            <div *ngIf="activeTab() === 'comparison'" class="p-6">
+            <div *ngIf="activeTab() === 'comparison'" class="p-3 sm:p-4 md:p-6">
               <!-- Filters -->
-              <div class="bg-white rounded-sm shadow-sm p-6 mb-6">
-                <h2 class="font-display text-lg text-stone-800 font-semibold mb-4">
+              <div class="bg-white rounded-sm shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6">
+                <h2 class="font-display text-base sm:text-lg text-stone-800 font-semibold mb-3 sm:mb-4">
                   Zestawienie lokali
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-2 sm:gap-4">
                   <div>
-                    <label class="block text-stone-600 text-sm font-medium mb-2">Od daty</label>
+                    <label class="block text-stone-600 text-[11px] sm:text-sm font-medium mb-1 sm:mb-2">Od daty</label>
                     <input 
                       type="date"
                       [(ngModel)]="comparisonFilter.dateFrom"
                       (change)="loadComparison()"
-                      class="form-input text-sm"
+                      class="form-input text-xs sm:text-sm"
                     >
                   </div>
                   <div>
-                    <label class="block text-stone-600 text-sm font-medium mb-2">Do daty</label>
+                    <label class="block text-stone-600 text-[11px] sm:text-sm font-medium mb-1 sm:mb-2">Do daty</label>
                     <input 
                       type="date"
                       [(ngModel)]="comparisonFilter.dateTo"
                       (change)="loadComparison()"
-                      class="form-input text-sm"
+                      class="form-input text-xs sm:text-sm"
                     >
                   </div>
                 </div>
@@ -463,36 +459,36 @@ interface StatisticsFromReservations {
               </div>
 
               <!-- Comparison Content -->
-              <div *ngIf="!loadingComparison()" class="space-y-6">
+              <div *ngIf="!loadingComparison()" class="space-y-4 sm:space-y-6">
                 <!-- Summary Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-4 sm:gap-6">
                   <div *ngFor="let location of locations(); let i = index" 
-                       class="bg-white rounded-sm shadow-sm p-6">
-                    <h3 class="font-display text-xl text-stone-800 font-semibold mb-4">
+                       class="bg-white rounded-sm shadow-sm p-3 sm:p-4 md:p-6">
+                    <h3 class="font-display text-base sm:text-xl text-stone-800 font-semibold mb-3 sm:mb-4">
                       {{ location.name }}
                     </h3>
-                    <div class="grid grid-cols-2 gap-4">
-                      <div class="p-4 bg-warm-50 rounded-sm">
-                        <p class="text-stone-500 text-xs mb-1">Łączny przychód</p>
-                        <p class="font-display text-2xl text-brown-700 font-bold">
+                    <div class="grid grid-cols-2 gap-2 sm:gap-4">
+                      <div class="p-2 sm:p-4 bg-warm-50 rounded-sm min-w-0">
+                        <p class="text-stone-500 text-[10px] sm:text-xs mb-1 truncate">Łączny przychód</p>
+                        <p class="font-display text-base sm:text-2xl text-brown-700 font-bold truncate">
                           {{ formatPrice(getLocationTotalRevenue(location._id), 'PLN') }}
                         </p>
                       </div>
-                      <div class="p-4 bg-warm-50 rounded-sm">
-                        <p class="text-stone-500 text-xs mb-1">Średni przychód/dzień</p>
-                        <p class="font-display text-xl text-stone-800 font-semibold">
+                      <div class="p-2 sm:p-4 bg-warm-50 rounded-sm min-w-0">
+                        <p class="text-stone-500 text-[10px] sm:text-xs mb-1 truncate">Średni/dzień</p>
+                        <p class="font-display text-base sm:text-xl text-stone-800 font-semibold truncate">
                           {{ formatPrice(getLocationAverageRevenue(location._id), 'PLN') }}
                         </p>
                       </div>
-                      <div class="p-4 bg-blue-50 rounded-sm">
-                        <p class="text-blue-600 text-xs mb-1">Łączna liczba gości</p>
-                        <p class="font-display text-xl text-blue-800 font-semibold">
+                      <div class="p-2 sm:p-4 bg-blue-50 rounded-sm min-w-0">
+                        <p class="text-blue-600 text-[10px] sm:text-xs mb-1 truncate">Liczba gości</p>
+                        <p class="font-display text-base sm:text-xl text-blue-800 font-semibold">
                           {{ getLocationTotalGuests(location._id) }}
                         </p>
                       </div>
-                      <div class="p-4 bg-green-50 rounded-sm">
-                        <p class="text-green-600 text-xs mb-1">Rezerwacje</p>
-                        <p class="font-display text-xl text-green-800 font-semibold">
+                      <div class="p-2 sm:p-4 bg-green-50 rounded-sm min-w-0">
+                        <p class="text-green-600 text-[10px] sm:text-xs mb-1 truncate">Rezerwacje</p>
+                        <p class="font-display text-base sm:text-xl text-green-800 font-semibold">
                           {{ getLocationTotalReservations(location._id) }}
                         </p>
                       </div>
@@ -501,25 +497,25 @@ interface StatisticsFromReservations {
                 </div>
 
                 <!-- Revenue Comparison Chart -->
-                <div class="bg-white rounded-sm shadow-sm p-6">
-                  <h3 class="font-display text-lg text-stone-800 font-semibold mb-6">
+                <div class="bg-white rounded-sm shadow-sm p-3 sm:p-4 md:p-6">
+                  <h3 class="font-display text-sm sm:text-lg text-stone-800 font-semibold mb-3 sm:mb-6">
                     Porównanie przychodów
                   </h3>
-                  <div class="space-y-6">
+                  <div class="space-y-4 sm:space-y-6">
                     <div *ngFor="let location of locations(); let i = index">
-                      <div class="flex items-center justify-between mb-2">
-                        <span class="text-stone-600 text-sm font-medium">{{ location.name }}</span>
-                        <span class="text-stone-800 font-semibold">
+                      <div class="flex items-center justify-between mb-1 sm:mb-2">
+                        <span class="text-stone-600 text-xs sm:text-sm font-medium truncate mr-2">{{ location.name }}</span>
+                        <span class="text-stone-800 text-xs sm:text-sm font-semibold whitespace-nowrap">
                           {{ formatPrice(getLocationTotalRevenue(location._id), 'PLN') }}
                         </span>
                       </div>
-                      <div class="w-full bg-warm-100 rounded-full h-8 overflow-hidden">
+                      <div class="w-full bg-warm-100 rounded-full h-6 sm:h-8 overflow-hidden">
                         <div 
-                          class="h-full flex items-center justify-center text-white text-xs font-semibold transition-all duration-500"
+                          class="h-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold transition-all duration-500"
                           [style.width.%]="getRevenuePercentage(location._id)"
                           [style.background-color]="i === 0 ? '#92400e' : '#a16207'"
                         >
-                          <span *ngIf="getRevenuePercentage(location._id) > 10">
+                          <span *ngIf="getRevenuePercentage(location._id) > 15" class="hidden sm:inline">
                             {{ formatPrice(getLocationTotalRevenue(location._id), 'PLN') }}
                           </span>
                         </div>
@@ -529,25 +525,25 @@ interface StatisticsFromReservations {
                 </div>
 
                 <!-- Guests Comparison Chart -->
-                <div class="bg-white rounded-sm shadow-sm p-6">
-                  <h3 class="font-display text-lg text-stone-800 font-semibold mb-6">
+                <div class="bg-white rounded-sm shadow-sm p-3 sm:p-4 md:p-6">
+                  <h3 class="font-display text-sm sm:text-lg text-stone-800 font-semibold mb-3 sm:mb-6">
                     Porównanie liczby gości
                   </h3>
-                  <div class="space-y-6">
+                  <div class="space-y-4 sm:space-y-6">
                     <div *ngFor="let location of locations(); let i = index">
-                      <div class="flex items-center justify-between mb-2">
-                        <span class="text-stone-600 text-sm font-medium">{{ location.name }}</span>
-                        <span class="text-stone-800 font-semibold">
+                      <div class="flex items-center justify-between mb-1 sm:mb-2">
+                        <span class="text-stone-600 text-xs sm:text-sm font-medium truncate mr-2">{{ location.name }}</span>
+                        <span class="text-stone-800 text-xs sm:text-sm font-semibold whitespace-nowrap">
                           {{ getLocationTotalGuests(location._id) }} gości
                         </span>
                       </div>
-                      <div class="w-full bg-warm-100 rounded-full h-8 overflow-hidden">
+                      <div class="w-full bg-warm-100 rounded-full h-6 sm:h-8 overflow-hidden">
                         <div 
-                          class="h-full flex items-center justify-center text-white text-xs font-semibold transition-all duration-500"
+                          class="h-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold transition-all duration-500"
                           [style.width.%]="getGuestsPercentage(location._id)"
                           [style.background-color]="i === 0 ? '#0891b2' : '#0e7490'"
                         >
-                          <span *ngIf="getGuestsPercentage(location._id) > 10">
+                          <span *ngIf="getGuestsPercentage(location._id) > 15" class="hidden sm:inline">
                             {{ getLocationTotalGuests(location._id) }}
                           </span>
                         </div>
@@ -557,25 +553,25 @@ interface StatisticsFromReservations {
                 </div>
 
                 <!-- Reservations Comparison Chart -->
-                <div class="bg-white rounded-sm shadow-sm p-6">
-                  <h3 class="font-display text-lg text-stone-800 font-semibold mb-6">
+                <div class="bg-white rounded-sm shadow-sm p-3 sm:p-4 md:p-6">
+                  <h3 class="font-display text-sm sm:text-lg text-stone-800 font-semibold mb-3 sm:mb-6">
                     Porównanie rezerwacji
                   </h3>
-                  <div class="space-y-6">
+                  <div class="space-y-4 sm:space-y-6">
                     <div *ngFor="let location of locations(); let i = index">
-                      <div class="flex items-center justify-between mb-2">
-                        <span class="text-stone-600 text-sm font-medium">{{ location.name }}</span>
-                        <span class="text-stone-800 font-semibold">
-                          {{ getLocationTotalReservations(location._id) }} rezerwacji
+                      <div class="flex items-center justify-between mb-1 sm:mb-2">
+                        <span class="text-stone-600 text-xs sm:text-sm font-medium truncate mr-2">{{ location.name }}</span>
+                        <span class="text-stone-800 text-xs sm:text-sm font-semibold whitespace-nowrap">
+                          {{ getLocationTotalReservations(location._id) }} rez.
                         </span>
                       </div>
-                      <div class="w-full bg-warm-100 rounded-full h-8 overflow-hidden">
+                      <div class="w-full bg-warm-100 rounded-full h-6 sm:h-8 overflow-hidden">
                         <div 
-                          class="h-full flex items-center justify-center text-white text-xs font-semibold transition-all duration-500"
+                          class="h-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold transition-all duration-500"
                           [style.width.%]="getReservationsPercentage(location._id)"
                           [style.background-color]="i === 0 ? '#059669' : '#047857'"
                         >
-                          <span *ngIf="getReservationsPercentage(location._id) > 10">
+                          <span *ngIf="getReservationsPercentage(location._id) > 15" class="hidden sm:inline">
                             {{ getLocationTotalReservations(location._id) }}
                           </span>
                         </div>
@@ -586,95 +582,95 @@ interface StatisticsFromReservations {
 
                 <!-- Detailed Comparison Table -->
                 <div class="bg-white rounded-sm shadow-sm overflow-hidden">
-                  <div class="p-6 border-b border-warm-200 bg-warm-50">
-                    <h3 class="font-display text-lg text-stone-800 font-semibold">
+                  <div class="p-3 sm:p-4 md:p-6 border-b border-warm-200 bg-warm-50">
+                    <h3 class="font-display text-sm sm:text-lg text-stone-800 font-semibold">
                       Szczegółowe zestawienie
                     </h3>
                   </div>
                   <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="w-full min-w-[400px]">
                       <thead class="bg-warm-100">
                         <tr>
-                          <th class="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase">
+                          <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-semibold text-stone-600 uppercase">
                             Metryka
                           </th>
                           <th *ngFor="let location of locations()" 
-                              class="px-6 py-3 text-center text-xs font-semibold text-stone-600 uppercase">
+                              class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-semibold text-stone-600 uppercase">
                             {{ location.name }}
                           </th>
-                          <th class="px-6 py-3 text-center text-xs font-semibold text-stone-600 uppercase">
+                          <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-center text-[10px] sm:text-xs font-semibold text-stone-600 uppercase">
                             Razem
                           </th>
                         </tr>
                       </thead>
                       <tbody class="divide-y divide-warm-200">
                         <tr>
-                          <td class="px-6 py-4 text-sm text-stone-600 font-medium">Przychód</td>
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-stone-600 font-medium">Przychód</td>
                           <td *ngFor="let location of locations()" 
-                              class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                              class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ formatPrice(getLocationTotalRevenue(location._id), 'PLN') }}
                           </td>
-                          <td class="px-6 py-4 text-sm text-center text-brown-700 font-bold">
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-brown-700 font-bold">
                             {{ formatPrice(getTotalRevenue(), 'PLN') }}
                           </td>
                         </tr>
                         <tr>
-                          <td class="px-6 py-4 text-sm text-stone-600 font-medium">Średni przychód/dzień</td>
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-stone-600 font-medium">Śr./dzień</td>
                           <td *ngFor="let location of locations()" 
-                              class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                              class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ formatPrice(getLocationAverageRevenue(location._id), 'PLN') }}
                           </td>
-                          <td class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ formatPrice(getAverageRevenue(), 'PLN') }}
                           </td>
                         </tr>
                         <tr>
-                          <td class="px-6 py-4 text-sm text-stone-600 font-medium">Goście</td>
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-stone-600 font-medium">Goście</td>
                           <td *ngFor="let location of locations()" 
-                              class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                              class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ getLocationTotalGuests(location._id) }}
                           </td>
-                          <td class="px-6 py-4 text-sm text-center text-blue-700 font-bold">
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-blue-700 font-bold">
                             {{ getTotalGuests() }}
                           </td>
                         </tr>
                         <tr>
-                          <td class="px-6 py-4 text-sm text-stone-600 font-medium">Rezerwacje</td>
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-stone-600 font-medium">Rezerwacje</td>
                           <td *ngFor="let location of locations()" 
-                              class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                              class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ getLocationTotalReservations(location._id) }}
                           </td>
-                          <td class="px-6 py-4 text-sm text-center text-green-700 font-bold">
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-green-700 font-bold">
                             {{ getTotalReservations() }}
                           </td>
                         </tr>
                         <tr>
-                          <td class="px-6 py-4 text-sm text-stone-600 font-medium">Średni przychód/gość</td>
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-stone-600 font-medium">Śr./gość</td>
                           <td *ngFor="let location of locations()" 
-                              class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                              class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ formatPrice(getLocationAverageRevenuePerGuest(location._id), 'PLN') }}
                           </td>
-                          <td class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ formatPrice(getAverageRevenuePerGuest(), 'PLN') }}
                           </td>
                         </tr>
                         <tr>
-                          <td class="px-6 py-4 text-sm text-stone-600 font-medium">Średnia gości/rezerwacja</td>
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-stone-600 font-medium">Goście/rez.</td>
                           <td *ngFor="let location of locations()" 
-                              class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                              class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ getLocationAverageGuestsPerReservation(location._id).toFixed(2) }}
                           </td>
-                          <td class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ getAverageGuestsPerReservation().toFixed(2) }}
                           </td>
                         </tr>
                         <tr>
-                          <td class="px-6 py-4 text-sm text-stone-600 font-medium">Liczba dni z raportami</td>
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-stone-600 font-medium">Dni</td>
                           <td *ngFor="let location of locations()" 
-                              class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                              class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ getLocationReportDays(location._id) }}
                           </td>
-                          <td class="px-6 py-4 text-sm text-center text-stone-800 font-semibold">
+                          <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 text-[11px] sm:text-sm text-center text-stone-800 font-semibold">
                             {{ getTotalReportDays() }}
                           </td>
                         </tr>

@@ -17,8 +17,8 @@ import { NotificationBellComponent } from '../../components/notification-bell/no
       <div class="flex-1 md:ml-64">
         <!-- Header -->
         <header class="bg-white shadow-sm border-b border-warm-200 px-4 md:px-8 py-4">
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-4 flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
               <!-- Hamburger button (mobile only) -->
               <button 
                 (click)="sidebarService.toggle()"
@@ -28,22 +28,17 @@ import { NotificationBellComponent } from '../../components/notification-bell/no
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
               </button>
-              <div class="min-w-0">
-                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">Powiadomienia</h1>
-                <p class="text-stone-500 text-sm hidden md:block">
-                  {{ notificationService.unreadCount() }} nieprzeczytanych
-                </p>
-              </div>
+              <h1 class="font-display text-lg sm:text-xl md:text-2xl text-stone-800 font-semibold truncate">Powiadomienia</h1>
             </div>
-            <div class="flex items-center gap-4 flex-shrink-0">
+            <div class="flex items-center gap-2 flex-shrink-0">
               <app-notification-bell></app-notification-bell>
               <button
                 *ngIf="notificationService.unreadCount() > 0"
                 (click)="markAllAsRead()"
-                class="px-4 py-2 bg-brown-700 text-white text-sm rounded-sm hover:bg-brown-800 transition-colors whitespace-nowrap"
+                class="hidden sm:block px-3 py-2 bg-brown-700 text-white text-sm rounded-sm hover:bg-brown-800 transition-colors whitespace-nowrap"
                 [disabled]="loading()"
               >
-                Oznacz wszystkie jako przeczytane
+                Oznacz wszystkie
               </button>
             </div>
           </div>
@@ -51,13 +46,14 @@ import { NotificationBellComponent } from '../../components/notification-bell/no
 
         <!-- Content -->
         <main class="p-4 md:p-8">
-          <!-- Filters -->
-          <div class="bg-white rounded-sm shadow-sm p-4 md:p-6 mb-6">
-            <div class="flex flex-col sm:flex-row gap-4 items-center">
-              <div class="flex gap-2 flex-1 w-full sm:w-auto">
+          <!-- Filters & Actions -->
+          <div class="bg-white rounded-sm shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6">
+            <div class="flex flex-col gap-3">
+              <!-- Filter buttons -->
+              <div class="flex flex-wrap gap-2">
                 <button
                   (click)="filter.set('all')"
-                  class="px-4 py-2 text-sm rounded-sm transition-colors"
+                  class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm rounded-sm transition-colors text-center"
                   [class.bg-brown-700]="filter() === 'all'"
                   [class.text-white]="filter() === 'all'"
                   [class.bg-stone-200]="filter() !== 'all'"
@@ -67,7 +63,7 @@ import { NotificationBellComponent } from '../../components/notification-bell/no
                 </button>
                 <button
                   (click)="filter.set('unread')"
-                  class="px-4 py-2 text-sm rounded-sm transition-colors"
+                  class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm rounded-sm transition-colors text-center"
                   [class.bg-brown-700]="filter() === 'unread'"
                   [class.text-white]="filter() === 'unread'"
                   [class.bg-stone-200]="filter() !== 'unread'"
@@ -77,7 +73,7 @@ import { NotificationBellComponent } from '../../components/notification-bell/no
                 </button>
                 <button
                   (click)="filter.set('read')"
-                  class="px-4 py-2 text-sm rounded-sm transition-colors"
+                  class="flex-1 sm:flex-none px-3 py-2 text-xs sm:text-sm rounded-sm transition-colors text-center"
                   [class.bg-brown-700]="filter() === 'read'"
                   [class.text-white]="filter() === 'read'"
                   [class.bg-stone-200]="filter() !== 'read'"
@@ -86,14 +82,24 @@ import { NotificationBellComponent } from '../../components/notification-bell/no
                   Przeczytane ({{ readCount() }})
                 </button>
               </div>
-              <button
-                (click)="refresh()"
-                class="px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded-sm hover:bg-stone-300 transition-colors whitespace-nowrap"
-                [disabled]="loading()"
-              >
-                <span *ngIf="!loading()">Odśwież</span>
-                <span *ngIf="loading()">Odświeżanie...</span>
-              </button>
+              <!-- Action buttons -->
+              <div class="flex gap-2">
+                <button
+                  (click)="refresh()"
+                  class="flex-1 sm:flex-none px-4 py-2 bg-stone-200 text-stone-700 text-sm rounded-sm hover:bg-stone-300 transition-colors"
+                  [disabled]="loading()"
+                >
+                  {{ loading() ? 'Odświeżanie...' : 'Odśwież' }}
+                </button>
+                <button
+                  *ngIf="notificationService.unreadCount() > 0"
+                  (click)="markAllAsRead()"
+                  class="sm:hidden flex-1 px-3 py-2 bg-brown-700 text-white text-sm rounded-sm hover:bg-brown-800 transition-colors"
+                  [disabled]="loading()"
+                >
+                  Oznacz wszystkie
+                </button>
+              </div>
             </div>
           </div>
 
@@ -112,70 +118,61 @@ import { NotificationBellComponent } from '../../components/notification-bell/no
               <p class="text-sm">Nie masz żadnych powiadomień w tej kategorii.</p>
             </div>
 
-            <div *ngIf="!loading() && filteredNotifications().length > 0" class="divide-y divide-warm-100">
+            <div *ngIf="!loading() && filteredNotifications().length > 0" class="p-3 sm:p-4 flex flex-col gap-3">
               <div
                 *ngFor="let notification of filteredNotifications()"
-                class="p-4 md:p-6 hover:bg-warm-50 transition-colors"
+                class="p-4 hover:bg-warm-50 transition-colors rounded-sm border border-warm-200"
                 [class.bg-blue-50]="!notification.isRead"
+                [class.border-blue-200]="!notification.isRead"
               >
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 mt-1">
+                <!-- Header: Title + Time + Status dot -->
+                <div class="flex items-start justify-between gap-2 mb-2">
+                  <div class="flex items-center gap-2 min-w-0">
                     <div 
-                      class="w-3 h-3 rounded-full"
+                      class="w-2 h-2 rounded-full flex-shrink-0"
                       [class.bg-blue-600]="!notification.isRead"
-                      [class.bg-transparent]="notification.isRead"
+                      [class.bg-stone-300]="notification.isRead"
                     ></div>
+                    <h3 class="font-semibold text-stone-800 text-sm sm:text-base truncate">
+                      {{ notification.title }}
+                    </h3>
                   </div>
-                  
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-start justify-between gap-4 mb-2">
-                      <div class="flex-1 min-w-0">
-                        <h3 class="font-display text-base md:text-lg text-stone-800 font-semibold mb-1">
-                          {{ notification.title }}
-                        </h3>
-                        <p class="text-stone-600 text-sm md:text-base mb-3">
-                          {{ notification.message }}
-                        </p>
-                        
-                        <!-- Reservation details if available -->
-                        <div *ngIf="notification.reservation" class="bg-warm-50 p-3 rounded-sm mb-3">
-                          <p class="text-xs text-stone-500 mb-1">Szczegóły rezerwacji:</p>
-                          <p class="text-sm text-stone-700">
-                            <strong>{{ notification.reservation.customer.firstName }} {{ notification.reservation.customer.lastName }}</strong> • 
-                            {{ formatDate(notification.reservation.date) }} o {{ notification.reservation.timeSlot.start }}
-                          </p>
-                          <p *ngIf="notification.location" class="text-xs text-stone-500 mt-1">
-                            Lokal: {{ notification.location.name }}
-                          </p>
-                        </div>
-                        
-                        <div class="flex items-center gap-4 text-xs text-stone-500">
-                          <span>{{ formatTime(notification.createdAt) }}</span>
-                          <span *ngIf="notification.location && !notification.reservation">
-                            Lokal: {{ notification.location.name }}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div class="flex items-start gap-2 flex-shrink-0">
-                        <button
-                          *ngIf="!notification.isRead"
-                          (click)="markAsRead(notification._id)"
-                          class="px-3 py-1.5 text-xs bg-brown-100 text-brown-700 rounded-sm hover:bg-brown-200 transition-colors whitespace-nowrap"
-                        >
-                          Oznacz jako przeczytane
-                        </button>
-                        <a
-                          *ngIf="notification.reservation"
-                          [routerLink]="['/admin/reservations']"
-                          [queryParams]="{ reservationId: notification.reservation._id }"
-                          class="px-3 py-1.5 text-xs bg-stone-200 text-stone-700 rounded-sm hover:bg-stone-300 transition-colors whitespace-nowrap"
-                        >
-                          Zobacz rezerwację
-                        </a>
-                      </div>
-                    </div>
+                  <span class="text-xs text-stone-400 flex-shrink-0">{{ formatTime(notification.createdAt) }}</span>
+                </div>
+
+                <!-- Reservation info (compact) -->
+                <div *ngIf="notification.reservation" class="ml-4 mb-3">
+                  <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-stone-700">
+                    <span class="font-medium">{{ notification.reservation.customer.firstName }} {{ notification.reservation.customer.lastName }}</span>
+                    <span class="text-stone-400">•</span>
+                    <span>{{ formatDateShort(notification.reservation.date) }}, {{ notification.reservation.timeSlot.start }}</span>
+                    <span *ngIf="notification.location" class="text-stone-400">•</span>
+                    <span *ngIf="notification.location" class="text-stone-500">{{ notification.location.name }}</span>
                   </div>
+                </div>
+
+                <!-- Message for non-reservation notifications -->
+                <p *ngIf="!notification.reservation" class="ml-4 mb-3 text-sm text-stone-600">
+                  {{ notification.message }}
+                </p>
+
+                <!-- Actions -->
+                <div class="ml-4 flex flex-wrap items-center gap-2">
+                  <a
+                    *ngIf="notification.reservation"
+                    [routerLink]="['/admin/reservations']"
+                    [queryParams]="{ reservationId: notification.reservation._id }"
+                    class="px-3 py-1.5 text-xs bg-brown-700 text-white rounded-sm hover:bg-brown-800 transition-colors"
+                  >
+                    Zobacz rezerwację
+                  </a>
+                  <button
+                    *ngIf="!notification.isRead"
+                    (click)="markAsRead(notification._id)"
+                    class="px-3 py-1.5 text-xs text-stone-600 hover:text-stone-800 hover:bg-stone-100 rounded-sm transition-colors"
+                  >
+                    Oznacz jako przeczytane
+                  </button>
                 </div>
               </div>
             </div>
@@ -275,5 +272,10 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   formatDate(dateStr: string): string {
     const date = new Date(dateStr);
     return date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  formatDateShort(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' });
   }
 }

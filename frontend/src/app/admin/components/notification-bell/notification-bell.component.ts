@@ -34,8 +34,9 @@ import { AuthService } from '../../../core/services/auth.service';
       <!-- Dropdown -->
       <div 
         *ngIf="isDropdownOpen()"
-        class="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-sm shadow-xl border border-warm-200 
-               z-50 max-h-[500px] overflow-hidden flex flex-col"
+        class="fixed left-3 right-3 top-16 w-auto bg-white rounded-sm shadow-xl border border-warm-200 
+               z-50 max-h-[70vh] overflow-hidden flex flex-col
+               sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-2 sm:w-80 md:w-96"
       >
         <!-- Header -->
         <div class="p-4 border-b border-warm-200 flex items-center justify-between bg-warm-50">
