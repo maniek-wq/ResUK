@@ -142,6 +142,39 @@ a, button {
   transform: translateY(0) translateX(0);
 }
 
+// Ensure delay classes work with transitions
+.animate-on-scroll.delay-100 {
+  transition-delay: 100ms;
+}
+
+.animate-on-scroll.delay-200 {
+  transition-delay: 200ms;
+}
+
+.animate-on-scroll.delay-300 {
+  transition-delay: 300ms;
+}
+
+.animate-on-scroll.delay-400 {
+  transition-delay: 400ms;
+}
+
+.animate-on-scroll.delay-500 {
+  transition-delay: 500ms;
+}
+
+.animate-on-scroll.delay-600 {
+  transition-delay: 600ms;
+}
+
+.animate-on-scroll.delay-700 {
+  transition-delay: 700ms;
+}
+
+.animate-on-scroll.delay-800 {
+  transition-delay: 800ms;
+}
+
 // Gradient text
 .gradient-text {
   @apply bg-gradient-to-r from-brown-700 via-brown-600 to-brown-800 bg-clip-text text-transparent;

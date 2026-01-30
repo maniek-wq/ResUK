@@ -200,18 +200,19 @@ import { LocationService, Location } from '../../core/services/location.service'
       <div class="absolute top-0 left-0 w-64 h-64 bg-brown-700/20 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
       <div class="absolute bottom-0 right-0 w-96 h-96 bg-brown-600/10 rounded-full translate-x-1/3 translate-y-1/3"></div>
       
-      <div class="container mx-auto px-6 text-center relative z-10 animate-on-scroll animate-fade-in-up">
-        <h2 class="font-display text-4xl md:text-5xl text-warm-100 font-semibold mb-6">
+      <div class="container mx-auto px-6 text-center relative z-10">
+        <h2 class="font-display text-4xl md:text-5xl text-warm-100 font-semibold mb-6 animate-on-scroll animate-fade-in-up">
           Zarezerwuj Swój Stolik
         </h2>
-        <p class="font-body text-warm-300 text-lg max-w-2xl mx-auto mb-10">
+        <p class="font-body text-warm-300 text-lg max-w-2xl mx-auto mb-10 animate-on-scroll animate-fade-in-up delay-200">
           Wybierz lokal, datę i godzinę — resztą zajmiemy się my. 
           Czekamy, aby stworzyć dla Ciebie niezapomniane wspomnienia.
         </p>
         <a routerLink="/rezerwacja" class="inline-block px-12 py-4 bg-warm-100 text-brown-900 
                                            font-body font-semibold tracking-wider rounded-sm
                                            hover:bg-white transform hover:scale-105 
-                                           shadow-xl hover:shadow-2xl transition-all duration-300">
+                                           shadow-xl hover:shadow-2xl transition-all duration-300
+                                           animate-on-scroll animate-fade-in-up delay-400">
           Zarezerwuj Teraz
         </a>
       </div>
@@ -220,9 +221,14 @@ import { LocationService, Location } from '../../core/services/location.service'
     <app-footer></app-footer>
   `,
   styles: [`
-    .delay-200 { animation-delay: 200ms; }
-    .delay-400 { animation-delay: 400ms; }
-    .delay-600 { animation-delay: 600ms; }
+    .delay-100 { animation-delay: 100ms; transition-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; transition-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; transition-delay: 300ms; }
+    .delay-400 { animation-delay: 400ms; transition-delay: 400ms; }
+    .delay-500 { animation-delay: 500ms; transition-delay: 500ms; }
+    .delay-600 { animation-delay: 600ms; transition-delay: 600ms; }
+    .delay-700 { animation-delay: 700ms; transition-delay: 700ms; }
+    .delay-800 { animation-delay: 800ms; transition-delay: 800ms; }
   `]
 })
 export class HomeComponent implements OnInit, AfterViewInit {
@@ -244,37 +250,31 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   private setupScrollAnimations(): void {
-    const observerOptions = {
-      threshold: 0.15,
-      rootMargin: '0px 0px -80px 0px'
-    };
+    // Wait for DOM to be fully rendered
+    setTimeout(() => {
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -30px 0px'
+      };
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const element = entry.target as HTMLElement;
-          const animatedElements = element.querySelectorAll('.animate-on-scroll');
-          animatedElements.forEach((el) => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const element = entry.target as HTMLElement;
             // Add 'visible' class to trigger animation
-            el.classList.add('visible');
-          });
-          observer.unobserve(element);
-        }
-      });
-    }, observerOptions);
+            element.classList.add('visible');
+            // Unobserve after animation is triggered
+            observer.unobserve(element);
+          }
+        });
+      }, observerOptions);
 
-    // Observe all sections
-    if (this.aboutSection?.nativeElement) {
-      observer.observe(this.aboutSection.nativeElement);
-    }
-    if (this.locationsSection?.nativeElement) {
-      observer.observe(this.locationsSection.nativeElement);
-    }
-    if (this.featuresSection?.nativeElement) {
-      observer.observe(this.featuresSection.nativeElement);
-    }
-    if (this.ctaSection?.nativeElement) {
-      observer.observe(this.ctaSection.nativeElement);
-    }
+      // Observe ALL elements with animate-on-scroll class directly
+      // This ensures every element gets its own animation trigger
+      const animatedElements = document.querySelectorAll('.animate-on-scroll');
+      animatedElements.forEach((el) => {
+        observer.observe(el);
+      });
+    }, 200);
   }
 }
