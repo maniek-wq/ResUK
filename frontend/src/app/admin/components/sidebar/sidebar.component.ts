@@ -138,6 +138,23 @@ import { filter } from 'rxjs';
             <span>Ułóż stoliki</span>
           </a>
         </div>
+
+        <!-- Admin Management (tylko dla roli admin) -->
+        <div class="pt-4 mt-4 border-t border-stone-800">
+          <a 
+            routerLink="/admin/admins"
+            routerLinkActive="bg-brown-900/50 text-brown-400"
+            (click)="onNavClick()"
+            class="flex items-center gap-3 px-4 py-3 rounded-sm text-warm-300 
+                   hover:bg-stone-800 hover:text-warm-100 transition-colors"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <span>Administratorzy</span>
+          </a>
+        </div>
       </nav>
 
       <!-- User & Logout -->

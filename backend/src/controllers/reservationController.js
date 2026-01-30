@@ -140,7 +140,10 @@ exports.getReservation = async (req, res) => {
     const reservation = await Reservation.findById(req.params.id)
       .populate('location')
       .populate('tables')
-      .populate('confirmedBy', 'firstName lastName');
+      .populate('confirmedBy', 'firstName lastName')
+      .populate('createdBy', 'firstName lastName email')
+      .populate('updatedBy', 'firstName lastName email')
+      .populate('statusHistory.changedBy', 'firstName lastName email');
     
     if (!reservation) {
       return res.status(404).json({
@@ -255,7 +258,16 @@ exports.createReservation = async (req, res) => {
     // Utwórz rezerwację z przypisanymi stolikami
     const reservationData = {
       ...req.body,
-      tables: assignedTables || []
+      tables: assignedTables || [],
+      // Zapisz kto utworzył (jeśli admin)
+      createdBy: req.admin ? req.admin._id : null,
+      // Utwórz pierwszy wpis w historii statusu
+      statusHistory: [{
+        status: 'pending',
+        changedBy: req.admin ? req.admin._id : null,
+        changedAt: new Date(),
+        reason: 'Utworzenie rezerwacji'
+      }]
     };
     const reservation = await Reservation.create(reservationData);
     
@@ -426,7 +438,7 @@ exports.deleteReservation = async (req, res) => {
 // @access  Private
 exports.updateReservationStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, reason } = req.body;
     
     if (!['pending', 'confirmed', 'cancelled', 'completed'].includes(status)) {
       return res.status(400).json({
@@ -439,7 +451,25 @@ exports.updateReservationStatus = async (req, res) => {
     const previousReservation = await Reservation.findById(req.params.id);
     const previousStatus = previousReservation?.status;
     
-    const updateData = { status };
+    if (!previousReservation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rezerwacja nie znaleziona'
+      });
+    }
+    
+    const updateData = { 
+      status,
+      updatedBy: req.admin._id,
+      $push: {
+        statusHistory: {
+          status: status,
+          changedBy: req.admin._id,
+          changedAt: new Date(),
+          reason: reason || `Zmiana statusu z ${previousStatus} na ${status}`
+        }
+      }
+    };
     
     if (status === 'confirmed') {
       updateData.confirmedBy = req.admin._id;
@@ -452,7 +482,9 @@ exports.updateReservationStatus = async (req, res) => {
       { new: true }
     )
       .populate('location', 'name address')
-      .populate('tables', 'tableNumber seats');
+      .populate('tables', 'tableNumber seats')
+      .populate('updatedBy', 'firstName lastName')
+      .populate('statusHistory.changedBy', 'firstName lastName');
     
     if (!reservation) {
       return res.status(404).json({

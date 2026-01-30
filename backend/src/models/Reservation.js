@@ -86,7 +86,39 @@ const reservationSchema = new mongoose.Schema({
   },
   confirmedAt: {
     type: Date
-  }
+  },
+  // Audyt - kto utworzył rezerwację
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Admin'
+  },
+  // Audyt - kto ostatnio edytował
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Admin'
+  },
+  // Historia zmian statusu
+  statusHistory: [{
+    status: {
+      type: String,
+      enum: ['pending', 'confirmed', 'cancelled', 'completed'],
+      required: true
+    },
+    changedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Admin',
+      required: true
+    },
+    changedAt: {
+      type: Date,
+      default: Date.now,
+      required: true
+    },
+    reason: {
+      type: String,
+      trim: true
+    }
+  }]
 }, {
   timestamps: true
 });

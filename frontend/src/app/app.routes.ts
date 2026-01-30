@@ -102,6 +102,11 @@ export const routes: Routes = [
         path: 'powiadomienia',
         loadComponent: () => import('./admin/pages/notifications/notifications.component').then(m => m.NotificationsComponent),
         canActivate: [authGuard]
+      },
+      {
+        path: 'admins',
+        loadComponent: () => import('./admin/pages/admins/admins-management.component').then(m => m.AdminsManagementComponent),
+        canActivate: [authGuard]
       }
     ]
   },

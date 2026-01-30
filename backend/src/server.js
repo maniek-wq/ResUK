@@ -129,6 +129,7 @@ app.get('/', (req, res) => {
 // UWAGA: Route /api/seed musi być przed innymi route'ami z parametrami dynamicznymi
 app.use('/api/seed', require('./routes/seed'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admins', require('./routes/admins'));
 app.use('/api/locations', require('./routes/locations'));
 app.use('/api/reservations', require('./routes/reservations'));
 app.use('/api/tables', require('./routes/tables'));
