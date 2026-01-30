@@ -18,38 +18,38 @@ import { firstValueFrom } from 'rxjs';
 
       <div class="flex-1 md:ml-64">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-warm-200 px-4 md:px-8 py-4">
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-4 flex-1 min-w-0">
+        <header class="bg-white shadow-sm border-b border-warm-200 px-3 sm:px-4 md:px-6 lg:px-8 py-3 md:py-4">
+          <div class="flex items-center justify-between gap-2 sm:gap-3 md:gap-4">
+            <div class="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
               <!-- Hamburger button (mobile only) -->
               <button 
                 (click)="sidebarService.toggle()"
-                class="md:hidden p-2 text-stone-600 hover:text-stone-800 hover:bg-warm-50 rounded-sm transition-colors flex-shrink-0"
+                class="md:hidden p-1.5 text-stone-600 hover:text-stone-800 hover:bg-warm-50 rounded-sm transition-colors flex-shrink-0"
               >
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
               </button>
               <div class="min-w-0">
-                <h1 class="font-display text-xl md:text-2xl text-stone-800 font-semibold">Rezerwacje</h1>
-                <p class="text-stone-500 text-sm hidden md:block">Zarządzaj rezerwacjami w obu lokalach</p>
+                <h1 class="font-display text-base sm:text-lg md:text-xl lg:text-2xl text-stone-800 font-semibold truncate">Rezerwacje</h1>
+                <p class="text-stone-500 text-xs md:text-sm hidden md:block">Zarządzaj rezerwacjami w obu lokalach</p>
               </div>
             </div>
             <button 
               (click)="openAddModal()"
-              class="btn-primary text-sm px-4 md:px-6 flex-shrink-0 whitespace-nowrap"
+              class="btn-primary text-xs sm:text-sm px-3 sm:px-4 lg:px-6 py-2 flex-shrink-0 whitespace-nowrap"
             >
-              <span class="hidden md:inline">+ Dodaj rezerwację</span>
-              <span class="md:hidden">+ Dodaj</span>
+              <span class="hidden sm:inline">+ Dodaj rezerwację</span>
+              <span class="sm:hidden">+ Dodaj</span>
             </button>
           </div>
         </header>
 
         <!-- Content -->
-        <main class="p-4 md:p-8">
+        <main class="p-3 sm:p-4 md:p-6 lg:p-8">
           <!-- Filters -->
-          <div class="bg-white rounded-sm shadow-sm p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div class="bg-white rounded-sm shadow-sm p-4 md:p-6 mb-4 md:mb-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
               <div>
                 <label class="block text-stone-600 text-sm font-medium mb-2">Lokal</label>
                 <select 
@@ -112,7 +112,7 @@ import { firstValueFrom } from 'rxjs';
           <!-- Reservations List -->
           <div class="bg-white rounded-sm shadow-sm overflow-hidden">
             <!-- Table Header (Desktop only) -->
-            <div class="hidden md:grid grid-cols-12 gap-4 p-4 bg-warm-50 border-b border-warm-200 text-sm font-semibold text-stone-600">
+            <div class="hidden xl:grid grid-cols-12 gap-4 p-4 bg-warm-50 border-b border-warm-200 text-sm font-semibold text-stone-600">
               <div class="col-span-3">Klient</div>
               <div class="col-span-2">Lokal</div>
               <div class="col-span-2">Data i godzina</div>
@@ -132,10 +132,10 @@ import { firstValueFrom } from 'rxjs';
               Brak rezerwacji spełniających kryteria
             </div>
 
-            <!-- Mobile Card Layout -->
-            <div *ngIf="!loading() && reservations().length > 0" class="md:hidden space-y-4 p-4">
+            <!-- Mobile/Tablet Card Layout -->
+            <div *ngIf="!loading() && reservations().length > 0" class="xl:hidden space-y-3 p-3 md:p-4">
               <div *ngFor="let reservation of reservations()" 
-                   class="bg-white border border-warm-200 rounded-sm p-4 shadow-sm hover:shadow-md transition-shadow">
+                   class="bg-white border border-warm-200 rounded-sm p-3 md:p-4 shadow-sm hover:shadow-md transition-shadow">
                 <!-- Header: Customer & Status -->
                 <div class="flex items-start justify-between mb-3">
                   <div class="flex-1">
@@ -191,30 +191,30 @@ import { firstValueFrom } from 'rxjs';
                 </div>
 
                 <!-- Actions -->
-                <div class="flex flex-wrap gap-2 pt-3 border-t border-warm-100">
+                <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2 pt-3 border-t border-warm-100">
                   <button 
                     *ngIf="reservation.status === 'pending'"
                     (click)="updateStatus(reservation._id, 'confirmed')"
-                    class="flex-1 px-3 py-2 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                    class="px-2 sm:px-3 py-1.5 sm:py-2 bg-green-600 text-white text-[10px] sm:text-xs rounded hover:bg-green-700 transition-colors whitespace-nowrap"
                   >
                     Potwierdź
                   </button>
                   <button 
                     *ngIf="reservation.status === 'pending' || reservation.status === 'confirmed'"
                     (click)="updateStatus(reservation._id, 'cancelled')"
-                    class="flex-1 px-3 py-2 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+                    class="px-2 sm:px-3 py-1.5 sm:py-2 bg-red-600 text-white text-[10px] sm:text-xs rounded hover:bg-red-700 transition-colors whitespace-nowrap"
                   >
                     Anuluj
                   </button>
                   <button 
                     (click)="openEditModal(reservation)"
-                    class="flex-1 px-3 py-2 bg-stone-600 text-white text-xs rounded hover:bg-stone-700 transition-colors"
+                    class="px-2 sm:px-3 py-1.5 sm:py-2 bg-stone-600 text-white text-[10px] sm:text-xs rounded hover:bg-stone-700 transition-colors whitespace-nowrap"
                   >
                     Edytuj
                   </button>
                   <button 
                     (click)="deleteReservation(reservation._id)"
-                    class="flex-1 px-3 py-2 bg-stone-200 text-stone-600 text-xs rounded hover:bg-stone-300 transition-colors"
+                    class="px-2 sm:px-3 py-1.5 sm:py-2 bg-stone-200 text-stone-600 text-[10px] sm:text-xs rounded hover:bg-stone-300 transition-colors whitespace-nowrap"
                   >
                     Usuń
                   </button>
@@ -223,9 +223,9 @@ import { firstValueFrom } from 'rxjs';
             </div>
 
             <!-- Desktop Table Rows -->
-            <div *ngIf="!loading() && reservations().length > 0" class="hidden md:block">
+            <div *ngIf="!loading() && reservations().length > 0" class="hidden xl:block">
               <div *ngFor="let reservation of reservations()" 
-                   class="grid grid-cols-12 gap-4 p-4 border-b border-warm-100 hover:bg-warm-50 transition-colors items-center">
+                   class="grid grid-cols-12 gap-3 p-3 lg:gap-4 lg:p-4 border-b border-warm-100 hover:bg-warm-50 transition-colors items-center">
                 <!-- Customer -->
                 <div class="col-span-3">
                   <p class="font-medium text-stone-800">
@@ -279,30 +279,30 @@ import { firstValueFrom } from 'rxjs';
                 </div>
                 
                 <!-- Actions -->
-                <div class="col-span-2 flex justify-end gap-2">
+                <div class="col-span-2 flex justify-end gap-1.5">
                   <button 
                     *ngIf="reservation.status === 'pending'"
                     (click)="updateStatus(reservation._id, 'confirmed')"
-                    class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                    class="px-2 py-1 bg-green-600 text-white text-[10px] xl:text-xs rounded hover:bg-green-700 transition-colors whitespace-nowrap"
                   >
                     Potwierdź
                   </button>
                   <button 
                     *ngIf="reservation.status === 'pending' || reservation.status === 'confirmed'"
                     (click)="updateStatus(reservation._id, 'cancelled')"
-                    class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+                    class="px-2 py-1 bg-red-600 text-white text-[10px] xl:text-xs rounded hover:bg-red-700 transition-colors whitespace-nowrap"
                   >
                     Anuluj
                   </button>
                   <button 
                     (click)="openEditModal(reservation)"
-                    class="px-3 py-1 bg-stone-600 text-white text-xs rounded hover:bg-stone-700 transition-colors"
+                    class="px-2 py-1 bg-stone-600 text-white text-[10px] xl:text-xs rounded hover:bg-stone-700 transition-colors whitespace-nowrap"
                   >
                     Edytuj
                   </button>
                   <button 
                     (click)="deleteReservation(reservation._id)"
-                    class="px-3 py-1 bg-stone-200 text-stone-600 text-xs rounded hover:bg-stone-300 transition-colors"
+                    class="px-2 py-1 bg-stone-200 text-stone-600 text-[10px] xl:text-xs rounded hover:bg-stone-300 transition-colors whitespace-nowrap"
                   >
                     Usuń
                   </button>
