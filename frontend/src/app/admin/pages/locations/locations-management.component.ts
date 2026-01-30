@@ -81,6 +81,16 @@ interface StatisticsFromReservations {
                   Lokale
                 </button>
                 <button 
+                  (click)="activeTab.set('hours')"
+                  class="flex-1 sm:flex-none px-3 sm:px-6 py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
+                  [class]="activeTab() === 'hours'
+                           ? 'border-brown-700 text-brown-700'
+                           : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'"
+                >
+                  <span class="sm:hidden">Godziny</span>
+                  <span class="hidden sm:inline">Godziny otwarcia</span>
+                </button>
+                <button 
                   (click)="activeTab.set('reports')"
                   class="flex-1 sm:flex-none px-3 sm:px-6 py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
                   [class]="activeTab() === 'reports'
@@ -134,6 +144,176 @@ interface StatisticsFromReservations {
                     >
                       Zobacz raporty
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hours Tab -->
+            <div *ngIf="activeTab() === 'hours'" class="p-6">
+              <div *ngIf="loading()" class="text-center py-12">
+                <div class="inline-block w-8 h-8 border-4 border-brown-200 border-t-brown-700 rounded-full animate-spin"></div>
+              </div>
+
+              <div *ngIf="!loading() && locations().length === 0" class="text-center py-12 text-stone-500">
+                <p>Brak lokali. Dodaj lokal w zakładce "Lokale".</p>
+              </div>
+
+              <div *ngIf="!loading() && locations().length > 0" class="max-w-4xl mx-auto space-y-6">
+                <!-- Location selector -->
+                <div class="bg-white rounded-sm shadow-sm p-6">
+                  <label class="block text-sm font-medium text-stone-700 mb-2">
+                    Wybierz lokal
+                  </label>
+                  <select
+                    [(ngModel)]="selectedLocationForHours"
+                    (change)="loadHoursForLocation()"
+                    class="form-input"
+                  >
+                    <option value="">-- Wybierz lokal --</option>
+                    <option *ngFor="let loc of locations()" [value]="loc._id">
+                      {{ loc.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Opening hours form -->
+                <div *ngIf="selectedLocationForHours && hoursForm" class="bg-white rounded-sm shadow-sm p-6">
+                  <h2 class="font-display text-xl text-stone-800 font-semibold mb-6">
+                    Godziny otwarcia
+                  </h2>
+
+                  <div class="space-y-4">
+                    <!-- Monday -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                      <label class="text-sm font-medium text-stone-700">Poniedziałek</label>
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.monday.open"
+                        class="form-input"
+                        placeholder="Otwarcie"
+                      >
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.monday.close"
+                        class="form-input"
+                        placeholder="Zamknięcie"
+                      >
+                    </div>
+
+                    <!-- Tuesday -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                      <label class="text-sm font-medium text-stone-700">Wtorek</label>
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.tuesday.open"
+                        class="form-input"
+                      >
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.tuesday.close"
+                        class="form-input"
+                      >
+                    </div>
+
+                    <!-- Wednesday -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                      <label class="text-sm font-medium text-stone-700">Środa</label>
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.wednesday.open"
+                        class="form-input"
+                      >
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.wednesday.close"
+                        class="form-input"
+                      >
+                    </div>
+
+                    <!-- Thursday -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                      <label class="text-sm font-medium text-stone-700">Czwartek</label>
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.thursday.open"
+                        class="form-input"
+                      >
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.thursday.close"
+                        class="form-input"
+                      >
+                    </div>
+
+                    <!-- Friday -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                      <label class="text-sm font-medium text-stone-700">Piątek</label>
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.friday.open"
+                        class="form-input"
+                      >
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.friday.close"
+                        class="form-input"
+                      >
+                    </div>
+
+                    <!-- Saturday -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                      <label class="text-sm font-medium text-stone-700">Sobota</label>
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.saturday.open"
+                        class="form-input"
+                      >
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.saturday.close"
+                        class="form-input"
+                      >
+                    </div>
+
+                    <!-- Sunday -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                      <label class="text-sm font-medium text-stone-700">Niedziela</label>
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.sunday.open"
+                        class="form-input"
+                      >
+                      <input
+                        type="time"
+                        [(ngModel)]="hoursForm.sunday.close"
+                        class="form-input"
+                      >
+                    </div>
+                  </div>
+
+                  <!-- Action buttons -->
+                  <div class="flex gap-4 mt-6 pt-6 border-t border-warm-200">
+                    <button
+                      (click)="saveOpeningHours()"
+                      [disabled]="savingHours()"
+                      class="px-6 py-2 bg-brown-700 text-white rounded-sm hover:bg-brown-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {{ savingHours() ? 'Zapisywanie...' : 'Zapisz godziny' }}
+                    </button>
+                    <button
+                      (click)="copyHoursToAll()"
+                      class="px-6 py-2 bg-stone-600 text-white rounded-sm hover:bg-stone-700 transition-colors"
+                    >
+                      Skopiuj do wszystkich dni
+                    </button>
+                  </div>
+
+                  <!-- Info -->
+                  <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-sm">
+                    <p class="text-sm text-blue-800">
+                      <strong>Wskazówka:</strong> Ustaw godziny dla poniedziałku, następnie użyj przycisku "Skopiuj do wszystkich dni" aby zastosować te same godziny dla całego tygodnia. Możesz potem edytować poszczególne dni indywidualnie.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -693,7 +873,7 @@ export class LocationsManagementComponent implements OnInit {
   loadingReports = signal(false);
   loadingStatistics = signal(false);
   submitting = signal(false);
-  activeTab = signal<'locations' | 'reports' | 'comparison'>('locations');
+  activeTab = signal<'locations' | 'hours' | 'reports' | 'comparison'>('locations');
   comparisonFilter = {
     dateFrom: '',
     dateTo: ''
@@ -728,6 +908,11 @@ export class LocationsManagementComponent implements OnInit {
   };
 
   today = new Date().toISOString().split('T')[0];
+
+  // Opening hours management
+  selectedLocationForHours = '';
+  savingHours = signal(false);
+  hoursForm: any = null;
 
   constructor(
     private locationService: LocationService,
@@ -1108,5 +1293,78 @@ export class LocationsManagementComponent implements OnInit {
     const total = this.getTotalReservations();
     if (total === 0) return 0;
     return (this.getLocationTotalReservations(locationId) / total) * 100;
+  }
+
+  // Opening hours management
+  loadHoursForLocation(): void {
+    if (!this.selectedLocationForHours) {
+      this.hoursForm = null;
+      return;
+    }
+
+    const location = this.locations().find(l => l._id === this.selectedLocationForHours);
+    if (!location) return;
+
+    // Initialize form with existing hours or default values
+    this.hoursForm = {
+      monday: location.openingHours?.monday || { open: '12:00', close: '22:00' },
+      tuesday: location.openingHours?.tuesday || { open: '12:00', close: '22:00' },
+      wednesday: location.openingHours?.wednesday || { open: '12:00', close: '22:00' },
+      thursday: location.openingHours?.thursday || { open: '12:00', close: '23:00' },
+      friday: location.openingHours?.friday || { open: '11:00', close: '24:00' },
+      saturday: location.openingHours?.saturday || { open: '11:00', close: '24:00' },
+      sunday: location.openingHours?.sunday || { open: '11:00', close: '21:00' }
+    };
+  }
+
+  async saveOpeningHours(): Promise<void> {
+    if (!this.selectedLocationForHours || !this.hoursForm) return;
+
+    try {
+      this.savingHours.set(true);
+      this.errorMessage.set('');
+      this.successMessage.set('');
+
+      const response: any = await firstValueFrom(
+        this.api.put(`/locations/${this.selectedLocationForHours}`, {
+          openingHours: this.hoursForm
+        })
+      );
+
+      if (response.success) {
+        this.successMessage.set('Godziny otwarcia zostały zaktualizowane');
+        // Reload locations to get updated data
+        await this.loadLocations();
+        // Reload form with new data
+        this.loadHoursForLocation();
+        
+        // Clear message after 3 seconds
+        setTimeout(() => this.successMessage.set(''), 3000);
+      }
+    } catch (error: any) {
+      console.error('Error saving opening hours:', error);
+      this.errorMessage.set(error.error?.message || 'Błąd podczas zapisywania godzin otwarcia');
+    } finally {
+      this.savingHours.set(false);
+    }
+  }
+
+  copyHoursToAll(): void {
+    if (!this.hoursForm || !this.hoursForm.monday) return;
+
+    const mondayHours = { ...this.hoursForm.monday };
+    
+    this.hoursForm = {
+      monday: mondayHours,
+      tuesday: { ...mondayHours },
+      wednesday: { ...mondayHours },
+      thursday: { ...mondayHours },
+      friday: { ...mondayHours },
+      saturday: { ...mondayHours },
+      sunday: { ...mondayHours }
+    };
+
+    this.successMessage.set('Godziny skopiowane do wszystkich dni');
+    setTimeout(() => this.successMessage.set(''), 2000);
   }
 }

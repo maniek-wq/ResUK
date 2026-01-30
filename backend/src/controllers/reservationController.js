@@ -569,40 +569,83 @@ exports.getAvailability = async (req, res) => {
       status: { $in: ['pending', 'confirmed'] }
     });
     
-    // Generuj sloty czasowe (co 30 min od 12:00 do 22:00)
+    // Pobierz dzień tygodnia dla wybranej daty (0=niedziela, 1=pon, ..., 6=sobota)
+    const requestDate = new Date(date);
+    const dayOfWeek = requestDate.getDay();
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayName = dayNames[dayOfWeek];
+    
+    // Pobierz godziny otwarcia dla tego dnia
+    const openingHours = location.openingHours?.[dayName];
+    
+    // Jeśli brak godzin otwarcia, użyj domyślnych (12:00-22:00)
+    let startHour = 12;
+    let startMin = 0;
+    let endHour = 22;
+    let endMin = 0;
+    
+    if (openingHours && openingHours.open && openingHours.close) {
+      // Parsuj godzinę otwarcia (format: "HH:MM")
+      const [openH, openM] = openingHours.open.split(':').map(Number);
+      startHour = openH;
+      startMin = openM;
+      
+      // Parsuj godzinę zamknięcia
+      const [closeH, closeM] = openingHours.close.split(':').map(Number);
+      endHour = closeH;
+      endMin = closeM;
+      
+      // Obsługa "24:00" jako godziny zamknięcia
+      if (endHour === 24) {
+        endHour = 23;
+        endMin = 59;
+      }
+    }
+    
+    // Generuj sloty czasowe (co 30 min od godziny otwarcia do zamknięcia)
     const slots = [];
-    for (let hour = 12; hour < 22; hour++) {
-      for (let min of [0, 30]) {
-        const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
-        const endHour = min === 30 ? hour + 1 : hour;
-        const endMin = min === 30 ? 0 : 30;
-        const endTimeStr = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`;
-        
-        // Znajdź stoliki zarezerwowane w tym slocie
-        const reservedTableIds = reservations
-          .filter(r => {
-            return r.timeSlot.start < endTimeStr && r.timeSlot.end > timeStr;
-          })
-          .flatMap(r => r.tables.map(t => t.toString()));
-        
-        // Znajdź dostępne stoliki
-        const availableTables = tables.filter(t => 
-          !reservedTableIds.includes(t._id.toString())
-        );
-        
-        // Oblicz łączną pojemność dostępnych stolików
-        const totalSeats = availableTables.reduce((sum, t) => sum + t.seats, 0);
-        
-        // Slot jest dostępny tylko jeśli łączna pojemność >= liczba gości
-        const canAccommodate = totalSeats >= guestsNum;
-        
-        slots.push({
-          time: timeStr,
-          available: canAccommodate,
-          availableTables: availableTables.length,
-          totalSeats,
-          canAccommodate
-        });
+    let currentHour = startHour;
+    let currentMin = startMin;
+    
+    while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
+      const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMin.toString().padStart(2, '0')}`;
+      
+      // Oblicz czas zakończenia slotu (30 min później)
+      let slotEndHour = currentMin === 30 ? currentHour + 1 : currentHour;
+      let slotEndMin = currentMin === 30 ? 0 : 30;
+      const endTimeStr = `${slotEndHour.toString().padStart(2, '0')}:${slotEndMin.toString().padStart(2, '0')}`;
+      
+      // Znajdź stoliki zarezerwowane w tym slocie
+      const reservedTableIds = reservations
+        .filter(r => {
+          return r.timeSlot.start < endTimeStr && r.timeSlot.end > timeStr;
+        })
+        .flatMap(r => r.tables.map(t => t.toString()));
+      
+      // Znajdź dostępne stoliki
+      const availableTables = tables.filter(t => 
+        !reservedTableIds.includes(t._id.toString())
+      );
+      
+      // Oblicz łączną pojemność dostępnych stolików
+      const totalSeats = availableTables.reduce((sum, t) => sum + t.seats, 0);
+      
+      // Slot jest dostępny tylko jeśli łączna pojemność >= liczba gości
+      const canAccommodate = totalSeats >= guestsNum;
+      
+      slots.push({
+        time: timeStr,
+        available: canAccommodate,
+        availableTables: availableTables.length,
+        totalSeats,
+        canAccommodate
+      });
+      
+      // Następny slot (co 30 min)
+      currentMin += 30;
+      if (currentMin >= 60) {
+        currentMin = 0;
+        currentHour += 1;
       }
     }
     

@@ -1,6 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { LocationService, Location } from '../../../core/services/location.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-footer',
@@ -57,7 +59,37 @@ import { RouterModule } from '@angular/router';
           <!-- Opening Hours -->
           <div class="lg:col-span-1">
             <h4 class="font-display text-lg text-warm-100 mb-6">Godziny Otwarcia</h4>
-            <div class="space-y-3">
+            <div *ngIf="primaryLocation() && primaryLocation()?.openingHours" class="space-y-3">
+              <div class="flex justify-between text-sm">
+                <span class="text-warm-400">Poniedziałek</span>
+                <span class="text-warm-200">{{ formatHours(primaryLocation()!.openingHours.monday) }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-warm-400">Wtorek</span>
+                <span class="text-warm-200">{{ formatHours(primaryLocation()!.openingHours.tuesday) }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-warm-400">Środa</span>
+                <span class="text-warm-200">{{ formatHours(primaryLocation()!.openingHours.wednesday) }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-warm-400">Czwartek</span>
+                <span class="text-warm-200">{{ formatHours(primaryLocation()!.openingHours.thursday) }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-warm-400">Piątek</span>
+                <span class="text-warm-200">{{ formatHours(primaryLocation()!.openingHours.friday) }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-warm-400">Sobota</span>
+                <span class="text-warm-200">{{ formatHours(primaryLocation()!.openingHours.saturday) }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-warm-400">Niedziela</span>
+                <span class="text-warm-200">{{ formatHours(primaryLocation()!.openingHours.sunday) }}</span>
+              </div>
+            </div>
+            <div *ngIf="!primaryLocation() || !primaryLocation()?.openingHours" class="space-y-3">
               <div class="flex justify-between text-sm">
                 <span class="text-warm-400">Pon - Śr</span>
                 <span class="text-warm-200">12:00 - 22:00</span>
@@ -283,16 +315,43 @@ import { RouterModule } from '@angular/router';
     </div>
   `
 })
-export class FooterComponent {
+export class FooterComponent implements OnInit {
   currentYear = new Date().getFullYear();
   showPrivacyModal = signal(false);
   showTermsModal = signal(false);
+  primaryLocation = signal<Location | null>(null);
   
   currentDate = new Date().toLocaleDateString('pl-PL', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
+
+  constructor(private locationService: LocationService) {}
+
+  ngOnInit(): void {
+    this.loadPrimaryLocation();
+  }
+
+  async loadPrimaryLocation(): Promise<void> {
+    try {
+      const response = await firstValueFrom(this.locationService.getLocations());
+      if (response.success && response.data.length > 0) {
+        // Znajdź pierwszy aktywny lokal (lub pierwszy w ogóle)
+        const activeLocation = response.data.find(l => l.isActive) || response.data[0];
+        this.primaryLocation.set(activeLocation || null);
+      }
+    } catch (error) {
+      console.error('Error loading location for footer:', error);
+    }
+  }
+
+  formatHours(hours: { open: string; close: string } | undefined): string {
+    if (!hours || !hours.open || !hours.close) {
+      return 'Nieczynne';
+    }
+    return `${hours.open} - ${hours.close}`;
+  }
 
   openPrivacyModal(): void {
     this.showPrivacyModal.set(true);
