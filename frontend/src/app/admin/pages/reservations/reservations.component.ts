@@ -586,6 +586,39 @@ import { firstValueFrom } from 'rxjs';
                 class="form-input text-sm resize-none"
               ></textarea>
             </div>
+            
+            <!-- Historia zmian -->
+            <div *ngIf="editingReservation()?.statusHistory && editingReservation()!.statusHistory!.length > 0" 
+                 class="border-t border-warm-200 pt-4">
+              <h3 class="font-semibold text-stone-800 mb-3 text-sm">Historia zmian statusu</h3>
+              <div class="space-y-2 max-h-48 overflow-y-auto">
+                <div *ngFor="let change of editingReservation()!.statusHistory" 
+                     class="text-xs p-3 bg-warm-50 border border-warm-100 rounded-sm">
+                  <div class="flex items-start justify-between gap-2 mb-1">
+                    <span 
+                      class="px-2 py-0.5 rounded-full font-medium"
+                      [ngClass]="{
+                        'bg-yellow-100 text-yellow-800': change.status === 'pending',
+                        'bg-green-100 text-green-800': change.status === 'confirmed',
+                        'bg-red-100 text-red-800': change.status === 'cancelled',
+                        'bg-stone-100 text-stone-800': change.status === 'completed'
+                      }"
+                    >
+                      {{ getStatusLabel(change.status) }}
+                    </span>
+                    <span class="text-stone-500">
+                      {{ formatDateTime(change.changedAt) }}
+                    </span>
+                  </div>
+                  <p class="text-stone-700">
+                    <span class="font-medium">
+                      {{ change.changedBy?.firstName }} {{ change.changedBy?.lastName }}
+                    </span>
+                    <span *ngIf="change.reason" class="text-stone-500"> • {{ change.reason }}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="p-6 border-t border-warm-200 flex justify-end gap-4">
             <button 
@@ -752,16 +785,34 @@ export class AdminReservationsComponent implements OnInit {
     }
   }
 
-  openEditModal(reservation: Reservation): void {
-    this.editingReservation.set(reservation);
-    this.editForm = {
-      date: reservation.date.split('T')[0],
-      guests: reservation.guests,
-      timeStart: reservation.timeSlot.start,
-      timeEnd: reservation.timeSlot.end,
-      status: reservation.status,
-      notes: reservation.notes || ''
-    };
+  async openEditModal(reservation: Reservation): Promise<void> {
+    // Pobierz pełne dane rezerwacji z historią zmian
+    try {
+      const res = await firstValueFrom(this.reservationService.getReservation(reservation._id));
+      if (res.success) {
+        this.editingReservation.set(res.data);
+        this.editForm = {
+          date: res.data.date.split('T')[0],
+          guests: res.data.guests,
+          timeStart: res.data.timeSlot.start,
+          timeEnd: res.data.timeSlot.end,
+          status: res.data.status,
+          notes: res.data.notes || ''
+        };
+      }
+    } catch (error) {
+      console.error('Error loading reservation details:', error);
+      // Fallback do oryginalnych danych
+      this.editingReservation.set(reservation);
+      this.editForm = {
+        date: reservation.date.split('T')[0],
+        guests: reservation.guests,
+        timeStart: reservation.timeSlot.start,
+        timeEnd: reservation.timeSlot.end,
+        status: reservation.status,
+        notes: reservation.notes || ''
+      };
+    }
   }
 
   closeEditModal(): void {
@@ -797,6 +848,17 @@ export class AdminReservationsComponent implements OnInit {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
+    });
+  }
+
+  formatDateTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleString('pl-PL', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 

@@ -34,6 +34,14 @@ export interface Reservation {
   notes?: string;
   confirmedBy?: any;
   confirmedAt?: string;
+  createdBy?: any;
+  updatedBy?: any;
+  statusHistory?: Array<{
+    status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+    changedBy: any;
+    changedAt: string;
+    reason?: string;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
