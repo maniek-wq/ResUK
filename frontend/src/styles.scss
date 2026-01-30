@@ -136,10 +136,25 @@ a, button {
   transition: opacity 0.8s ease-out;
 }
 
-// When visible, trigger animation
+// When visible, trigger animation - specific for each animation type
 .animate-on-scroll.visible {
   opacity: 1;
-  transform: translateY(0) translateX(0);
+}
+
+.animate-on-scroll.visible.animate-fade-in-up {
+  transform: translateY(0);
+}
+
+.animate-on-scroll.visible.animate-fade-in-left {
+  transform: translateX(0);
+}
+
+.animate-on-scroll.visible.animate-fade-in-right {
+  transform: translateX(0);
+}
+
+.animate-on-scroll.visible.animate-fade-in {
+  transform: none;
 }
 
 // Ensure delay classes work with transitions
