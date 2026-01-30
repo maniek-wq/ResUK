@@ -1,5 +1,5 @@
-import { Component, OnInit, AfterViewInit, signal, ElementRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, AfterViewInit, OnDestroy, signal, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
@@ -231,50 +231,66 @@ import { LocationService, Location } from '../../core/services/location.service'
     .delay-800 { animation-delay: 800ms; transition-delay: 800ms; }
   `]
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   locations = signal<Location[]>([]);
-  
-  @ViewChild('aboutSection') aboutSection!: ElementRef;
-  @ViewChild('locationsSection') locationsSection!: ElementRef;
-  @ViewChild('featuresSection') featuresSection!: ElementRef;
-  @ViewChild('ctaSection') ctaSection!: ElementRef;
+  private observer: IntersectionObserver | null = null;
+  private isBrowser: boolean;
 
-  constructor(private locationService: LocationService) {}
+  constructor(
+    private locationService: LocationService,
+    private elementRef: ElementRef,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
     this.locationService.getLocations().subscribe();
   }
 
   ngAfterViewInit(): void {
-    this.setupScrollAnimations();
+    if (this.isBrowser) {
+      this.setupScrollAnimations();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
   }
 
   private setupScrollAnimations(): void {
-    // Wait for DOM to be fully rendered
-    setTimeout(() => {
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -30px 0px'
-      };
+    // Use requestAnimationFrame to ensure DOM is painted
+    requestAnimationFrame(() => {
+      // Additional small delay for Angular change detection
+      setTimeout(() => {
+        const observerOptions: IntersectionObserverInit = {
+          threshold: 0.1,
+          rootMargin: '0px 0px -20px 0px'
+        };
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const element = entry.target as HTMLElement;
-            // Add 'visible' class to trigger animation
-            element.classList.add('visible');
-            // Unobserve after animation is triggered
-            observer.unobserve(element);
-          }
+        this.observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const element = entry.target as HTMLElement;
+              // Add 'visible' class to trigger animation
+              element.classList.add('visible');
+              // Unobserve after animation is triggered
+              this.observer?.unobserve(element);
+            }
+          });
+        }, observerOptions);
+
+        // Use ElementRef to find elements within this component
+        const hostElement = this.elementRef.nativeElement;
+        const animatedElements = hostElement.querySelectorAll('.animate-on-scroll');
+        
+        // Observe each element
+        animatedElements.forEach((el: Element) => {
+          this.observer?.observe(el);
         });
-      }, observerOptions);
-
-      // Observe ALL elements with animate-on-scroll class directly
-      // This ensures every element gets its own animation trigger
-      const animatedElements = document.querySelectorAll('.animate-on-scroll');
-      animatedElements.forEach((el) => {
-        observer.observe(el);
-      });
-    }, 200);
+      }, 50);
+    });
   }
 }
