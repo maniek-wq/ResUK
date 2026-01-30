@@ -1,14 +1,28 @@
 // Service Worker dla Web Push Notifications
-const CACHE_NAME = 'restauracja-v1';
+// WAŻNE: Zmień wersję cache przy każdym deploymencie!
+const CACHE_VERSION = '1.0.0';
+const CACHE_NAME = `restauracja-v${CACHE_VERSION}`;
 const STATIC_CACHE_URLS = [
   '/',
   '/assets/',
   '/favicon.ico'
 ];
 
+// Powiadom aplikację o dostępnej aktualizacji
+function notifyClientsAboutUpdate() {
+  self.clients.matchAll({ type: 'window' }).then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({
+        type: 'NEW_VERSION_AVAILABLE',
+        version: CACHE_VERSION
+      });
+    });
+  });
+}
+
 // Instalacja Service Workera
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Installing...');
+  console.log(`[Service Worker] Installing version ${CACHE_VERSION}...`);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -19,8 +33,9 @@ self.addEventListener('install', (event) => {
         console.error('[Service Worker] Cache error:', err);
       })
   );
-  // Wymuś aktywację nowego Service Workera
-  self.skipWaiting();
+  // NIE wywołuj skipWaiting() automatycznie - poczekaj na sygnał od użytkownika
+  // Powiadom klientów o dostępnej aktualizacji
+  notifyClientsAboutUpdate();
 });
 
 // Aktywacja Service Workera
