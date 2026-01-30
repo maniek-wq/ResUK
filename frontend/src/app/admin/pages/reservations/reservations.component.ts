@@ -534,6 +534,34 @@ import { firstValueFrom } from 'rxjs';
             </button>
           </div>
           <div class="p-6 space-y-4">
+            <!-- Informacje o utworzeniu i potwierdzeniu -->
+            <div class="bg-warm-50 border border-warm-200 rounded-sm p-4 text-sm space-y-2">
+              <div *ngIf="editingReservation()?.createdBy" class="flex items-start gap-2">
+                <span class="text-stone-500 min-w-[100px]">Utworzona przez:</span>
+                <span class="text-stone-800 font-medium">
+                  {{ editingReservation()!.createdBy.firstName }} {{ editingReservation()!.createdBy.lastName }}
+                </span>
+              </div>
+              <div *ngIf="editingReservation()?.confirmedBy" class="flex items-start gap-2">
+                <span class="text-stone-500 min-w-[100px]">Potwierdzona przez:</span>
+                <span class="text-stone-800 font-medium">
+                  {{ editingReservation()!.confirmedBy.firstName }} {{ editingReservation()!.confirmedBy.lastName }}
+                  <span class="text-stone-500 text-xs ml-2" *ngIf="editingReservation()?.confirmedAt">
+                    ({{ formatDateTime(editingReservation()!.confirmedAt!) }})
+                  </span>
+                </span>
+              </div>
+              <div *ngIf="editingReservation()?.updatedBy" class="flex items-start gap-2">
+                <span class="text-stone-500 min-w-[100px]">Ostatnia zmiana:</span>
+                <span class="text-stone-800 font-medium">
+                  {{ editingReservation()!.updatedBy.firstName }} {{ editingReservation()!.updatedBy.lastName }}
+                  <span class="text-stone-500 text-xs ml-2">
+                    ({{ formatDateTime(editingReservation()!.updatedAt) }})
+                  </span>
+                </span>
+              </div>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-stone-600 text-sm font-medium mb-2">Data</label>
