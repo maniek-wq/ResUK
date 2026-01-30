@@ -59,6 +59,11 @@
                 "glob": "manifest.json",
                 "input": "src",
                 "output": "/"
+              },
+              {
+                "glob": "manifest.admin.json",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [
