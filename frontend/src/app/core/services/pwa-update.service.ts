@@ -107,8 +107,4 @@ export class PwaUpdateService {
     // Reset flag
     this.updateAvailable.set(false);
   }
-
-  dismissUpdate(): void {
-    this.updateAvailable.set(false);
-  }
 }

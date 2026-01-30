@@ -25,28 +25,21 @@ import { PwaUpdateService } from '../../../core/services/pwa-update.service';
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm sm:text-base font-semibold">
-                  Nowa wersja dostępna!
+                  Wymagana aktualizacja!
                 </p>
                 <p class="text-xs sm:text-sm text-brown-100 mt-0.5">
-                  Zaktualizuj aplikację, aby korzystać z najnowszych funkcji
+                  Kliknij "Aktualizuj teraz" aby zainstalować nową wersję (zajmie ~5 sekund)
                 </p>
               </div>
             </div>
 
-            <!-- Action Buttons -->
+            <!-- Action Button -->
             <div class="flex items-center gap-2 flex-shrink-0">
-              <button
-                (click)="dismiss()"
-                class="px-3 sm:px-4 py-2 text-xs sm:text-sm text-brown-200 hover:text-white 
-                       hover:bg-brown-600 rounded-sm transition-colors"
-              >
-                Później
-              </button>
               <button
                 (click)="update()"
                 class="px-4 sm:px-6 py-2 text-xs sm:text-sm bg-white text-brown-800 font-semibold 
                        rounded-sm hover:bg-brown-50 transition-all shadow-lg hover:shadow-xl
-                       transform hover:scale-105"
+                       transform hover:scale-105 animate-pulse"
               >
                 Aktualizuj teraz
               </button>
@@ -93,9 +86,5 @@ export class UpdateBannerComponent implements OnInit {
 
   update(): void {
     this.updateService.applyUpdate();
-  }
-
-  dismiss(): void {
-    this.updateService.dismissUpdate();
   }
 }

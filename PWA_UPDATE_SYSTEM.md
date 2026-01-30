@@ -9,13 +9,19 @@ Aplikacja automatycznie wykrywa dostępne aktualizacje i pokazuje banner na dole
 - ✅ Banner na dole ekranu gdy dostępna jest nowa wersja
 - ✅ **Banner widoczny TYLKO w panelu admina** (nie przeszkadza zwykłym klientom)
 - ✅ Przycisk "Aktualizuj teraz" do natychmiastowej instalacji
-- ✅ Przycisk "Później" do odłożenia aktualizacji
+- ✅ **Aktualizacja jest obowiązkowa** - brak przycisku "Później" (ponieważ w PWA nie ma przycisku odświeżania)
 - ✅ Automatyczne przeładowanie strony po instalacji nowej wersji
 
 ### Kto widzi banner aktualizacji?
 
 - ✅ **Administratorzy w panelu admina** (`/admin/*`)
 - ❌ **Zwykli użytkownicy na stronie publicznej** (strona główna, menu, rezerwacje)
+
+### Dlaczego brak przycisku "Później"?
+
+W PWA zainstalowanej na stronie głównej telefonu **nie ma przycisku odświeżania przeglądarki**. 
+Jeśli admin odłoży aktualizację, może utknąć na starej wersji bez możliwości aktualizacji.
+Dlatego aktualizacja jest **obowiązkowa** - admin musi kliknąć "Aktualizuj teraz".
 
 ---
 
