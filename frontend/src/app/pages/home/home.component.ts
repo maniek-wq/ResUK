@@ -261,34 +261,108 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setupScrollAnimations(): void {
+    console.log('[Animations] Setting up scroll animations...');
+    
     // Wait for DOM to be fully rendered
     requestAnimationFrame(() => {
       setTimeout(() => {
+        const hostElement = this.elementRef.nativeElement;
+        console.log('[Animations] Host element:', hostElement);
+        
+        const animatedElements = hostElement.querySelectorAll('.animate-on-scroll');
+        console.log(`[Animations] Found ${animatedElements.length} elements with .animate-on-scroll class`);
+        
+        // Log each element found
+        animatedElements.forEach((el: Element, index: number) => {
+          const htmlEl = el as HTMLElement;
+          console.log(`[Animations] Element ${index + 1}:`, {
+            tag: htmlEl.tagName,
+            classes: htmlEl.className,
+            hasVisible: htmlEl.classList.contains('visible'),
+            rect: htmlEl.getBoundingClientRect()
+          });
+        });
+
+        if (animatedElements.length === 0) {
+          console.warn('[Animations] No elements found! Checking DOM structure...');
+          console.log('[Animations] Host element HTML:', hostElement.innerHTML.substring(0, 500));
+          return;
+        }
+
         const observerOptions: IntersectionObserverInit = {
           threshold: 0.15, // Trigger when 15% of element is visible
           rootMargin: '0px 0px -50px 0px' // Start animation 50px before element enters viewport
         };
 
+        console.log('[Animations] Creating IntersectionObserver with options:', observerOptions);
+
         this.observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
+          console.log(`[Animations] IntersectionObserver callback triggered with ${entries.length} entries`);
+          
+          entries.forEach((entry, index) => {
+            const element = entry.target as HTMLElement;
+            console.log(`[Animations] Entry ${index + 1}:`, {
+              isIntersecting: entry.isIntersecting,
+              intersectionRatio: entry.intersectionRatio,
+              boundingClientRect: entry.boundingClientRect,
+              element: element,
+              classes: element.className,
+              hasVisible: element.classList.contains('visible')
+            });
+
             if (entry.isIntersecting) {
-              const element = entry.target as HTMLElement;
-              // Add 'visible' class to trigger animation
+              console.log(`[Animations] ✅ Element is intersecting! Adding 'visible' class to:`, element);
               element.classList.add('visible');
+              
+              // Verify class was added
+              setTimeout(() => {
+                const hasVisible = element.classList.contains('visible');
+                const computedStyle = window.getComputedStyle(element);
+                console.log(`[Animations] After adding 'visible':`, {
+                  hasVisibleClass: hasVisible,
+                  opacity: computedStyle.opacity,
+                  transform: computedStyle.transform,
+                  element: element
+                });
+              }, 100);
+              
               // Unobserve after animation is triggered (performance)
               this.observer?.unobserve(element);
+              console.log(`[Animations] Unobserved element:`, element);
             }
           });
         }, observerOptions);
 
-        // Find all animated elements within this component
-        const hostElement = this.elementRef.nativeElement;
-        const animatedElements = hostElement.querySelectorAll('.animate-on-scroll');
-        
         // Observe each element individually
-        animatedElements.forEach((el: Element) => {
+        console.log('[Animations] Starting to observe elements...');
+        animatedElements.forEach((el: Element, index: number) => {
+          const htmlEl = el as HTMLElement;
+          const rect = htmlEl.getBoundingClientRect();
+          console.log(`[Animations] Observing element ${index + 1}:`, {
+            element: htmlEl,
+            classes: htmlEl.className,
+            rect: rect,
+            isInViewport: rect.top < window.innerHeight && rect.bottom > 0
+          });
           this.observer?.observe(el);
         });
+        
+        console.log(`[Animations] ✅ Setup complete! Observing ${animatedElements.length} elements.`);
+        
+        // Also check immediately if any elements are already visible
+        setTimeout(() => {
+          console.log('[Animations] Checking initial visibility...');
+          animatedElements.forEach((el: Element, index: number) => {
+            const htmlEl = el as HTMLElement;
+            const rect = htmlEl.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+            console.log(`[Animations] Element ${index + 1} initial state:`, {
+              isVisible,
+              rect: rect,
+              windowHeight: window.innerHeight
+            });
+          });
+        }, 200);
       }, 100);
     });
   }
