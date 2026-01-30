@@ -31,7 +31,7 @@ import { LocationService, Location } from '../../core/services/location.service'
         <h1 class="font-display text-5xl md:text-7xl lg:text-8xl text-warm-100 font-bold mb-6
                    animate-fade-in-up delay-200">
           Restauracji
-          <span class="block font-accent text-brown-500 italic font-normal mt-2">Złotej</span>
+          <span class="block font-accent text-brown-500 italic font-normal mt-2">U Kelnerów</span>
         </h1>
         
         <p class="font-body text-warm-300 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed
