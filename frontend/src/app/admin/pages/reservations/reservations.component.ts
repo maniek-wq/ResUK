@@ -190,6 +190,29 @@ import { firstValueFrom } from 'rxjs';
                   </span>
                 </div>
 
+                <!-- Event Details (if event or full_venue) -->
+                <div *ngIf="(reservation.type === 'event' || reservation.type === 'full_venue') && reservation.eventDetails" 
+                     class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-sm text-sm space-y-2">
+                  <div *ngIf="reservation.eventDetails.name" class="flex items-start gap-2">
+                    <span class="text-blue-700 font-medium text-xs">Wydarzenie:</span>
+                    <span class="text-blue-900 text-xs">{{ reservation.eventDetails.name }}</span>
+                  </div>
+                  <div *ngIf="reservation.eventDetails.description" class="flex items-start gap-2">
+                    <span class="text-blue-700 font-medium text-xs">Opis:</span>
+                    <span class="text-blue-900 text-xs">{{ reservation.eventDetails.description }}</span>
+                  </div>
+                  <div *ngIf="reservation.eventDetails.specialRequirements" class="flex items-start gap-2">
+                    <span class="text-blue-700 font-medium text-xs">Wymagania:</span>
+                    <span class="text-blue-900 text-xs">{{ reservation.eventDetails.specialRequirements }}</span>
+                  </div>
+                </div>
+
+                <!-- Notes (if any) -->
+                <div *ngIf="reservation.notes" class="mb-4 p-3 bg-warm-50 border border-warm-200 rounded-sm">
+                  <p class="text-stone-500 text-xs mb-1">Notatki</p>
+                  <p class="text-stone-800 text-sm">{{ reservation.notes }}</p>
+                </div>
+
                 <!-- Actions -->
                 <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2 pt-3 border-t border-warm-100">
                   <button 
@@ -559,6 +582,38 @@ import { firstValueFrom } from 'rxjs';
                     ({{ formatDateTime(editingReservation()!.updatedAt) }})
                   </span>
                 </span>
+              </div>
+            </div>
+
+            <!-- Typ rezerwacji i szczegóły wydarzenia -->
+            <div class="bg-blue-50 border border-blue-200 rounded-sm p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <h3 class="font-semibold text-blue-900 text-sm">
+                  {{ getReservationTypeLabel(editingReservation()!.type) }}
+                </h3>
+              </div>
+              
+              <!-- Event details - only for event/full_venue types -->
+              <div *ngIf="editingReservation()!.type === 'event' || editingReservation()!.type === 'full_venue'" class="space-y-2 text-sm">
+                <div *ngIf="editingReservation()?.eventDetails?.name" class="flex items-start gap-2">
+                  <span class="text-blue-700 font-medium min-w-[120px]">Nazwa wydarzenia:</span>
+                  <span class="text-blue-900">{{ editingReservation()!.eventDetails!.name }}</span>
+                </div>
+                <div *ngIf="editingReservation()?.eventDetails?.description" class="flex items-start gap-2">
+                  <span class="text-blue-700 font-medium min-w-[120px]">Opis:</span>
+                  <span class="text-blue-900">{{ editingReservation()!.eventDetails!.description }}</span>
+                </div>
+                <div *ngIf="editingReservation()?.eventDetails?.specialRequirements" class="flex items-start gap-2">
+                  <span class="text-blue-700 font-medium min-w-[120px]">Specjalne wymagania:</span>
+                  <span class="text-blue-900">{{ editingReservation()!.eventDetails!.specialRequirements }}</span>
+                </div>
+                <div *ngIf="!editingReservation()?.eventDetails?.name && !editingReservation()?.eventDetails?.description && !editingReservation()?.eventDetails?.specialRequirements" class="text-blue-700 text-xs italic">
+                  Brak dodatkowych szczegółów wydarzenia
+                </div>
               </div>
             </div>
 
@@ -1117,5 +1172,14 @@ export class AdminReservationsComponent implements OnInit {
     } finally {
       this.addingReservation.set(false);
     }
+  }
+
+  getReservationTypeLabel(type: string): string {
+    const labels: { [key: string]: string } = {
+      'table': 'Rezerwacja stolika',
+      'event': 'Wydarzenie',
+      'full_venue': 'Rezerwacja całego lokalu'
+    };
+    return labels[type] || 'Rezerwacja';
   }
 }
