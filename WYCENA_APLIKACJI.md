@@ -1,4 +1,4 @@
-# Wycena Aplikacji - Restauracja Złota
+# Wycena Aplikacji - U kelnerów
 ## Analiza Funkcjonalności i Wycena na Polski Rynek
 
 ---

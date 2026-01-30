@@ -38,7 +38,7 @@ import { PushService } from '../../../core/services/push.service';
             <span class="font-display text-white text-2xl font-bold">Z</span>
           </div>
           <h1 class="font-display text-2xl text-warm-100 font-semibold">Panel Administracyjny</h1>
-          <p class="text-warm-500 text-sm mt-1">Restauracja Złota</p>
+          <p class="text-warm-500 text-sm mt-1">U kelnerów</p>
         </div>
 
         <!-- Login Form -->

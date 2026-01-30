@@ -1,4 +1,4 @@
-# 🚀 Przewodnik Deploymentu - Restauracja Złota
+# 🚀 Przewodnik Deploymentu - U kelnerów
 
 Przewodnik krok po kroku do wdrożenia aplikacji na Vercel (frontend), Render (backend) i MongoDB Atlas.
 

@@ -1,4 +1,4 @@
-# 🔒 Raport Audytu Bezpieczeństwa - Restauracja Złota
+# 🔒 Raport Audytu Bezpieczeństwa - U kelnerów
 
 **Data audytu:** 2024  
 **Wersja aplikacji:** 1.0.0  

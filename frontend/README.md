@@ -1,4 +1,4 @@
-# Restauracja Złota - Frontend
+# U kelnerów - Frontend
 
 Frontend aplikacji dla restauracji z dwoma lokalami, zbudowany w Angular 17 z Tailwind CSS.
 

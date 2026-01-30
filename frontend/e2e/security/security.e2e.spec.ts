@@ -15,7 +15,7 @@ const TEST_INVALID_CREDENTIALS = {
 };
 
 /**
- * Testy E2E Bezpieczeństwa - Restauracja Złota
+ * Testy E2E Bezpieczeństwa - U kelnerów
  * 
  * Testy sprawdzają:
  * - Ochronę przed atakami brute force

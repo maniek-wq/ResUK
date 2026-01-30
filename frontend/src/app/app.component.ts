@@ -17,5 +17,5 @@ import { UpdateBannerComponent } from './shared/components/update-banner/update-
   styles: []
 })
 export class AppComponent {
-  title = 'Restauracja Złota';
+  title = 'U kelnerów';
 }

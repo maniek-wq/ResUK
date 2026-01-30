@@ -1,5 +1,5 @@
 {
-  "name": "Restauracja Złota - Panel Administracyjny",
+  "name": "U kelnerów - Panel Administracyjny",
   "short_name": "Admin",
   "description": "Panel administracyjny restauracji",
   "start_url": "/admin/login",

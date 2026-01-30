@@ -27,12 +27,12 @@ import { filter } from 'rxjs';
         <div class="flex items-center gap-3">
           <img 
             src="/assets/images/logo.jpg" 
-            alt="Restauracja Złota"
+            alt="U kelnerów"
             class="w-10 h-10 rounded-full object-cover shadow-lg"
           >
           <div>
             <span class="font-display text-lg text-warm-100 font-semibold">Admin</span>
-            <p class="text-xs text-stone-500">Restauracja Złota</p>
+            <p class="text-xs text-stone-500">U kelnerów</p>
           </div>
         </div>
       </div>

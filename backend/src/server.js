@@ -110,7 +110,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'Restauracja Złota API',
+    message: 'U kelnerów API',
     version: '1.0.0',
       endpoints: {
       health: '/api/health',

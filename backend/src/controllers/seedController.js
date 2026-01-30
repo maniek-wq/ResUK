@@ -55,7 +55,7 @@ exports.seedDatabase = async () => {
         isActive: true
       },
       {
-        name: 'Restauracja Złota - Mokotów',
+        name: 'U kelnerów - Mokotów',
         address: {
           street: 'ul. Puławska 152',
           city: 'Warszawa',

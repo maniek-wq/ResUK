@@ -1,4 +1,4 @@
-# Restauracja Złota - System Rezerwacji
+# U kelnerów - System Rezerwacji
 
 Kompletna aplikacja dla restauracji z dwoma lokalami, umożliwiająca zarządzanie rezerwacjami stolików, wydarzeń i wynajmu całego lokalu.
 

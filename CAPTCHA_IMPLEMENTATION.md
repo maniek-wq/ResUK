@@ -51,7 +51,7 @@ SKIP_RECAPTCHA=true  # Pomiń weryfikację CAPTCHA w development
 1. **Przejdź do:** https://www.google.com/recaptcha/admin
 2. **Kliknij:** "+" (Create)
 3. **Wypełnij formularz:**
-   - Label: `Restauracja Złota Admin Panel`
+   - Label: `U kelnerów Admin Panel`
    - reCAPTCHA type: **reCAPTCHA v3** (niewidoczne)
    - Domains: `res-uk.vercel.app`, `localhost` (dla development)
 4. **Zaakceptuj** warunki

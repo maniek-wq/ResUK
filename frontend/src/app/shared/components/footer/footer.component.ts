@@ -110,7 +110,7 @@ import { RouterModule } from '@angular/router';
       <div class="border-t border-stone-800">
         <div class="container mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p class="text-warm-500 text-sm">
-            © {{ currentYear }} Restauracja Złota. Wszelkie prawa zastrzeżone.
+            © {{ currentYear }} U kelnerów. Wszelkie prawa zastrzeżone.
           </p>
           <div class="flex gap-6 text-sm">
             <button 

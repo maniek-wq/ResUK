@@ -231,7 +231,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
         </h2>
         <p class="text-stone-600 max-w-2xl mx-auto mb-8">
           Zapraszamy do odkrycia naszego świata smaków. Zarezerwuj stolik i pozwól nam 
-          pokazać Ci, dlaczego Restauracja Złota jest wyjątkowa.
+          pokazać Ci, dlaczego U kelnerów jest wyjątkowa.
         </p>
         <a routerLink="/rezerwacja" class="btn-primary">
           Zarezerwuj Stolik

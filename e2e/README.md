@@ -2,7 +2,7 @@
 
 ## 📋 Opis
 
-Testy end-to-end bezpieczeństwa dla aplikacji Restauracja Złota. Testy sprawdzają:
+Testy end-to-end bezpieczeństwa dla aplikacji U kelnerów. Testy sprawdzają:
 
 - ✅ Ochronę przed atakami brute force
 - ✅ Ochronę przed enumeration attacks

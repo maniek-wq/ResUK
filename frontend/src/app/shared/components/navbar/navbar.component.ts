@@ -19,14 +19,13 @@ import { RouterModule } from '@angular/router';
         <a routerLink="/" class="flex items-center gap-3 group">
           <img 
             src="/assets/images/logo.jpg" 
-            alt="Restauracja Złota"
+            alt="U kelnerów"
             class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shadow-lg group-hover:shadow-brown-600/30 transition-all duration-300"
           >
           <div class="hidden sm:block">
             <span class="font-display text-xl font-semibold text-warm-100">
-              Restauracja
+              U kelnerów
             </span>
-            <span class="font-accent text-brown-400 text-lg ml-1 italic">Złota</span>
           </div>
         </a>
 
@@ -95,11 +94,12 @@ import { RouterModule } from '@angular/router';
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-6 border-b border-warm-800/30 bg-stone-900/50 backdrop-blur-sm sticky top-0 z-10">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brown-600 to-brown-800 flex items-center justify-center shadow-lg">
-              <span class="font-display text-white text-lg font-bold">Z</span>
-            </div>
-            <span class="font-display text-warm-100 text-lg font-semibold">Restauracja</span>
-            <span class="font-accent text-brown-400 italic">Złota</span>
+            <img 
+              src="/assets/images/logo.jpg" 
+              alt="U kelnerów"
+              class="w-10 h-10 rounded-full object-cover shadow-lg"
+            >
+            <span class="font-display text-warm-100 text-lg font-semibold">U kelnerów</span>
           </div>
           <button 
             (click)="closeMobileMenu()"
