@@ -14,16 +14,17 @@ import { RouterModule } from '@angular/router';
           <!-- Brand -->
           <div class="lg:col-span-1">
             <div class="flex items-center gap-3 mb-6">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-brown-600 to-brown-800 flex items-center justify-center">
-                <span class="font-display text-white text-xl font-bold">Z</span>
-              </div>
+              <img 
+                src="/assets/images/logo.jpg" 
+                alt="U kelnerów"
+                class="w-12 h-12 rounded-full object-cover shadow-lg"
+              >
               <div>
-                <span class="font-display text-2xl font-semibold text-warm-100">Restauracja</span>
-                <span class="font-accent text-brown-400 text-xl ml-1 italic">Złota</span>
+                <span class="font-display text-2xl font-semibold text-warm-100">U kelnerów</span>
               </div>
             </div>
             <p class="text-warm-400 text-sm leading-relaxed mb-6">
-              Wykwintna kuchnia polska i europejska w dwóch eleganckich lokalizacjach w sercu Warszawy.
+              Wykwintna kuchnia polska i europejska w eleganckiej lokalizacji w Szczecinie.
             </p>
             <div class="flex gap-4">
               <a href="#" class="w-10 h-10 rounded-full bg-stone-800 flex items-center justify-center 
@@ -43,19 +44,12 @@ import { RouterModule } from '@angular/router';
 
           <!-- Locations -->
           <div class="lg:col-span-1">
-            <h4 class="font-display text-lg text-warm-100 mb-6">Nasze Lokale</h4>
+            <h4 class="font-display text-lg text-warm-100 mb-6">Nasz Lokal</h4>
             <div class="space-y-6">
               <div>
-                <p class="font-semibold text-warm-100 mb-1">Centrum</p>
-                <p class="text-warm-400 text-sm">ul. Złota 15</p>
-                <p class="text-warm-400 text-sm">00-019 Warszawa</p>
-                <p class="text-brown-400 text-sm mt-1">+48 22 123 45 67</p>
-              </div>
-              <div>
-                <p class="font-semibold text-warm-100 mb-1">Mokotów</p>
-                <p class="text-warm-400 text-sm">ul. Puławska 152</p>
-                <p class="text-warm-400 text-sm">02-624 Warszawa</p>
-                <p class="text-brown-400 text-sm mt-1">+48 22 987 65 43</p>
+                <p class="text-warm-400 text-sm">al. Wyzwolenia 41/u3a</p>
+                <p class="text-warm-400 text-sm">Szczecin</p>
+                <p class="text-brown-400 text-sm mt-1">+48 734 213 403</p>
               </div>
             </div>
           </div>
@@ -144,7 +138,7 @@ import { RouterModule } from '@angular/router';
           <h3 class="font-display text-xl text-stone-800 font-semibold mb-4">1. Informacje ogólne</h3>
           <p class="text-stone-600 leading-relaxed mb-6">
             Niniejsza Polityka Prywatności określa zasady przetwarzania i ochrony danych osobowych 
-            przekazanych przez Użytkowników w związku z korzystaniem przez nich z usług Restauracji Złota 
+            przekazanych przez Użytkowników w związku z korzystaniem przez nich z usług U kelnerów 
             (zwana dalej „Restauracją"), dostępnych za pośrednictwem strony internetowej.
           </p>
 
@@ -155,7 +149,7 @@ import { RouterModule } from '@angular/router';
             [ADRES FIRMY]<br>
             NIP: [NUMER NIP]<br>
             REGON: [NUMER REGON]<br><br>
-            Kontakt z Administratorem: kontakt&#64;restauracjazlota.pl
+            Kontakt z Administratorem: kontakt&#64;ukelnerow.pl
           </p>
 
           <h3 class="font-display text-xl text-stone-800 font-semibold mb-4 mt-8">3. Zakres zbieranych danych</h3>
@@ -193,8 +187,8 @@ import { RouterModule } from '@angular/router';
           <div class="mt-8 pt-6 border-t border-warm-200">
             <p class="text-stone-500 text-sm">
               W przypadku pytań dotyczących przetwarzania danych osobowych, prosimy o kontakt:<br>
-              Email: kontakt&#64;restauracjazlota.pl<br>
-              Telefon: +48 22 123 45 67
+              Email: kontakt&#64;ukelnerow.pl<br>
+              Telefon: +48 734 213 403
             </p>
           </div>
         </div>
@@ -220,8 +214,8 @@ import { RouterModule } from '@angular/router';
 
           <h3 class="font-display text-xl text-stone-800 font-semibold mb-4">§1. Postanowienia ogólne</h3>
           <p class="text-stone-600 leading-relaxed mb-6">
-            1. Niniejszy regulamin określa zasady korzystania z usług oferowanych przez Restaurację Złota 
-            z siedzibą w Warszawie (zwana dalej „Restauracją").<br>
+            1. Niniejszy regulamin określa zasady korzystania z usług oferowanych przez U kelnerów 
+            z siedzibą w Szczecinie (zwana dalej „Restauracją").<br>
             2. Właścicielem i operatorem Restauracji jest [NAZWA FIRMY], [ADRES FIRMY].<br>
             3. Korzystanie z usług Restauracji oznacza akceptację niniejszego regulaminu.<br>
             4. Restauracja zastrzega sobie prawo do wprowadzania zmian w regulaminie, o czym klienci 
@@ -280,8 +274,8 @@ import { RouterModule } from '@angular/router';
           <div class="mt-8 pt-6 border-t border-warm-200">
             <p class="text-stone-500 text-sm">
               W przypadku pytań dotyczących regulaminu, prosimy o kontakt:<br>
-              Email: kontakt&#64;restauracjazlota.pl<br>
-              Telefon: +48 22 123 45 67
+              Email: kontakt&#64;ukelnerow.pl<br>
+              Telefon: +48 734 213 403
             </p>
           </div>
         </div>
