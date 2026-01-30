@@ -233,8 +233,9 @@ import { LocationService, Location } from '../../core/services/location.service'
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   locations = signal<Location[]>([]);
-  private observer: IntersectionObserver | null = null;
   private isBrowser: boolean;
+  private scrollHandler: (() => void) | null = null;
+  private animatedElements: Element[] = [];
 
   constructor(
     private locationService: LocationService,
@@ -255,42 +256,39 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.observer) {
-      this.observer.disconnect();
+    if (this.scrollHandler) {
+      window.removeEventListener('scroll', this.scrollHandler);
     }
   }
 
   private setupScrollAnimations(): void {
-    // Use requestAnimationFrame to ensure DOM is painted
-    requestAnimationFrame(() => {
-      // Additional small delay for Angular change detection
-      setTimeout(() => {
-        const observerOptions: IntersectionObserverInit = {
-          threshold: 0.1,
-          rootMargin: '0px 0px -20px 0px'
-        };
+    // Wait for DOM to be fully rendered
+    setTimeout(() => {
+      const hostElement = this.elementRef.nativeElement;
+      this.animatedElements = Array.from(hostElement.querySelectorAll('.animate-on-scroll'));
+      
+      // Check elements on load
+      this.checkElementsVisibility();
+      
+      // Setup scroll listener
+      this.scrollHandler = () => this.checkElementsVisibility();
+      window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    }, 100);
+  }
 
-        this.observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const element = entry.target as HTMLElement;
-              // Add 'visible' class to trigger animation
-              element.classList.add('visible');
-              // Unobserve after animation is triggered
-              this.observer?.unobserve(element);
-            }
-          });
-        }, observerOptions);
+  private checkElementsVisibility(): void {
+    const windowHeight = window.innerHeight;
+    const triggerPoint = windowHeight * 0.85; // Trigger when element is 85% from top
 
-        // Use ElementRef to find elements within this component
-        const hostElement = this.elementRef.nativeElement;
-        const animatedElements = hostElement.querySelectorAll('.animate-on-scroll');
-        
-        // Observe each element
-        animatedElements.forEach((el: Element) => {
-          this.observer?.observe(el);
-        });
-      }, 50);
+    this.animatedElements.forEach((el) => {
+      if (el.classList.contains('visible')) return; // Skip already animated
+
+      const rect = el.getBoundingClientRect();
+      
+      // Element is visible when its top is above the trigger point
+      if (rect.top < triggerPoint) {
+        el.classList.add('visible');
+      }
     });
   }
 }
