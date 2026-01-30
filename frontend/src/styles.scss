@@ -133,46 +133,50 @@ a, button {
 }
 
 .animate-on-scroll.animate-fade-in {
-  transition: opacity 0.8s ease-out;
+  transition: opacity 0.8s ease-out !important;
 }
 
-// When visible, trigger animation - specific for each animation type
-.animate-on-scroll.visible {
-  opacity: 1;
-}
+// // When visible, trigger animation - specific for each animation type
+// .animate-on-scroll.visible {
+//   opacity: 1 !important;
+// }
 
-.animate-on-scroll.visible.animate-fade-in-up {
-  transform: translateY(0);
-}
+// .animate-on-scroll.visible.animate-fade-in-up {
+//   transform: translateY(0) !important;
+//   transition: opacity 0.8s ease-out, transform 0.8s ease-out !important;
+// }
 
-.animate-on-scroll.visible.animate-fade-in-left {
-  transform: translateX(0);
-}
+// .animate-on-scroll.visible.animate-fade-in-left {
+//   transform: translateX(0) !important;
+//   transition: opacity 0.8s ease-out, transform 0.8s ease-out !important;
+// }
 
-.animate-on-scroll.visible.animate-fade-in-right {
-  transform: translateX(0);
-}
+// .animate-on-scroll.visible.animate-fade-in-right {
+//   transform: translateX(0) !important;
+//   transition: opacity 0.8s ease-out, transform 0.8s ease-out !important;
+// }
 
-.animate-on-scroll.visible.animate-fade-in {
-  transform: none;
-}
+// .animate-on-scroll.visible.animate-fade-in {
+//   transform: none !important;
+//   transition: opacity 0.8s ease-out !important;
+// }
 
-// Ensure delay classes work with transitions
-.animate-on-scroll.delay-100 {
-  transition-delay: 100ms;
-}
+// // Ensure delay classes work with transitions
+// .animate-on-scroll.delay-100 {
+//   transition-delay: 100ms;
+// }
 
-.animate-on-scroll.delay-200 {
-  transition-delay: 200ms;
-}
+// .animate-on-scroll.delay-200 {
+//   transition-delay: 200ms;
+// }
 
-.animate-on-scroll.delay-300 {
-  transition-delay: 300ms;
-}
+// .animate-on-scroll.delay-300 {
+//   transition-delay: 300ms;
+// }
 
-.animate-on-scroll.delay-400 {
-  transition-delay: 400ms;
-}
+// .animate-on-scroll.delay-400 {
+//   transition-delay: 400ms;
+// }
 
 .animate-on-scroll.delay-500 {
   transition-delay: 500ms;

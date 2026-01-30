@@ -102,7 +102,7 @@ import { LocationService, Location } from '../../core/services/location.service'
 
     <!-- Locations Section -->
     <section #locationsSection class="py-24 bg-stone-900 text-warm-100">
-      <div class="container mx-auto px-6">
+      <div class="container mx-auto px-6 animate-on-scroll animate-fade-in-right">
         <div class="text-center mb-16 animate-on-scroll animate-fade-in-up">
           <span class="font-accent text-brown-400 text-lg tracking-wider">Odwiedź nas</span>
           <h2 class="font-display text-4xl md:text-5xl font-semibold mt-2">
@@ -139,8 +139,8 @@ import { LocationService, Location } from '../../core/services/location.service'
 
     <!-- Features Section -->
     <section #featuresSection class="py-24 bg-warm-100">
-      <div class="container mx-auto px-6">
-        <div class="text-center mb-16 animate-on-scroll animate-fade-in-up">
+      <div class="container mx-auto px-6 ">
+        <div class="text-center mb-16 animate-on-scroll animate-fade-in-left delay-300">
           <span class="font-accent text-brown-600 text-lg tracking-wider">Co nas wyróżnia</span>
           <h2 class="font-display text-4xl md:text-5xl text-stone-800 font-semibold mt-2">
             Wyjątkowe Doświadczenie
@@ -149,7 +149,7 @@ import { LocationService, Location } from '../../core/services/location.service'
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="text-center p-8 animate-on-scroll animate-fade-in-up delay-200">
+          <div class="text-center p-8 animate-on-scroll animate-fade-in-right delay-500">
             <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-brown-700/10 flex items-center justify-center">
               <svg class="w-8 h-8 text-brown-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
@@ -163,7 +163,7 @@ import { LocationService, Location } from '../../core/services/location.service'
             </p>
           </div>
 
-          <div class="text-center p-8 animate-on-scroll animate-fade-in-up delay-400">
+          <div class="text-center p-8 animate-on-scroll animate-fade-in-left delay-700">
             <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-brown-700/10 flex items-center justify-center">
               <svg class="w-8 h-8 text-brown-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
@@ -177,7 +177,7 @@ import { LocationService, Location } from '../../core/services/location.service'
             </p>
           </div>
 
-          <div class="text-center p-8 animate-on-scroll animate-fade-in-up delay-600">
+          <div class="text-center p-8 animate-on-scroll animate-fade-in-right delay-200">
             <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-brown-700/10 flex items-center justify-center">
               <svg class="w-8 h-8 text-brown-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
@@ -195,7 +195,7 @@ import { LocationService, Location } from '../../core/services/location.service'
     </section>
 
     <!-- CTA Section -->
-    <section #ctaSection class="py-24 bg-gradient-to-br from-brown-800 via-brown-900 to-stone-900 relative overflow-hidden">
+    <section #ctaSection class="py-24 bg-gradient-to-br from-brown-800 via-brown-900 to-stone-900 relative overflow-hidden animate-on-scroll animate-fade-in-left delay-300" >
       <!-- Decorative elements -->
       <div class="absolute top-0 left-0 w-64 h-64 bg-brown-700/20 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
       <div class="absolute bottom-0 right-0 w-96 h-96 bg-brown-600/10 rounded-full translate-x-1/3 translate-y-1/3"></div>
@@ -290,45 +290,102 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         const observerOptions: IntersectionObserverInit = {
-          threshold: 0.15, // Trigger when 15% of element is visible
-          rootMargin: '0px 0px -50px 0px' // Start animation 50px before element enters viewport
+          threshold: 0.05, // Trigger when just 5% of element is visible (more sensitive)
+          rootMargin: '0px 0px -100px 0px' // Start animation 100px before element enters viewport
         };
 
         console.log('[Animations] Creating IntersectionObserver with options:', observerOptions);
 
         this.observer = new IntersectionObserver((entries) => {
-          console.log(`[Animations] IntersectionObserver callback triggered with ${entries.length} entries`);
+          const intersectingCount = entries.filter(e => e.isIntersecting).length;
+          console.log(`[Animations] 🔄 IntersectionObserver callback triggered:`, {
+            totalEntries: entries.length,
+            intersectingCount: intersectingCount,
+            scrollY: window.scrollY,
+            windowHeight: window.innerHeight
+          });
           
           entries.forEach((entry, index) => {
             const element = entry.target as HTMLElement;
-            console.log(`[Animations] Entry ${index + 1}:`, {
-              isIntersecting: entry.isIntersecting,
-              intersectionRatio: entry.intersectionRatio,
-              boundingClientRect: entry.boundingClientRect,
-              element: element,
-              classes: element.className,
-              hasVisible: element.classList.contains('visible')
-            });
+            const rect = entry.boundingClientRect;
+            
+            // Only log intersecting entries or if it's the first callback
+            if (entry.isIntersecting || entries.length <= 2) {
+              console.log(`[Animations] Entry ${index + 1} (${element.className.split(' ').find(c => c.includes('fade')) || 'unknown'}):`, {
+                isIntersecting: entry.isIntersecting,
+                intersectionRatio: entry.intersectionRatio.toFixed(2),
+                rect: {
+                  top: Math.round(rect.top),
+                  bottom: Math.round(rect.bottom),
+                  height: Math.round(rect.height)
+                },
+                element: element.tagName + '.' + element.className.split(' ').slice(0, 2).join('.'),
+                hasVisible: element.classList.contains('visible')
+              });
+            }
 
             if (entry.isIntersecting) {
-              console.log(`[Animations] ✅ Element is intersecting! Adding 'visible' class to:`, element);
+              console.log(`[Animations] ✅✅✅ ELEMENT IS INTERSECTING! Adding 'visible' class to:`, {
+                element: element,
+                classes: element.className,
+                rect: rect
+              });
+              
+              // Force reflow before adding class
+              element.offsetHeight;
+              
               element.classList.add('visible');
               
-              // Verify class was added
+              // Force reflow after adding class to ensure CSS is applied
+              element.offsetHeight;
+              
+              // Fallback: Set styles directly via JavaScript if CSS doesn't work
+              // Only apply if CSS classes didn't work (check after a delay)
+              setTimeout(() => {
+                const computedStyle = window.getComputedStyle(element);
+                const currentOpacity = parseFloat(computedStyle.opacity);
+                const allClasses = element.className.split(' ');
+                const hasFadeInLeft = allClasses.includes('animate-fade-in-left');
+                const hasFadeInRight = allClasses.includes('animate-fade-in-right');
+                const hasFadeInUp = allClasses.includes('animate-fade-in-up');
+                
+                // Only apply fallback if opacity is still low (CSS didn't work)
+                if (currentOpacity < 0.5 && (hasFadeInLeft || hasFadeInRight || hasFadeInUp)) {
+                  console.log(`[Animations] ⚠️ CSS didn't work, applying inline fallback. Current opacity: ${currentOpacity}`);
+                  element.style.opacity = '1';
+                  if (hasFadeInLeft || hasFadeInRight) {
+                    element.style.transform = 'translateX(0)';
+                  } else if (hasFadeInUp) {
+                    element.style.transform = 'translateY(0)';
+                  }
+                }
+              }, 50);
+              
+              // Verify class was added and CSS is applied
               setTimeout(() => {
                 const hasVisible = element.classList.contains('visible');
                 const computedStyle = window.getComputedStyle(element);
-                console.log(`[Animations] After adding 'visible':`, {
+                const allClasses = element.className.split(' ');
+                const animationType = allClasses.find(c => c.includes('fade-in'));
+                
+                console.log(`[Animations] ✅ After adding 'visible' class:`, {
                   hasVisibleClass: hasVisible,
+                  allClasses: allClasses,
+                  animationType: animationType,
                   opacity: computedStyle.opacity,
                   transform: computedStyle.transform,
-                  element: element
+                  transition: computedStyle.transition,
+                  element: element.tagName,
+                  // Check if specific CSS rules are applied
+                  hasFadeInUp: element.classList.contains('animate-fade-in-up'),
+                  hasFadeInLeft: element.classList.contains('animate-fade-in-left'),
+                  hasFadeInRight: element.classList.contains('animate-fade-in-right')
                 });
               }, 100);
               
               // Unobserve after animation is triggered (performance)
               this.observer?.unobserve(element);
-              console.log(`[Animations] Unobserved element:`, element);
+              console.log(`[Animations] Unobserved element`);
             }
           });
         }, observerOptions);
