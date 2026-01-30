@@ -9,7 +9,7 @@ const {
   changePassword,
   getMe
 } = require('../controllers/adminController');
-const { protect, restrictTo } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 // Wszystkie route wymagają autentykacji
 router.use(protect);
@@ -19,13 +19,13 @@ router.get('/me', getMe);
 
 // CRUD dla adminów - tylko dla roli 'admin'
 router.route('/')
-  .get(restrictTo('admin'), getAllAdmins)
-  .post(restrictTo('admin'), createAdmin);
+  .get(authorize('admin'), getAllAdmins)
+  .post(authorize('admin'), createAdmin);
 
 router.route('/:id')
-  .get(restrictTo('admin'), getAdmin)
-  .put(restrictTo('admin'), updateAdmin)
-  .delete(restrictTo('admin'), deleteAdmin);
+  .get(authorize('admin'), getAdmin)
+  .put(authorize('admin'), updateAdmin)
+  .delete(authorize('admin'), deleteAdmin);
 
 // Zmiana hasła - admin może zmienić każdemu, inni tylko sobie
 router.put('/:id/password', (req, res, next) => {
