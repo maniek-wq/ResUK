@@ -29,8 +29,16 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.svg">
   
-  <!-- Web App Manifest -->
-  <link rel="manifest" id="app-manifest" href="/manifest.json">
+  <!-- Web App Manifest - dynamically set based on path -->
+  <script>
+    (function() {
+      var link = document.createElement('link');
+      link.rel = 'manifest';
+      link.id = 'app-manifest';
+      link.href = window.location.pathname.startsWith('/admin') ? '/manifest.admin.json' : '/manifest.json';
+      document.head.appendChild(link);
+    })();
+  </script>
   
   <!-- Theme Color -->
   <meta name="theme-color" content="#92400e">

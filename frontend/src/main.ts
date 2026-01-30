@@ -2,13 +2,6 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
 
-// Ustaw manifest zależnie od ścieżki (public vs admin)
-const manifestLink = document.getElementById('app-manifest') as HTMLLinkElement | null;
-if (manifestLink) {
-  const isAdminPath = window.location.pathname.startsWith('/admin');
-  manifestLink.href = isAdminPath ? '/manifest.admin.json' : '/manifest.json';
-}
-
 // Rejestracja Service Workera dla Web Push Notifications
 if ('serviceWorker' in navigator) {
   // Rejestruj natychmiast, nie czekaj na 'load'
