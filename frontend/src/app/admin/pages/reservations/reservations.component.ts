@@ -847,27 +847,41 @@ export class AdminReservationsComponent implements OnInit {
     this.editingReservation.set(null);
   }
 
-  saveEdit(): void {
+  async saveEdit(): Promise<void> {
     const reservation = this.editingReservation();
     if (!reservation) return;
 
-    const updates: Partial<Reservation> = {
-      date: this.editForm.date,
-      guests: this.editForm.guests,
-      timeSlot: {
-        start: this.editForm.timeStart,
-        end: this.editForm.timeEnd
-      },
-      status: this.editForm.status as any,
-      notes: this.editForm.notes
-    };
+    try {
+      // Jeśli status się zmienił, użyj dedykowanego endpointu do zmiany statusu
+      if (this.editForm.status !== reservation.status) {
+        await firstValueFrom(
+          this.reservationService.updateStatus(reservation._id, this.editForm.status as any)
+        );
+      }
 
-    this.reservationService.updateReservation(reservation._id, updates).subscribe(res => {
+      // Zaktualizuj pozostałe pola
+      const updates: Partial<Reservation> = {
+        date: this.editForm.date,
+        guests: this.editForm.guests,
+        timeSlot: {
+          start: this.editForm.timeStart,
+          end: this.editForm.timeEnd
+        },
+        notes: this.editForm.notes
+      };
+
+      const res = await firstValueFrom(
+        this.reservationService.updateReservation(reservation._id, updates)
+      );
+      
       if (res.success) {
         this.closeEditModal();
         this.applyFilters();
       }
-    });
+    } catch (error) {
+      console.error('Error saving reservation:', error);
+      alert('Błąd zapisywania zmian');
+    }
   }
 
   formatDate(dateStr: string): string {
