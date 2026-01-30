@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, AfterViewInit, signal, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -59,11 +59,11 @@ import { LocationService, Location } from '../../core/services/location.service'
     </section>
 
     <!-- About Section -->
-    <section class="py-24 bg-warm-50">
+    <section #aboutSection class="py-24 bg-warm-50">
       <div class="container mx-auto px-6">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <!-- Image -->
-          <div class="relative">
+          <div class="relative animate-on-scroll animate-fade-in-left">
             <div class="aspect-[4/5] bg-warm-200 rounded-sm overflow-hidden shadow-2xl">
               <img 
                 src="/assets/images/historia.jpg" 
@@ -76,7 +76,7 @@ import { LocationService, Location } from '../../core/services/location.service'
           </div>
 
           <!-- Content -->
-          <div>
+          <div class="animate-on-scroll animate-fade-in-right">
             <span class="font-accent text-brown-600 text-lg tracking-wider">Nasza Historia</span>
             <h2 class="font-display text-4xl md:text-5xl text-stone-800 font-semibold mt-2 mb-6">
               Tradycja spotyka nowoczesność
@@ -101,9 +101,9 @@ import { LocationService, Location } from '../../core/services/location.service'
     </section>
 
     <!-- Locations Section -->
-    <section class="py-24 bg-stone-900 text-warm-100">
+    <section #locationsSection class="py-24 bg-stone-900 text-warm-100">
       <div class="container mx-auto px-6">
-        <div class="text-center mb-16">
+        <div class="text-center mb-16 animate-on-scroll animate-fade-in-up">
           <span class="font-accent text-brown-400 text-lg tracking-wider">Odwiedź nas</span>
           <h2 class="font-display text-4xl md:text-5xl font-semibold mt-2">
             Nasz Lokal
@@ -111,7 +111,7 @@ import { LocationService, Location } from '../../core/services/location.service'
           <div class="section-divider !bg-gradient-to-r !from-transparent !via-brown-500 !to-transparent"></div>
         </div>
 
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-4xl mx-auto animate-on-scroll animate-fade-in-up delay-200">
           <!-- Location -->
           <div class="group relative overflow-hidden rounded-sm">
             <div class="aspect-[16/10] bg-stone-800">
@@ -138,9 +138,9 @@ import { LocationService, Location } from '../../core/services/location.service'
     </section>
 
     <!-- Features Section -->
-    <section class="py-24 bg-warm-100">
+    <section #featuresSection class="py-24 bg-warm-100">
       <div class="container mx-auto px-6">
-        <div class="text-center mb-16">
+        <div class="text-center mb-16 animate-on-scroll animate-fade-in-up">
           <span class="font-accent text-brown-600 text-lg tracking-wider">Co nas wyróżnia</span>
           <h2 class="font-display text-4xl md:text-5xl text-stone-800 font-semibold mt-2">
             Wyjątkowe Doświadczenie
@@ -149,7 +149,7 @@ import { LocationService, Location } from '../../core/services/location.service'
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="text-center p-8">
+          <div class="text-center p-8 animate-on-scroll animate-fade-in-up delay-200">
             <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-brown-700/10 flex items-center justify-center">
               <svg class="w-8 h-8 text-brown-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
@@ -163,7 +163,7 @@ import { LocationService, Location } from '../../core/services/location.service'
             </p>
           </div>
 
-          <div class="text-center p-8">
+          <div class="text-center p-8 animate-on-scroll animate-fade-in-up delay-400">
             <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-brown-700/10 flex items-center justify-center">
               <svg class="w-8 h-8 text-brown-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
@@ -177,7 +177,7 @@ import { LocationService, Location } from '../../core/services/location.service'
             </p>
           </div>
 
-          <div class="text-center p-8">
+          <div class="text-center p-8 animate-on-scroll animate-fade-in-up delay-600">
             <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-brown-700/10 flex items-center justify-center">
               <svg class="w-8 h-8 text-brown-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
@@ -195,12 +195,12 @@ import { LocationService, Location } from '../../core/services/location.service'
     </section>
 
     <!-- CTA Section -->
-    <section class="py-24 bg-gradient-to-br from-brown-800 via-brown-900 to-stone-900 relative overflow-hidden">
+    <section #ctaSection class="py-24 bg-gradient-to-br from-brown-800 via-brown-900 to-stone-900 relative overflow-hidden">
       <!-- Decorative elements -->
       <div class="absolute top-0 left-0 w-64 h-64 bg-brown-700/20 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
       <div class="absolute bottom-0 right-0 w-96 h-96 bg-brown-600/10 rounded-full translate-x-1/3 translate-y-1/3"></div>
       
-      <div class="container mx-auto px-6 text-center relative z-10">
+      <div class="container mx-auto px-6 text-center relative z-10 animate-on-scroll animate-fade-in-up">
         <h2 class="font-display text-4xl md:text-5xl text-warm-100 font-semibold mb-6">
           Zarezerwuj Swój Stolik
         </h2>
@@ -225,12 +225,56 @@ import { LocationService, Location } from '../../core/services/location.service'
     .delay-600 { animation-delay: 600ms; }
   `]
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   locations = signal<Location[]>([]);
+  
+  @ViewChild('aboutSection') aboutSection!: ElementRef;
+  @ViewChild('locationsSection') locationsSection!: ElementRef;
+  @ViewChild('featuresSection') featuresSection!: ElementRef;
+  @ViewChild('ctaSection') ctaSection!: ElementRef;
 
   constructor(private locationService: LocationService) {}
 
   ngOnInit(): void {
     this.locationService.getLocations().subscribe();
+  }
+
+  ngAfterViewInit(): void {
+    this.setupScrollAnimations();
+  }
+
+  private setupScrollAnimations(): void {
+    const observerOptions = {
+      threshold: 0.15,
+      rootMargin: '0px 0px -80px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const element = entry.target as HTMLElement;
+          const animatedElements = element.querySelectorAll('.animate-on-scroll');
+          animatedElements.forEach((el) => {
+            // Add 'visible' class to trigger animation
+            el.classList.add('visible');
+          });
+          observer.unobserve(element);
+        }
+      });
+    }, observerOptions);
+
+    // Observe all sections
+    if (this.aboutSection?.nativeElement) {
+      observer.observe(this.aboutSection.nativeElement);
+    }
+    if (this.locationsSection?.nativeElement) {
+      observer.observe(this.locationsSection.nativeElement);
+    }
+    if (this.featuresSection?.nativeElement) {
+      observer.observe(this.featuresSection.nativeElement);
+    }
+    if (this.ctaSection?.nativeElement) {
+      observer.observe(this.ctaSection.nativeElement);
+    }
   }
 }
