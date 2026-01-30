@@ -67,6 +67,9 @@ const allowedOrigins = [
   process.env.FRONTEND_URL   // Production (Vercel)
 ].filter(Boolean); // Usuwa undefined wartości
 
+// Wzorzec dla Vercel preview deployments (np. res-abc123-maniek-wqs-projects.vercel.app)
+const vercelPreviewPattern = /^https:\/\/res-[a-z0-9]+-maniek-wqs-projects\.vercel\.app$/;
+
 app.use(cors({
   origin: function (origin, callback) {
     // Pozwól na requesty bez origin (np. Postman, curl, direct API calls, mobile apps)
@@ -76,6 +79,11 @@ app.use(cors({
     
     // Sprawdź czy origin jest na liście dozwolonych
     if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    
+    // Sprawdź czy origin pasuje do wzorca Vercel preview deployments
+    if (vercelPreviewPattern.test(origin)) {
       return callback(null, true);
     }
     
