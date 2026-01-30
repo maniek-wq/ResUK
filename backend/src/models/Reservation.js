@@ -107,7 +107,7 @@ const reservationSchema = new mongoose.Schema({
     changedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Admin',
-      required: true
+      required: false  // Nie wymagane - rezerwacje mogą być tworzone przez klientów
     },
     changedAt: {
       type: Date,
