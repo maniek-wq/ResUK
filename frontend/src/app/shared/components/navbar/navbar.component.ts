@@ -17,9 +17,11 @@ import { RouterModule } from '@angular/router';
       <div class="container mx-auto px-6 flex items-center justify-between">
         <!-- Logo -->
         <a routerLink="/" class="flex items-center gap-3 group">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brown-600 to-brown-800 flex items-center justify-center shadow-lg group-hover:shadow-brown-600/30 transition-all duration-300">
-            <span class="font-display text-white text-lg font-bold">Z</span>
-          </div>
+          <img 
+            src="/assets/images/logo.jpg" 
+            alt="Restauracja Złota"
+            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shadow-lg group-hover:shadow-brown-600/30 transition-all duration-300"
+          >
           <div class="hidden sm:block">
             <span class="font-display text-xl font-semibold text-warm-100">
               Restauracja

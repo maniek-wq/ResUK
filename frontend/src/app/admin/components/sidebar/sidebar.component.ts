@@ -25,10 +25,11 @@ import { filter } from 'rxjs';
       <!-- Logo -->
       <div class="p-6 border-b border-stone-800">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brown-600 to-brown-800 
-                      flex items-center justify-center">
-            <span class="font-display text-white text-lg font-bold">Z</span>
-          </div>
+          <img 
+            src="/assets/images/logo.jpg" 
+            alt="Restauracja Złota"
+            class="w-10 h-10 rounded-full object-cover shadow-lg"
+          >
           <div>
             <span class="font-display text-lg text-warm-100 font-semibold">Admin</span>
             <p class="text-xs text-stone-500">Restauracja Złota</p>
