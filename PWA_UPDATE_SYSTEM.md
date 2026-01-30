@@ -7,9 +7,15 @@ Aplikacja automatycznie wykrywa dostępne aktualizacje i pokazuje banner na dole
 ### Funkcjonalności:
 - ✅ Automatyczne sprawdzanie aktualizacji co 30 minut
 - ✅ Banner na dole ekranu gdy dostępna jest nowa wersja
+- ✅ **Banner widoczny TYLKO w panelu admina** (nie przeszkadza zwykłym klientom)
 - ✅ Przycisk "Aktualizuj teraz" do natychmiastowej instalacji
 - ✅ Przycisk "Później" do odłożenia aktualizacji
 - ✅ Automatyczne przeładowanie strony po instalacji nowej wersji
+
+### Kto widzi banner aktualizacji?
+
+- ✅ **Administratorzy w panelu admina** (`/admin/*`)
+- ❌ **Zwykli użytkownicy na stronie publicznej** (strona główna, menu, rezerwacje)
 
 ---
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { PwaUpdateService } from '../../../core/services/pwa-update.service';
 
 @Component({
@@ -8,7 +9,7 @@ import { PwaUpdateService } from '../../../core/services/pwa-update.service';
   imports: [CommonModule],
   template: `
     <div 
-      *ngIf="updateService.updateAvailable()"
+      *ngIf="updateService.updateAvailable() && isAdminPanel()"
       class="fixed bottom-0 left-0 right-0 z-[9999] animate-slide-up"
     >
       <div class="bg-gradient-to-r from-brown-700 to-brown-800 text-white shadow-2xl border-t-4 border-brown-500">
@@ -73,11 +74,21 @@ import { PwaUpdateService } from '../../../core/services/pwa-update.service';
   `]
 })
 export class UpdateBannerComponent implements OnInit {
-  constructor(public updateService: PwaUpdateService) {}
+  constructor(
+    public updateService: PwaUpdateService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Sprawdź aktualizacje przy starcie komponentu
-    this.updateService.checkForUpdate();
+    // Sprawdź aktualizacje przy starcie komponentu (tylko w panelu admina)
+    if (this.isAdminPanel()) {
+      this.updateService.checkForUpdate();
+    }
+  }
+
+  isAdminPanel(): boolean {
+    // Pokazuj banner tylko w panelu admina (URL zaczyna się od /admin)
+    return this.router.url.startsWith('/admin');
   }
 
   update(): void {
