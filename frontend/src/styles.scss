@@ -20,6 +20,7 @@
 // Base styles
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden; // Blokuje poziomy scroll na całej stronie (np. przy offcanvas / fixed elementach)
 }
 
 body {

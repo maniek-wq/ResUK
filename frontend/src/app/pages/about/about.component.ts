@@ -14,7 +14,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
     <!-- Hero -->
     <section class="relative h-[50vh] min-h-[400px] flex items-center justify-center">
       <div class="absolute inset-0 bg-stone-900">
-        <div class="absolute inset-0 bg-[url('/assets/images/about.jpg')] 
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&q=80')] 
                     bg-cover bg-center opacity-50"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/60"></div>
       </div>
@@ -55,7 +55,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
           <div class="relative">
             <div class="aspect-[4/5] bg-warm-200 rounded-sm overflow-hidden shadow-2xl">
               <img 
-                src="/assets/images/about2.jpg" 
+                src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&q=80" 
                 alt="Szef kuchni przygotowujący danie"
                 class="w-full h-full object-cover"
               >
@@ -139,7 +139,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
           <div class="text-center">
             <div class="aspect-square bg-warm-200 rounded-full overflow-hidden shadow-2xl mx-auto max-w-xs mb-6">
               <img 
-                src="/assets/images/Zdjecie_Piotr.jpg" 
+                src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=600&q=80" 
                 alt="Piotr Gafiuk"
                 class="w-full h-full object-cover"
               >
@@ -160,7 +160,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
           <div class="text-center">
             <div class="aspect-square bg-warm-200 rounded-full overflow-hidden shadow-2xl mx-auto max-w-xs mb-6">
               <img 
-                src="/assets/images/Zdjecie_Patryk.jpg" 
+                src="https://images.unsplash.com/photo-1581299894007-aaa50297cf16?w=600&q=80" 
                 alt="Patryk Krupczyński"
                 class="w-full h-full object-cover"
               >
@@ -181,7 +181,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
           <div class="text-center">
             <div class="aspect-square bg-warm-200 rounded-full overflow-hidden shadow-2xl mx-auto max-w-xs mb-6">
               <img 
-                src="/assets/images/about2.jpg" 
+                src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=600&q=80" 
                 alt="Szef kuchni"
                 class="w-full h-full object-cover"
               >

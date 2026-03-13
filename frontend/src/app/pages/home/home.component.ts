@@ -12,11 +12,11 @@ import { LocationService, Location } from '../../core/services/location.service'
   template: `
     <app-navbar></app-navbar>
 
-    <!-- Hero Section -->
-    <section class="relative h-screen flex items-center justify-center overflow-hidden">
+    <!-- Hero Section - pełen widok 100dvh -->
+    <section class="relative min-h-[100dvh] pt-16 flex items-center justify-center overflow-hidden">
       <!-- Background Image -->
       <div class="absolute inset-0 bg-gradient-to-br from-stone-900 via-brown-950 to-stone-900">
-        <div class="absolute inset-0 bg-[url('/assets/images/bg.jpg')] 
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&q=80')] 
                     bg-cover bg-center opacity-40"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/50"></div>
       </div>
@@ -66,7 +66,7 @@ import { LocationService, Location } from '../../core/services/location.service'
           <div class="relative animate-on-scroll animate-fade-in-left">
             <div class="aspect-[4/5] bg-warm-200 rounded-sm overflow-hidden shadow-2xl">
               <img 
-                src="/assets/images/historia.jpg" 
+                src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80" 
                 alt="Wnętrze restauracji"
                 class="w-full h-full object-cover"
               >
@@ -116,7 +116,7 @@ import { LocationService, Location } from '../../core/services/location.service'
           <div class="group relative overflow-hidden rounded-sm">
             <div class="aspect-[16/10] bg-stone-800">
               <img 
-                src="/assets/images/bg.jpg"
+                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80"
                 alt="U Kelnerów"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               >

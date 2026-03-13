@@ -17,7 +17,7 @@ import { environment } from '../../../environments/environment';
     <!-- Hero -->
     <section class="relative h-[40vh] min-h-[350px] flex items-center justify-center">
       <div class="absolute inset-0 bg-stone-900">
-        <div class="absolute inset-0 bg-[url('/assets/images/kontakt.jpg')] 
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&q=80')] 
                     bg-cover bg-center opacity-40"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/60"></div>
       </div>
